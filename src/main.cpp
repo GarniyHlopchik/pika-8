@@ -1,8 +1,9 @@
 #include "config.h"
+#include "sprite_mesh/mesh.h"
 
 unsigned int make_module(const std::string& filepath, unsigned int module_type);
 unsigned int make_shader(const std::string& vertex_filepath, const std::string& fragment_filepath);
-
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 int main(){
     //opengl setup------------------------
     GLFWwindow* window;
@@ -11,15 +12,24 @@ int main(){
         std::cout << "GLFW couldn't start" << std::endl;
         return -1;
     }
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
     window = glfwCreateWindow(512,512,"PIKA-8",NULL,NULL);
     glfwMakeContextCurrent(window);
+
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
         glfwDestroyWindow(window);
         glfwTerminate();
         return -1;
     }
-    glViewport(0,0,512,512);
+    int w,h;
+    glfwGetFramebufferSize(window, &w,&h);
+    glViewport(0,0,w,h);
     //---------------------------------------------------
     lua_State* L = luaL_newstate();  // Lua vm
     luaL_openlibs(L);               // setup
@@ -30,10 +40,16 @@ int main(){
         "../src/shaders/vertex.txt",
         "../src/shaders/fragment.txt"
     );
+    //draw sprite obj
+    SpriteMesh* sprite = new SpriteMesh();
+
+
+
     while(!glfwWindowShouldClose(window)){
         glfwPollEvents();
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shader);
+        sprite->draw();
         glfwSwapBuffers(window);
     }
     glDeleteProgram(shader);
@@ -41,6 +57,10 @@ int main(){
     glfwTerminate();
     return 0;
 }
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}  
 unsigned int make_shader(const std::string& vertex_filepath, const std::string& fragment_filepath){
     std::vector<unsigned> modules;
     modules.push_back(make_module(vertex_filepath, GL_VERTEX_SHADER));

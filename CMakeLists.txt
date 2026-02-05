@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 4.0.0)
 project(pika-8 VERSION 1.0.0 LANGUAGES C CXX)
 
-add_executable(pika-8 src/config.h src/main.cpp dependencies/glad/glad.c)
+add_executable(pika-8 src/config.h src/main.cpp dependencies/glad/glad.c src/sprite_mesh/mesh.h src/sprite_mesh/mesh.cpp)
 
 target_include_directories(pika-8 PRIVATE dependencies)
 
