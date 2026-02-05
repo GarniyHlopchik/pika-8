@@ -1,0 +1,10 @@
+/build/
+/out/
+/bin/
+/*.exe
+/*.dll
+/*.so
+/*.dylib
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
