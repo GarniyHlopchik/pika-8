@@ -12,3 +12,5 @@ extern "C" {
 #include "sstream"
 #include "string"
 #include "vector"
+#include "cstdint"
+#include "tuple"

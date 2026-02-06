@@ -1,0 +1,12 @@
+spritesheet width 128, height 32: 4096 pixels
+
+SAVEFILE EXAMPLE
+__lua__
+#all the lua start to finish
+__gfx__
+[Palette]
+00000000 ffffffff
+[Spritesheet]
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ...#4096 pixels
+[Sprites]
+0 0 8 8 8 0 16 8 ...#four numbers represent a sprite, here 2 are made: 0,0->8,8; ...
