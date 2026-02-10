@@ -1,10 +1,16 @@
 #include "config.h"
 #include "sprite_mesh/mesh.h"
-
+#
 unsigned int make_module(const std::string& filepath, unsigned int module_type);
 unsigned int make_shader(const std::string& vertex_filepath, const std::string& fragment_filepath);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+int l_cls(lua_State* L){
+    glClear(GL_COLOR_BUFFER_BIT);
+    std::cout << "Screan cleared" << std::endl;
+    return 0;
+}
 int main(){
+
     //opengl setup------------------------
     GLFWwindow* window;
 
@@ -31,9 +37,19 @@ int main(){
     glfwGetFramebufferSize(window, &w,&h);
     glViewport(0,0,w,h);
     //---------------------------------------------------
+    //lua setup-----------------------------
     lua_State* L = luaL_newstate();  // Lua vm
     luaL_openlibs(L);               // setup
-    luaL_dostring(L, "print('hello from lua')"); //just test but it's so beautiful I'm leaving it
+    lua_register(L, "cls", l_cls); //registering cpp function to lua
+    if (luaL_dofile(L, "main.lua") != LUA_OK) {
+        const char* err = lua_tostring(L, -1);
+        std::cout << "Issue loading main.lua" << std::endl;
+        std::cout << err << std::endl;
+        std::cout << "\nPress Enter to exit...";
+        std::cin.get();
+        return -1;
+    }
+    //----------------------
 
     glClearColor(0.0f,1.0f,0.0f,1.0f);
     unsigned int shader = make_shader(
