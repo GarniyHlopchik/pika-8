@@ -14,3 +14,5 @@ extern "C" {
 #include "vector"
 #include "cstdint"
 #include "tuple"
+#include "array"
+

@@ -24,13 +24,26 @@ file(GLOB LUA_SOURCES
     dependencies/lua/*.c
 )
 
+# Exclude Lua files that define `main()` (lua and luac are standalone programs)
+list(REMOVE_ITEM LUA_SOURCES
+    ${CMAKE_SOURCE_DIR}/dependencies/lua/lua.c
+    ${CMAKE_SOURCE_DIR}/dependencies/lua/luac.c
+)
+
 add_library(lua STATIC ${LUA_SOURCES})
+
+if (MSVC)
+    set_property(TARGET lua PROPERTY
+        MSVC_RUNTIME_LIBRARY "MultiThreadedDLL"
+    )
+endif()
 
 target_include_directories(lua PUBLIC dependencies/lua)
 target_link_libraries(pika-8 PRIVATE lua)
 
 target_include_directories(pika-8 PRIVATE
     src
+    src/data_types
     dependencies/glad
 )
 
@@ -39,7 +52,7 @@ if (WIN32)
 endif()
 if (MSVC)
     set_property(TARGET pika-8 PROPERTY
-        MSVC_RUNTIME_LIBRARY "MultiThreaded"
+        MSVC_RUNTIME_LIBRARY "MultiThreadedDLL"
     )
 endif()
 if (UNIX AND NOT APPLE)
