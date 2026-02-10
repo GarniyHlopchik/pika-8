@@ -1,12 +1,42 @@
 #include "config.h"
 #include "sprite_mesh/mesh.h"
-#
+
+lua_State* L;
+
 unsigned int make_module(const std::string& filepath, unsigned int module_type);
 unsigned int make_shader(const std::string& vertex_filepath, const std::string& fragment_filepath);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void call_lua(const char* name) {
+    lua_getglobal(L, name);
+    if (!lua_isfunction(L, -1)) {
+        lua_pop(L, 1);
+        return;
+    }
+    if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+        const char* err = lua_tostring(L, -1);
+        lua_pop(L, 1);
+    }
+}
+void call_lua_update(float delta) {
+    lua_getglobal(L, "_update");
+
+    if (!lua_isfunction(L, -1)) {
+        lua_pop(L, 1);
+        return;
+    }
+
+    // Push arguments (in order)
+    lua_pushnumber(L, delta);
+
+    // Call: 1 argument, 0 return values
+    if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
+        const char* err = lua_tostring(L, -1);
+        lua_pop(L, 1);
+    }
+}
 int l_cls(lua_State* L){
     glClear(GL_COLOR_BUFFER_BIT);
-    std::cout << "Screan cleared" << std::endl;
+    std::cout << "Screen cleared" << std::endl;
     return 0;
 }
 int main(){
@@ -38,7 +68,7 @@ int main(){
     glViewport(0,0,w,h);
     //---------------------------------------------------
     //lua setup-----------------------------
-    lua_State* L = luaL_newstate();  // Lua vm
+    L = luaL_newstate();  // Lua vm
     luaL_openlibs(L);               // setup
     lua_register(L, "cls", l_cls); //registering cpp function to lua
     if (luaL_dofile(L, "main.lua") != LUA_OK) {
@@ -49,6 +79,7 @@ int main(){
         std::cin.get();
         return -1;
     }
+    call_lua("_init"); // call init callback in lua
     //----------------------
 
     glClearColor(0.0f,1.0f,0.0f,1.0f);
@@ -60,10 +91,18 @@ int main(){
     SpriteMesh* sprite = new SpriteMesh();
 
 
-
+    //update loop
+    auto last_time = std::chrono::high_resolution_clock::now();
     while(!glfwWindowShouldClose(window)){
         glfwPollEvents();
-        glClear(GL_COLOR_BUFFER_BIT);
+
+        //count delta
+        auto now = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float> delta = now - last_time;
+        last_time = now;
+        float dt = delta.count();
+        call_lua_update(dt);
+
         glUseProgram(shader);
         sprite->draw();
         glfwSwapBuffers(window);
