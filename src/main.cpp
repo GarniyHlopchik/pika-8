@@ -25,7 +25,7 @@ int main(){
     //----------------------
 
     //draw sprite obj
-    SpriteMesh* sprite = new SpriteMesh();
+    //SpriteMesh* sprite = new SpriteMesh();
 
 
     //update loop
