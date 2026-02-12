@@ -1,43 +1,11 @@
 #include "config.h"
 #include "sprite_mesh/mesh.h"
 #include "shader_utils/shader_utils.h"
+#include "lua_system/lua_system.h"
 lua_State* L;
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void log_error(const char* err){
-    std::cout << err << std::endl;
-}
-void call_lua(const char* name) {
-    lua_getglobal(L, name);
-    if (!lua_isfunction(L, -1)) {
-        lua_pop(L, 1);
-        return;
-    }
-    if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
-        const char* err = lua_tostring(L, -1);
-        log_error(err);
-        lua_pop(L, 1);
-    }
-}
-void call_lua_update(float delta) {
-    lua_getglobal(L, "_update");
-
-    if (!lua_isfunction(L, -1)) {
-        lua_pop(L, 1);
-        return;
-    }
-
-    // Push arguments (in order)
-    lua_pushnumber(L, delta);
-
-    // Call: 1 argument, 0 return values
-    if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
-        const char* err = lua_tostring(L, -1);
-        log_error(err);
-        lua_pop(L, 1);
-    }
-}
 int l_cls(lua_State* L){
     glClear(GL_COLOR_BUFFER_BIT);
     std::cout << "Screen cleared" << std::endl;
@@ -72,18 +40,16 @@ int main(){
     glViewport(0,0,w,h);
     //---------------------------------------------------
     //lua setup-----------------------------
-    L = luaL_newstate();  // Lua vm
-    luaL_openlibs(L);               // setup
-    lua_register(L, "cls", l_cls); //registering cpp function to lua
-    if (luaL_dofile(L, "main.lua") != LUA_OK) {
-        const char* err = lua_tostring(L, -1);
-        std::cout << "Issue loading main.lua" << std::endl;
-        std::cout << err << std::endl;
-        std::cout << "\nPress Enter to exit...";
-        std::cin.get();
-        return -1;
-    }
-    call_lua("_init"); // call init callback in lua
+    LuaSystem lua;
+
+    static const luaL_Reg gfx_lib[] = {
+    {"cls", l_cls},
+    {NULL, NULL}
+    };
+    lua.bind_lib(gfx_lib,"GFX");
+
+    lua.load_script("main.lua");
+    lua.call("_init");
     //----------------------
 
     glClearColor(0.0f,1.0f,0.0f,1.0f);
@@ -105,7 +71,7 @@ int main(){
         std::chrono::duration<float> delta = now - last_time;
         last_time = now;
         float dt = delta.count();
-        call_lua_update(dt);
+        lua.call_update(dt);
 
         glUseProgram(shader);
         sprite->draw();

@@ -3,7 +3,7 @@ project(pika-8 VERSION 1.0.0 LANGUAGES C CXX)
 
 add_executable(pika-8 src/config.h src/main.cpp dependencies/glad/glad.c 
 src/sprite_mesh/mesh.h src/sprite_mesh/mesh.cpp src/shader_utils/shader_utils.h
-src/shader_utils/shader_utils.cpp)
+src/shader_utils/shader_utils.cpp src/lua_system/lua_system.cpp src/lua_system/lua_system.h)
 
 target_include_directories(pika-8 PRIVATE dependencies)
 
