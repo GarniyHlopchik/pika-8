@@ -33,18 +33,31 @@ GFX::GFX(int w, int h){
         "../src/shaders/vertex.txt",
         "../src/shaders/fragment.txt"
     );
+
+    
+
 }
+
 GFX::~GFX(){
     glDeleteProgram(shader);
     glfwDestroyWindow(window);
     glfwTerminate();
 }
+
+GLFWwindow* GFX::getWindow(){
+    return (GLFWwindow*)window;
+}
+
+bool GFX::window_should_close(){
+    return glfwWindowShouldClose(window);
+}
+
 void GFX::update(){
     glfwPollEvents();
     glUseProgram(shader);
     glClear(GL_COLOR_BUFFER_BIT);
     glfwSwapBuffers(window);
 }
-bool GFX::window_should_close(){
-    return glfwWindowShouldClose(window);
-}
+
+
+

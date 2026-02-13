@@ -8,7 +8,7 @@ for key, value in ipairs(table) do
 end
 
 --тест c++ функції
-cls()
+-- cls()
 
 --коллбек на початку програми
 function _init()

@@ -6,8 +6,11 @@ class GFX{
     public:
     GFX(int w, int h);
     ~GFX();
-    void update();
+
     bool window_should_close();
+    static GLFWwindow* getWindow();
+    void update();
+
     private:
     GLFWwindow* window;
     unsigned int shader;
