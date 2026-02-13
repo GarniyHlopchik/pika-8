@@ -45,7 +45,7 @@ GFX::~GFX(){
 }
 
 GLFWwindow* GFX::getWindow(){
-    return (GLFWwindow*)window;
+    return GFX::window;
 }
 
 bool GFX::window_should_close(){

@@ -12,6 +12,6 @@ class GFX{
     void update();
 
     private:
-    GLFWwindow* window;
+    static GLFWwindow* window;
     unsigned int shader;
 };
