@@ -53,18 +53,29 @@ GFX::GFX(int w, int h){
 
     spritemesh.init();
 }
+
 GFX::~GFX(){
     glDeleteProgram(shader);
     glfwDestroyWindow(window);
     glfwTerminate();
 }
+
+GLFWwindow* GFX::getWindow(){
+    return GFX::window;
+}
+
+bool GFX::window_should_close(){
+    return glfwWindowShouldClose(window);
+}
+
 void GFX::update(){
     glfwPollEvents();
     glfwSwapBuffers(window);
 }
-bool GFX::window_should_close(){
-    return glfwWindowShouldClose(window);
-}
+
+
+
+
 unsigned int GFX::load_texture(const std::string& path){
     int width, height, nrChannels;
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
