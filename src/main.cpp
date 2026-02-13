@@ -17,7 +17,11 @@ int main(){
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    window = glfwCreateWindow(512,512,"PIKA-8",NULL,NULL);
+
+    const char* title = "PIKA-8";
+    const int width = 512;
+    const int height = 512;
+    window = glfwCreateWindow(width, height, title, NULL, NULL);
     glfwMakeContextCurrent(window);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -35,6 +39,7 @@ int main(){
     luaL_openlibs(L);               // setup
     luaL_dostring(L, "print('hello from lua')"); //just test but it's so beautiful I'm leaving it
 
+
     glClearColor(0.0f,1.0f,0.0f,1.0f);
     unsigned int shader = make_shader(
         "../src/shaders/vertex.txt",
@@ -46,12 +51,17 @@ int main(){
 
 
     while(!glfwWindowShouldClose(window)){
+        
         glfwPollEvents();
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shader);
         sprite->draw();
         glfwSwapBuffers(window);
+
     }
+
+
+
     glDeleteProgram(shader);
     glfwDestroyWindow(window);
     glfwTerminate();
