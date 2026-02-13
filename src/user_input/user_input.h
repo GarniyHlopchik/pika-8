@@ -4,5 +4,4 @@
 
 bool IsKeyPressed(int key);
 bool IsKeyDown(int key);
-
-double* getRelativeCursorPos(GLFWwindow* window);
+double* getRelativeCursorPosition();
