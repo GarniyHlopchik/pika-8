@@ -1,8 +1,21 @@
 #include "config.h"
-#include "sprite_mesh/mesh.h"
+
 #include "lua_system/lua_system.h"
 #include "gfx/gfx.h"
-
+GFX gfx(512,512);
+int l_load(lua_State* L){
+    const char* path = luaL_checkstring(L, 1);
+    const unsigned int id = gfx.load_texture(path);
+    lua_pushnumber(L,id);
+    return 1;
+}
+int l_spr(lua_State* L){
+    const unsigned int texture = luaL_checknumber(L,1);
+    float x = luaL_checknumber(L,2);
+    float y = luaL_checknumber(L,3);
+    gfx.draw(texture,x,y);
+    return 0;
+}
 int l_cls(lua_State* L){
     glClear(GL_COLOR_BUFFER_BIT);
     std::cout << "Screen cleared" << std::endl;
@@ -10,12 +23,14 @@ int l_cls(lua_State* L){
 }
 int main(){
     //opengl setup------------------------
-    GFX gfx(512,512);
+    
     //lua setup-----------------------------
     LuaSystem lua;
 
     static const luaL_Reg gfx_lib[] = {
     {"cls", l_cls},
+    {"load", l_load},
+    {"spr", l_spr},
     {NULL, NULL}
     };
     lua.bind_lib(gfx_lib,"GFX");

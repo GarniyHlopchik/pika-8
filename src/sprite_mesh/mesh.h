@@ -3,8 +3,9 @@
 
 class SpriteMesh {
     public:
+    void init();
     SpriteMesh();
-    void draw();
+    void draw(unsigned int shader, unsigned int texture, int posX, int posY);
     ~SpriteMesh();
 
     private:
