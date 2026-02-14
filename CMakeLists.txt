@@ -7,7 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(pika-8 src/config.h src/main.cpp dependencies/glad/glad.c 
 src/sprite_mesh/mesh.h src/sprite_mesh/mesh.cpp src/shader_utils/shader_utils.h
 src/shader_utils/shader_utils.cpp src/lua_system/lua_system.cpp src/lua_system/lua_system.h 
-src/gfx/gfx.h src/gfx/gfx.cpp dependencies/stb_image/stb_image.h src/json_reader/json_reader.cpp)
+src/gfx/gfx.h src/gfx/gfx.cpp dependencies/stb_image/stb_image.h src/json_reader/json_reader.cpp src/user_input/user_input.cpp
+)
 
 target_include_directories(pika-8 PRIVATE dependencies)
 

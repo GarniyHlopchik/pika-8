@@ -14,7 +14,7 @@ bool IsKeyDown(int key)
 }
 
 double* getRelativeCursorPosition(){
-    double* position = {};
+    double* position = new double[2];
     glfwGetCursorPos(GFX::getWindow(), &position[0], &position[1]);
     return position;
 }
