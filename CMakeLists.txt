@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 4.0.0)
 project(pika-8 VERSION 1.0.0 LANGUAGES C CXX)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 add_executable(pika-8 src/config.h src/main.cpp dependencies/glad/glad.c 
 src/sprite_mesh/mesh.h src/sprite_mesh/mesh.cpp src/shader_utils/shader_utils.h
 src/shader_utils/shader_utils.cpp src/lua_system/lua_system.cpp src/lua_system/lua_system.h 

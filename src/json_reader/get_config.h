@@ -1,5 +1,7 @@
 #include "json_reader.h"
 
+#define CONFIG_FILE_PATH "config.json"
+
 class Config {
 public:
     ~Config();
@@ -8,11 +10,33 @@ public:
     std::string get_window_title() const { return window_title; }
     std::string get_lua_script() const { return lua_script; }
 
+    Config() {
+        if(get_json_element_by_key(CONFIG_FILE_PATH, "window_title", elem)) {
+            window_title = elem.get_string().value();
+        }
+        
+        if (get_json_element_by_key(CONFIG_FILE_PATH, "lua_script", elem)) {
+            lua_script = elem.get_string().value();
+        }
+
+        if (get_json_element_by_key(CONFIG_FILE_PATH, "window_width", elem)) {
+            window_width = elem.get_int64().value();
+        }
+
+        if (get_json_element_by_key(CONFIG_FILE_PATH, "window_height", elem)) {
+            window_height = elem.get_int64().value();
+        }
+    }
+
 private:
-    std::string window_title = get_json_element_by_key("config.json", "window_title").get_string().value().data();
-    std::string lua_script = get_json_element_by_key("config.json", "lua_script").get_string().value().data();
-    int64_t window_width = get_json_element_by_key("config.json", "window_width").get_int64().value();
-    int64_t window_height = get_json_element_by_key("config.json", "window_height").get_int64().value();
+    simdjson::dom::element elem;
+
+    std::string window_title = "Pika-67"; // Default to "Pika-8" if not specified
+    std::string lua_script = "main.lua"; // Default to "main.lua" if not specified
+    int64_t window_width = 512; // Default to 512 if not specified
+    int64_t window_height = 512; // Default to 512 if not specified
+
+    
 };
 
 inline Config::~Config(){
