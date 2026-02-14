@@ -5,7 +5,7 @@
 
 class GFX{
     public:
-    GFX(int w, int h);
+    GFX(int w, int h, const char* title);
     ~GFX();
 
     bool window_should_close();

@@ -2,6 +2,7 @@
 
 class Config {
 public:
+    ~Config();
     int64_t get_window_width() const { return window_width; }
     int64_t get_window_height() const { return window_height; }
     std::string get_window_title() const { return window_title; }
@@ -12,4 +13,10 @@ private:
     std::string lua_script = get_json_element_by_key("config.json", "lua_script").get_string().value().data();
     int64_t window_width = get_json_element_by_key("config.json", "window_width").get_int64().value();
     int64_t window_height = get_json_element_by_key("config.json", "window_height").get_int64().value();
+};
+
+inline Config::~Config(){
+    free((void*)window_title.c_str());
+    free((void*)lua_script.c_str());
+    delete this;
 };

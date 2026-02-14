@@ -21,7 +21,7 @@ void send_projection(int width, int height, unsigned int shader){
     glUniformMatrix4fv(location, 1, GL_TRUE, proj);
 
 }
-GFX::GFX(int w, int h){
+GFX::GFX(int w, int h, const char* title){
     if(!glfwInit()){
         std::cout << "GLFW couldn't start" << std::endl;
         
@@ -31,7 +31,7 @@ GFX::GFX(int w, int h){
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    window = glfwCreateWindow(w,h,"PIKA-8",NULL,NULL);
+    window = glfwCreateWindow(w,h, title,NULL,NULL);
     glfwMakeContextCurrent(window);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);

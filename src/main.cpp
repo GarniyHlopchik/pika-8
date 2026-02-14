@@ -6,7 +6,7 @@
 #include "json_reader/get_config.h"
 Config config;
 
-GFX gfx(config.get_window_width(),config.get_window_height());
+GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str());
 
 int l_load(lua_State* L){
     const char* path = luaL_checkstring(L, 1);
