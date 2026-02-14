@@ -4,7 +4,7 @@ project(pika-8 VERSION 1.0.0 LANGUAGES C CXX)
 add_executable(pika-8 src/config.h src/main.cpp dependencies/glad/glad.c 
 src/sprite_mesh/mesh.h src/sprite_mesh/mesh.cpp src/shader_utils/shader_utils.h
 src/shader_utils/shader_utils.cpp src/lua_system/lua_system.cpp src/lua_system/lua_system.h 
-src/gfx/gfx.h src/gfx/gfx.cpp dependencies/stb_image/stb_image.h)
+src/gfx/gfx.h src/gfx/gfx.cpp dependencies/stb_image/stb_image.h src/json_reader/json_reader.cpp)
 
 target_include_directories(pika-8 PRIVATE dependencies)
 
@@ -19,6 +19,15 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glfw)
 
 target_link_libraries(pika-8 PRIVATE glfw)
+
+FetchContent_Declare(
+    simdjson
+    GIT_REPOSITORY https://github.com/simdjson/simdjson.git
+    GIT_TAG v3.2.0
+)
+FetchContent_MakeAvailable(simdjson)
+
+target_link_libraries(pika-8 PRIVATE simdjson::simdjson)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(pika-8 PRIVATE OpenGL::GL)

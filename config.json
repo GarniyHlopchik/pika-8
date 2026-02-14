@@ -1,0 +1,6 @@
+{
+    "window_title": "Pika-8",
+    "window_width": 512,
+    "window_height": 512,
+    "lua_script": "main.lua"
+}

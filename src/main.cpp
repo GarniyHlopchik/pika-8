@@ -2,7 +2,12 @@
 
 #include "lua_system/lua_system.h"
 #include "gfx/gfx.h"
-GFX gfx(512,512);
+
+#include "json_reader/get_config.h"
+Config config;
+
+GFX gfx(config.get_window_width(),config.get_window_height());
+
 int l_load(lua_State* L){
     const char* path = luaL_checkstring(L, 1);
     const unsigned int id = gfx.load_texture(path);
@@ -22,6 +27,11 @@ int l_cls(lua_State* L){
     return 0;
 }
 int main(){
+
+    
+
+
+
     //opengl setup------------------------
     
     //lua setup-----------------------------
@@ -35,7 +45,7 @@ int main(){
     };
     lua.bind_lib(gfx_lib,"GFX");
 
-    lua.load_script("main.lua");
+    lua.load_script(config.get_lua_script());
     lua.call("_init");
     //----------------------
 
