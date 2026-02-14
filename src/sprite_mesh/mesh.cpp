@@ -28,7 +28,7 @@ void SpriteMesh::init(){
     glVertexAttribPointer(1,2, GL_FLOAT,GL_FALSE,16,(void*)8);
     glEnableVertexAttribArray(1);
 }
-void SpriteMesh::draw(unsigned int shader, unsigned int texture, int posX, int posY){
+void SpriteMesh::draw(unsigned int shader, unsigned int texture, float posX, float posY){
     glUseProgram(shader);
     GLint posLoc = glGetUniformLocation(shader, "uPos");
     glUniform2f(posLoc, posX, posY);

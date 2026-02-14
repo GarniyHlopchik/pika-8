@@ -5,7 +5,7 @@ class SpriteMesh {
     public:
     void init();
     SpriteMesh();
-    void draw(unsigned int shader, unsigned int texture, int posX, int posY);
+    void draw(unsigned int shader, unsigned int texture, float posX, float posY);
     ~SpriteMesh();
 
     private:
