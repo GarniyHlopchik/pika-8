@@ -1,28 +1,29 @@
 #include "shader_utils.h"
 
 // Define shaders
-const char* vertexSource =
+const char* fragSource =
     "#version 330 core\n"
-    "layout(location = 0) in vec3 aPos;\n"
-    "layout(location = 1) in vec3 aColor;\n"
-    "layout(location = 2) in vec2 aTexCoord;\n"
-    "out vec3 ourColor;\n"
-    "out vec2 TexCoord;\n"
+    "in vec2 vUV;\n"
+    "out vec4 screenColor;\n"
+    "uniform sampler2D ourTexture;\n"
     "void main()\n"
     "{\n"
-    "    gl_Position = vec4(aPos, 1.0);\n"
-    "    TexCoord = aTexCoord;\n"
+    "        screenColor = texture(ourTexture, vUV);\n"
     "}\n";
 
-const char* fragSource =
+const char* vertexSource =
     "#version 330 core \n"
-    "out vec4 FragColor; \n"
-    "in vec3 ourColor; \n"
-    "in vec2 TexCoord; \n"
-    "uniform sampler2D ourTexture; \n"
+    "layout (location = 0) in vec2 vertexPos; \n"
+    "layout (location = 1) in vec2 vertexUV; \n"
+    "uniform vec2 uPos;\n"
+    "uniform vec2 uSize;\n"
+    "uniform mat4 uProjection;\n"
+    "out vec2 vUV;\n"
     "void main() \n"
     "{\n"
-    "  FragColor = texture(ourTexture, TexCoord);\n"
+    "   vec2 worldPos = uPos + vertexPos * uSize;  \n"
+    "   gl_Position = uProjection * vec4(worldPos, 0.0, 1.0);  \n"
+    "   vUV = vertexUV;  \n"
     "}\n";
 
 unsigned int make_shader(){

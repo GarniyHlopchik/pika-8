@@ -29,7 +29,9 @@ int l_mpos(lua_State* L){
 }
 int l_load(lua_State* L){
     const char* path = luaL_checkstring(L, 1);
+    std::cout << "Loading " << path << std::endl;
     const unsigned int id = gfx.load_texture(path);
+    std::cout << "Loaded id " << id << std::endl;
     lua_pushnumber(L,id);
     return 1;
 }
