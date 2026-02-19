@@ -12,11 +12,12 @@ class GFX{
     unsigned int load_texture(const std::string& path);
     void draw(const unsigned int texture, float x, float y);
     static GLFWwindow* getWindow();
+    static unsigned int getShader();
     void update();
 
     private:
     static GLFWwindow* window;
     SpriteMesh spritemesh;
-    unsigned int shader;
+    static unsigned int shader;
     
 };

@@ -3,12 +3,16 @@
 #include "stb_image/stb_image.h"
 
 GLFWwindow* GFX::window = nullptr;
+unsigned int GFX::shader = 0;
+void send_projection(int width, int height);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+    send_projection(width,height);
     
 }  
-void send_projection(int width, int height, unsigned int shader){
+void send_projection(int width, int height){
+    unsigned int shader = GFX::getShader();
     glUseProgram(shader);
     unsigned int location = glGetUniformLocation(shader,"uProjection");
     float proj[16] = {
@@ -20,6 +24,9 @@ void send_projection(int width, int height, unsigned int shader){
 
     glUniformMatrix4fv(location, 1, GL_TRUE, proj);
 
+}
+unsigned int GFX::getShader(){
+    return GFX::shader;
 }
 GFX::GFX(int w, int h, const char* title){
     if(!glfwInit()){
@@ -48,7 +55,7 @@ GFX::GFX(int w, int h, const char* title){
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(0.11f,0.79f,0.88f,1.0f);
     shader = make_shader(    );
-    send_projection(w,h,shader);
+    send_projection(w,h);
 
     spritemesh.init();
 }
