@@ -5,12 +5,12 @@
 
 bool IsKeyPressed(int key)
 {
-    return (glfwGetKey(GFX::getWindow(), key) == GLFW_PRESS);
+    return !(glfwGetKey(GFX::getWindow(), key) == GLFW_PRESS);
 }
 
 bool IsKeyDown(int key)
 {
-    return (glfwGetKey(GFX::getWindow(), key) == GLFW_RELEASE);
+    return !(glfwGetKey(GFX::getWindow(), key) == GLFW_RELEASE);
 }
 
 double* getRelativeCursorPosition(){
