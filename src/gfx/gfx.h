@@ -10,7 +10,8 @@ class GFX{
 
     bool window_should_close();
     unsigned int load_texture(const std::string& path);
-    void draw(const unsigned int texture, float x, float y);
+    void draw(const unsigned int texture, float x, float y, float u1 = 0.0f, float v1 = 0.0f, float u2 = 1.0f, float v2 = 1.0f);
+    void draw_text(const std::string& text, float x, float y);
     static GLFWwindow* getWindow();
     static unsigned int getShader();
     void update();
@@ -19,5 +20,6 @@ class GFX{
     static GLFWwindow* window;
     SpriteMesh spritemesh;
     static unsigned int shader;
+    unsigned int font_texture;
     
 };

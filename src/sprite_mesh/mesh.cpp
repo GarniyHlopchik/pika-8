@@ -28,12 +28,19 @@ void SpriteMesh::init(){
     glVertexAttribPointer(1,2, GL_FLOAT,GL_FALSE,16,(void*)8);
     glEnableVertexAttribArray(1);
 }
-void SpriteMesh::draw(unsigned int shader, unsigned int texture, float posX, float posY){
+void SpriteMesh::draw(unsigned int shader, unsigned int texture, float posX, float posY, float u1, float v1, float u2, float v2){
     glUseProgram(shader);
     GLint posLoc = glGetUniformLocation(shader, "uPos");
     glUniform2f(posLoc, posX, posY);
     
-    
+    GLint uU1Loc = glGetUniformLocation(shader, "uU1");
+    glUniform1f(uU1Loc, u1);
+    GLint uV1Loc = glGetUniformLocation(shader, "uV1");
+    glUniform1f(uV1Loc, v1);
+    GLint uU2Loc = glGetUniformLocation(shader, "uU2");
+    glUniform1f(uU2Loc, u2);
+    GLint uV2Loc = glGetUniformLocation(shader, "uV2");
+    glUniform1f(uV2Loc, v2);
 
    
     

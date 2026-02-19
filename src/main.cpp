@@ -46,6 +46,13 @@ int l_cls(lua_State* L){
     glClear(GL_COLOR_BUFFER_BIT);
     return 0;
 }
+int l_text(lua_State* L){
+    const char* text = luaL_checkstring(L,1);
+    float x = luaL_checknumber(L,2);
+    float y = luaL_checknumber(L,3);
+    gfx.draw_text(text,x,y);
+    return 0;
+}
 int main(){
 
     //opengl setup------------------------
@@ -57,6 +64,7 @@ int main(){
     {"cls", l_cls},
     {"load", l_load},
     {"spr", l_spr},
+    {"text", l_text},
     {NULL, NULL}
     };
     lua.bind_lib(gfx_lib,"GFX");
