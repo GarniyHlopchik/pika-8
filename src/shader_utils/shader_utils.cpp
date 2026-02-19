@@ -1,9 +1,34 @@
 #include "shader_utils.h"
 
-unsigned int make_shader(const std::string& vertex_filepath, const std::string& fragment_filepath){
+// Define shaders
+const char* vertexSource =
+  "#version 330 core\n"
+  "layout(location = 0) in vec3 aPos;\n"
+  "layout(location = 1) in vec3 aColor;\n"
+  "layout(location = 2) in vec2 aTexCoord;\n"
+  "out vec3 ourColor;\n"
+  "out vec2 TexCoord;\n"
+  "void main()\n"
+  "{\n"
+  "    gl_Position = vec4(aPos, 1.0);\n"
+  "    TexCoord = aTexCoord;\n"
+  "}\n";
+
+const char* fragSource =
+  "#version 330 core \n"
+  "out vec4 FragColor; \n"
+  "in vec3 ourColor; \n"
+  "in vec2 TexCoord; \n"
+  "uniform sampler2D ourTexture; \n"
+  "void main() \n"
+  "{\n"
+  "  FragColor = texture(ourTexture, TexCoord);\n"
+  "}\n";
+
+unsigned int make_shader(){
     std::vector<unsigned> modules;
-    modules.push_back(make_module(vertex_filepath, GL_VERTEX_SHADER));
-    modules.push_back(make_module(fragment_filepath, GL_FRAGMENT_SHADER));
+    modules.push_back(make_module(GL_VERTEX_SHADER));
+    modules.push_back(make_module(GL_FRAGMENT_SHADER));
 
     unsigned int shader = glCreateProgram();
     for(unsigned int shaderModule : modules){
@@ -22,20 +47,10 @@ unsigned int make_shader(const std::string& vertex_filepath, const std::string& 
         glDeleteShader(shaderModule);
     }
     return shader;
-    }
-unsigned int make_module(const std::string& filepath, unsigned int module_type){
-    std::ifstream file;
-    std::stringstream bufferedLines;
-    std::string line;
+}
 
-    file.open(filepath);
-    while(std::getline(file,line)){
-        bufferedLines << line << "\n";
-    }
-    std::string ShaderSource = bufferedLines.str();
-    const char* ShaderSrc = ShaderSource.c_str();
-    bufferedLines.str("");
-    file.close();
+unsigned int make_module(unsigned int module_type){
+    const char* ShaderSrc = (module_type == GL_VERTEX_SHADER) ? vertexSource : fragSource;
 
     unsigned int shaderModule = glCreateShader(module_type);
     glShaderSource(shaderModule,1,&ShaderSrc,NULL);

@@ -39,17 +39,15 @@ GFX::GFX(int w, int h, const char* title){
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
         glfwDestroyWindow(window);
         glfwTerminate();
-        
+        shader = make_shader();
+        std::cout << "GLAD couldn't start" << std::endl;
     }
     glfwGetFramebufferSize(window, &w,&h);
     glViewport(0,0,w,h);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(0.11f,0.79f,0.88f,1.0f);
-    shader = make_shader(
-        "../src/shaders/vertex.txt",
-        "../src/shaders/fragment.txt"
-    );
+    shader = make_shader(    );
     send_projection(w,h,shader);
 
     spritemesh.init();

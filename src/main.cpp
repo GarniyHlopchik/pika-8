@@ -7,6 +7,7 @@
 Config config;
 
 GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str());
+
 int l_btn(lua_State* L){
     int key = luaL_checknumber(L,1);
     bool result = IsKeyPressed(key);
