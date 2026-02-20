@@ -136,7 +136,7 @@ void GFX::draw_text(const std::string& text, float x, float y, float scale, floa
 
     for (size_t i = 0; i < text.length(); ++i) {
         if (text[i] == ' ') {
-            cursor_x += (draw_width / space_multiplier); 
+            cursor_x += (draw_width * space_multiplier); 
             continue;
         }
 

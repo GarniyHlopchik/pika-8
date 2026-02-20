@@ -20,7 +20,9 @@ function _update(delta)
         print("FPS: "..fps)
     end
     GFX.cls()
-    GFX.text("Score: " .. score, 100, 100, 10)
+    GFX.text("a quick brown fox jumps over the lazy dog", 100, 100, 3, 1000.0)
+    GFX.text("12345678", 100, 140, 3, 100)
+    GFX.text(".,!?':; ()[]", 100, 180, 3, 100)
     GFX.spr(spr,pos_x,pos_y, 64,64)
 
     -- Spawn enemies every 2 seconds
