@@ -107,10 +107,11 @@ unsigned int GFX::load_texture(const std::string& path){
     stbi_image_free(data);
     return texture;
 }
-void GFX::draw(const unsigned int texture, float x, float y, float u1, float v1, float u2, float v2){
-    spritemesh.draw(shader,texture,x,y,u1,v1,u2,v2);
+void GFX::draw(const unsigned int texture, float x, float y, float width, float height, float u1, float v1, float u2, float v2) {
+    spritemesh.draw(shader, texture, x, y, width, height, u1, v1, u2, v2);
 }
-void GFX::draw_text(const std::string& text, float x, float y) {
+// Added a 'scale' parameter with a default value of 1.0f
+void GFX::draw_text(const std::string& text, float x, float y, float scale) {
     if (!font_texture) return;
 
     const float char_width = 8.0f;
@@ -118,41 +119,45 @@ void GFX::draw_text(const std::string& text, float x, float y) {
     const int chars_per_row = 8;
     const int total_rows = 6;
 
-    // Define the sequence of characters exactly as they appear in font.png
-    std::string charset = "ABCDEFGH"
-                          "IJKLMNOP"
-                          "QRSTUVWX"
-                          "YZ123456"
-                          "7890.,!?"
-                          "':;()[] "; // Added space at the end if applicable
+    // Apply your scale
+    float draw_width = char_width * scale;
+    float draw_height = char_height * scale;
+
+    std::string charset =   "ABCDEFGH"
+                            "IJKLMNOP"
+                            "QRSTUVWX"
+                            "YZ123456"
+                            "7890.,!?"
+                            "':;()[] "; 
 
     for (size_t i = 0; i < text.length(); ++i) {
-        char c = toupper(text[i]); // Convert to uppercase to match your sheet
+        char c = toupper(text[i]); 
         
-        // Find the index of the character in our charset string
         size_t index = charset.find(c);
-        
-        // If character isn't found, skip it or draw a space
         if (index == std::string::npos) continue;
 
         int col = index % chars_per_row;
         int row = index / chars_per_row;
 
-        // Get the total width and height of the texture in pixels
-        // (8 columns * 8 pixels = 64 width, 6 rows * 8 pixels = 48 height)
         const float tex_width = 64.0f; 
         const float tex_height = 48.0f;
             
-        // Create a tiny margin (e.g., 0.1 to 0.5 of a pixel)
         const float margin_u = 0.1f / tex_width;
         const float margin_v = 0.1f / tex_height;
             
-        // Apply the margin to the coordinates to pull them slightly inward
         float u1 = ((float)col / chars_per_row) + margin_u;
         float v1 = ((float)row / total_rows) + margin_v;
         float u2 = ((float)(col + 1) / chars_per_row) - margin_u;
         float v2 = ((float)(row + 1) / total_rows) - margin_v;
 
-        draw(font_texture, x + i * char_width, y, u1, v1, u2, v2);
+        // Calculate the actual X position using the scaled width
+        float current_x = x + (i * draw_width);
+
+        // NOTE: If your draw() function accepts width and height, pass them here!
+        draw(font_texture, current_x, y, draw_width, draw_height, u1, v1, u2, v2);
+        
+        // If it DOESN'T take width/height, you are using your original call:
+        // draw(font_texture, current_x, y, u1, v1, u2, v2);
+        // draw(font_texture, current_x, y, draw_width, draw_height, u1, v1, u2, v2);
     }
 }
