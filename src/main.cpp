@@ -35,15 +35,38 @@ int l_load(lua_State* L){
     lua_pushnumber(L,id);
     return 1;
 }
-int l_spr(lua_State* L){
-    const unsigned int texture = luaL_checknumber(L,1);
-    float x = luaL_checknumber(L,2);
-    float y = luaL_checknumber(L,3);
-    gfx.draw(texture,x,y);
+int l_spr(lua_State* L) {
+    // 1. Get required arguments (texture, x, y)
+    const unsigned int texture = luaL_checknumber(L, 1);
+    float x = luaL_checknumber(L, 2);
+    float y = luaL_checknumber(L, 3);
+
+    // 2. Get optional arguments (width, height) - defaulting to 8.0f if not provided
+    float width = luaL_optnumber(L, 4, 8.0f);
+    float height = luaL_optnumber(L, 5, 8.0f);
+
+    // 3. (Optional) You can also expose the UV coordinates to Lua for sprite animations
+    float u1 = luaL_optnumber(L, 6, 0.0f);
+    float v1 = luaL_optnumber(L, 7, 0.0f);
+    float u2 = luaL_optnumber(L, 8, 1.0f);
+    float v2 = luaL_optnumber(L, 9, 1.0f);
+
+    // Pass everything to your updated C++ draw function
+    gfx.draw(texture, x, y, width, height, u1, v1, u2, v2);
+    
     return 0;
 }
 int l_cls(lua_State* L){
     glClear(GL_COLOR_BUFFER_BIT);
+    return 0;
+}
+int l_text(lua_State* L){
+    const char* text = luaL_checkstring(L,1);
+    float x = luaL_checknumber(L,2);
+    float y = luaL_checknumber(L,3);
+    float scale = luaL_optnumber(L, 4, 1.0f);
+    float space_multiplier = luaL_optnumber(L, 5, 4.0f);
+    gfx.draw_text(text,x, y, scale, space_multiplier);
     return 0;
 }
 int main(){
@@ -57,6 +80,7 @@ int main(){
     {"cls", l_cls},
     {"load", l_load},
     {"spr", l_spr},
+    {"text", l_text},
     {NULL, NULL}
     };
     lua.bind_lib(gfx_lib,"GFX");
