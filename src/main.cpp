@@ -65,7 +65,7 @@ int l_text(lua_State* L){
     float x = luaL_checknumber(L,2);
     float y = luaL_checknumber(L,3);
     float scale = luaL_optnumber(L, 4, 1.0f);
-    float space_multiplier = luaL_optnumber(L, 5, 4.0f);
+    float space_multiplier = luaL_optnumber(L, 5, 0.4f);
     gfx.draw_text(text,x, y, scale, space_multiplier);
     return 0;
 }
