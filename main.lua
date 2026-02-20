@@ -1,3 +1,4 @@
+---@diagnostic disable: lowercase-global
 --#define KEY_RIGHT 262
 --#define KEY_LEFT 263
 --#define KEY_DOWN 264
@@ -19,8 +20,8 @@ function _update(delta)
         print("FPS: "..fps)
     end
     GFX.cls()
-    GFX.text("Score: " .. score, 100, 100)
-    GFX.spr(spr,pos_x,pos_y)
+    GFX.text("Score: " .. score, 100, 100, 10)
+    GFX.spr(spr,pos_x,pos_y, 64,64)
 
     -- Spawn enemies every 2 seconds
     spawn_timer = spawn_timer + delta
@@ -33,7 +34,7 @@ function _update(delta)
     for i = #enemies, 1, -1 do
         local enemy = enemies[i]
         enemy.y = enemy.y + enemy.speed * delta
-        GFX.spr(enemy_spr, enemy.x, enemy.y)
+        GFX.spr(enemy_spr, enemy.x, enemy.y, 16, 16)
         -- Remove if off screen
         if enemy.y > 512 then
             table.remove(enemies, i)

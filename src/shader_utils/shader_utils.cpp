@@ -22,7 +22,8 @@ const char* vertexSource =
     "out vec2 vUV;\n"
     "void main() \n"
     "{\n"
-    "   vec2 worldPos = uPos + vertexPos * uSize;  \n"
+    // vertexPos ranges from -1..1 so multiply by half-size to get correct pixel extents
+    "   vec2 worldPos = uPos + vertexPos * (uSize * 0.5);  \n"
     "   gl_Position = uProjection * vec4(worldPos, 0.0, 1.0);  \n"
     "   vUV = vec2(mix(uU1, uU2, vertexUV.x), mix(uV1, uV2, vertexUV.y));  \n"
     "}\n";

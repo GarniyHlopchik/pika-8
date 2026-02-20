@@ -46,10 +46,10 @@ int l_spr(lua_State* L) {
     float height = luaL_optnumber(L, 5, 8.0f);
 
     // 3. (Optional) You can also expose the UV coordinates to Lua for sprite animations
-    // float u1 = luaL_optnumber(L, 6, 0.0f);
-    // float v1 = luaL_optnumber(L, 7, 0.0f);
-    // float u2 = luaL_optnumber(L, 8, 1.0f);
-    // float v2 = luaL_optnumber(L, 9, 1.0f);
+    float u1 = luaL_optnumber(L, 6, 0.0f);
+    float v1 = luaL_optnumber(L, 7, 0.0f);
+    float u2 = luaL_optnumber(L, 8, 1.0f);
+    float v2 = luaL_optnumber(L, 9, 1.0f);
 
     // Pass everything to your updated C++ draw function
     gfx.draw(texture, x, y, width, height, u1, v1, u2, v2);
@@ -64,7 +64,9 @@ int l_text(lua_State* L){
     const char* text = luaL_checkstring(L,1);
     float x = luaL_checknumber(L,2);
     float y = luaL_checknumber(L,3);
-    gfx.draw_text(text,x,y);
+    float scale = luaL_optnumber(L, 4, 1.0f);
+    float space_multiplier = luaL_optnumber(L, 5, 4.0f);
+    gfx.draw_text(text,x, y, scale, space_multiplier);
     return 0;
 }
 int main(){
