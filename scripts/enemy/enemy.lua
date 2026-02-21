@@ -8,6 +8,7 @@ Enemy.__index = Enemy
 --- Class constructor
 --- @param x number начальная позиция X
 --- @param y number начальная позиция Y
+--- @param speed number скорость движения
 --- @param sprite number ID текстуры (от GFX.load)
 --- @return table новый объект Enemy
 function Enemy:new(x, y, sprite)

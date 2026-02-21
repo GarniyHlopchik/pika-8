@@ -4,6 +4,7 @@
 --#define KEY_DOWN 264
 --#define KEY_UP 265
 
+-- Подключаем класс Enemy
 local Enemy = require("scripts.enemy.enemy")
 
 function _init()
@@ -12,13 +13,8 @@ function _init()
     pos_x = 64
     pos_y = 64
     player_speed = 250.0
-
-    -- create some enemies
     enemies = {}
-    table.insert(enemies, Enemy:new(100, 200, enemy_spr))
-    table.insert(enemies, Enemy:new(250, 150, enemy_spr))
-    table.insert(enemies, Enemy:new(400, 300, enemy_spr))
-
+    spawn_timer = 0
     score = 0
 end
 
@@ -27,52 +23,52 @@ function _update(delta)
     if(fps < 300) then
         print("FPS: "..fps)
     end
-
     GFX.cls()
-    GFX.text("a quick brown fox jumps over the lazy dog", 100, 100, 3, .4)
-    GFX.text("12345678", 100, 140, 3, 100)
-    GFX.text(".,!?':; ()[]", 100, 180, 3, 100)
+
+    -- GFX.text("a quick brown fox jumps over the lazy dog", 100, 100, 3, .4)
+    -- GFX.text("12345678", 100, 140, 3, 100)
+    -- GFX.text(".,!?':; ()[]", 100, 180, 3, 100)
+
+    GFX.text("score: " .. score, 10, 30, 2, 0.4)
     GFX.spr(spr,pos_x,pos_y, 64,64)
 
-    GFX.spr(spr, pos_x, pos_y, 64, 64)
-
-    -- -- Spawn enemies every 2 seconds
-    -- spawn_timer = spawn_timer + delta
-    -- if spawn_timer >= 2 then
-    --     table.insert(enemies, {x = math.random(10, 502), y = -16, speed = 50})
-    --     spawn_timer = 0
-    -- end
+    -- Spawn enemies every 2 seconds
+    spawn_timer = spawn_timer + delta
+    if spawn_timer >= 2 then
+        local e = Enemy:new(math.random(10, 502), 10, enemy_spr)
+        table.insert(enemies, e)
+        spawn_timer = 0
+    end
 
     -- Update enemies
     for i = #enemies, 1, -1 do
         local enemy = enemies[i]
         enemy:update(delta)
         enemy:draw()
+        -- Remove if off screen
+        if enemy.y > 512 then
+            enemy.alive = false
+        end
 
-        -- enemy.y = enemy.y + enemy.speed * delta
-        -- GFX.spr(enemy_spr, enemy.x, enemy.y, 16, 16)
-        -- -- Remove if off screen
-        -- if enemy.y > 512 then
-        --     table.remove(enemies, i)
-        -- end
-        -- -- Check collision
-        -- if pos_x < enemy.x + 16 and pos_x + 64 > enemy.x and pos_y < enemy.y + 16 and pos_y + 64 > enemy.y then
-        --     print("Hit!")
-        --     score = score + 1
+        -- Проверка коллизии с игроком
+        if pos_x < enemy.x + enemy.width and pos_x + 64 > enemy.x
+           and pos_y < enemy.y + enemy.height and pos_y + 64 > enemy.y then
+            print("Hit!")
+            score = score + 1
+            enemy.alive = false
+        end
 
-        -- enemy:update(delta)
-        -- enemy:draw()
-
+        -- Убираем мёртвых
         if not enemy.alive then
             table.remove(enemies, i)
         end
     end
 
-    --TODO debug
     if #enemies > 0 then
-        GFX.text("enemy state: " .. enemies[1]:get_state_name(), 10, 10, 2, 0.4)
+        GFX.text("enemies: " .. #enemies .. "  state: " .. enemies[1]:get_state_name(), 10, 10, 2, 0.4)
+    else 
+        GFX.text("enemies: 0", 10, 10, 2, 0.4)
     end
-
 
     -- player movement
     if Input.btnp(262) then

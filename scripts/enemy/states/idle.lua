@@ -27,6 +27,7 @@ function IdleState:enter(enemy)
 end
 
 function IdleState:update(enemy, dt)
+    enemy.y = enemy.y + enemy.speed * dt
     -- Здесь позже можно добавить:
     --   idle-анимацию (покачивание, мигание)
     --   таймер перехода в patrol
