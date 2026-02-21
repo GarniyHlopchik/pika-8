@@ -24,4 +24,5 @@ function _update(delta)
 end
 ```
 
-This uses an update callback, which takes in delta parameter - time elapsed since last update. Inside of it we use 2 functions from engine's GFX API: text(txt: String,x:int,y:int,scale:int,spacing:int) and cls(). The first one prints a message onto the screen from our loaded font.png, and the second clears the screen.
+This uses an update callback, which takes in delta parameter - time elapsed since last update. Inside of it we use 2 functions from engine's GFX API: text(txt: String,x:int,y:int,scale:int,spacing:int) and cls(). 
+The first one clears the screen and the second one prints a message onto the screen from our loaded font.png
