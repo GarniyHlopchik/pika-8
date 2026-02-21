@@ -1,4 +1,4 @@
----@diagnostic disable: lowercase-global
+---@diagnostic disable: lowercase-global, undefined-global
 --#define KEY_RIGHT 262
 --#define KEY_LEFT 263
 --#define KEY_DOWN 264
@@ -33,7 +33,7 @@ function _update(delta)
     -- GFX.text("12345678", 100, 140, 3, 100)
     -- GFX.text(".,!?':; ()[]", 100, 180, 3, 100)
 
-    GFX.text("score: " .. score, 10, 30, 2, 0.4)
+    GFX.text("score: " .. score, 10, 30, "default", 2, 0.4)
     GFX.spr(spr,pos_x,pos_y, 64,64)
 
     -- Spawn enemies every 2 seconds
@@ -69,9 +69,9 @@ function _update(delta)
     end
 
     if #enemies > 0 then
-        GFX.text("enemies: " .. #enemies .. "  state: " .. enemies[1]:get_state_name(), 10, 10, 2, 0.4)
+        GFX.text("enemies: " .. #enemies .. "  state: " .. enemies[1]:get_state_name(), 10, 10, "default", 2, 0.4)
     else 
-        GFX.text("enemies: 0", 10, 10, 2, 0.4)
+        GFX.text("enemies: 0", 10, 10, "default", 2, 0.4)
     end
 
     -- player movement
