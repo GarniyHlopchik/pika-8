@@ -1,6 +1,22 @@
 {
-    "window_title": "Pika-8",
+    "window_title": "Hello World!",
     "window_width": 512,
     "window_height": 512,
-    "lua_script": "main.lua"
+    "lua_script": "main.lua",
+    "fonts": [
+        {
+        "name": "default",
+        "font_texture": "font.png",
+        "char_width": 8,
+        "char_height": 8,
+        "charset": "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,!?':;()[] "
+        },
+        {
+        "name": "default2",
+        "font_texture": "font.png",
+        "char_width": 5,
+        "char_height": 5,
+        "charset": "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,!?':;()[] "
+        }
+    ]
 }

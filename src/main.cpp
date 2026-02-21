@@ -92,7 +92,23 @@ int l_text(lua_State* L){
     std::string font_name = luaL_checkstring(L, 4);
     float scale = luaL_optnumber(L, 5, 1.0f);
     float space_multiplier = luaL_optnumber(L, 6, 0.4f);
+    try {
     gfx.draw_text(text,x, y, font_name, scale, space_multiplier);
+    } 
+    catch (const std::exception& e) {
+        if (std::string(e.what()).find("Font not found") != std::string::npos) {
+            font_name = "default";
+            std::cerr << "Warning: " << e.what() << " Falling back to default font." << std::endl;
+            try {
+                gfx.draw_text(text,x, y, font_name, scale, space_multiplier);
+            } catch (const std::exception& e) {
+                std::cerr << "Error: Default font also not found. Cannot draw text." << std::endl;
+            }
+        } else {
+            std::cerr << "Error in l_text: " << e.what() << std::endl;
+        }
+    }
+    
     return 0;
 }
 int l_sfx_load(lua_State* L){
