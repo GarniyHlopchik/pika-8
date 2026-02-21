@@ -8,6 +8,10 @@
 local Enemy = require("scripts.enemy.enemy")
 
 function _init()
+    --sound playing example
+    sound = SFX.load("pipe.mp3");
+    SFX.play(sound);
+    
     spr = GFX.load("sprite.png")
     enemy_spr = GFX.load("enemy.png")
     pos_x = 64
