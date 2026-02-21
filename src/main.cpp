@@ -4,10 +4,11 @@
 #include "gfx/gfx.h"
 #include "user_input/user_input.h"
 #include "json_reader/get_config.h"
+#include "sfx/sfx.h"
 Config config;
 
 GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str());
-
+SFX sfx;
 int l_btn(lua_State* L){
     int key = luaL_checknumber(L,1);
     bool result = IsKeyPressed(key);
@@ -94,6 +95,18 @@ int l_text(lua_State* L){
     gfx.draw_text(text,x, y, font_name, scale, space_multiplier);
     return 0;
 }
+int l_sfx_load(lua_State* L){
+    const char* path = luaL_checkstring(L,1);
+    unsigned int id = sfx.load(path);
+    lua_pushnumber(L,id);
+    return 1;
+}
+int l_sfx_play(lua_State* L){
+    unsigned int id = luaL_checknumber(L,1);
+    sfx.play(id);
+    return 0;
+}
+
 int main(){
 
     //opengl setup------------------------
@@ -117,6 +130,13 @@ int main(){
     {NULL, NULL}
     };
     lua.bind_lib(input_lib,"Input");
+
+    static const luaL_Reg sfx_lib[] = {
+        {"load",l_sfx_load},
+        {"play",l_sfx_play},
+        {NULL,NULL}
+    };
+    lua.bind_lib(sfx_lib,"SFX");
 
     lua.load_script(config.get_lua_script());
     lua.call("_init");
