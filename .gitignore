@@ -1,10 +1,14 @@
 /build/
 /out/
 /bin/
+/_deps
+
 /*.exe
 /*.dll
 /*.so
 /*.dylib
+
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
+Makefile
