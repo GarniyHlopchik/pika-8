@@ -80,16 +80,18 @@ int l_cls(lua_State* L){
 * 1. text (string) - the text to draw
 * 2. x (number) - x position
 * 3. y (number) - y position
-* 4. scale (number, optional) - scale of the text (default: 1.0)
-* 5. space_multiplier (number, optional) - multiplier for space character width (default
+* 4. font_name (string) - name of the font to use
+* 5. scale (number, optional) - scale of the text (default: 1.0)
+* 6. space_multiplier (number, optional) - multiplier for space character width (default: 0.4)
 */
 int l_text(lua_State* L){
     const char* text = luaL_checkstring(L,1);
     float x = luaL_checknumber(L,2);
     float y = luaL_checknumber(L,3);
-    float scale = luaL_optnumber(L, 4, 1.0f);
-    float space_multiplier = luaL_optnumber(L, 5, 0.4f);
-    gfx.draw_text(text,x, y, scale, space_multiplier);
+    std::string font_name = luaL_checkstring(L, 4);
+    float scale = luaL_optnumber(L, 5, 1.0f);
+    float space_multiplier = luaL_optnumber(L, 6, 0.4f);
+    gfx.draw_text(text,x, y, font_name, scale, space_multiplier);
     return 0;
 }
 int main(){

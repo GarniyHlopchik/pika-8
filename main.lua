@@ -52,7 +52,7 @@ function _update(delta)
 
         -- Проверка коллизии с игроком
         if pos_x < enemy.x + enemy.width and pos_x + 64 > enemy.x
-           and pos_y < enemy.y + enemy.height and pos_y + 64 > enemy.y then
+            and pos_y < enemy.y + enemy.height and pos_y + 64 > enemy.y then
             print("Hit!")
             score = score + 1
             enemy.alive = false

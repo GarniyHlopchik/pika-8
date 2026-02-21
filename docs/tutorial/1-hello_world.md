@@ -8,7 +8,16 @@ Pika-8 generally doesn't require a configuration file to run. In that case it wi
     "window_title": "Hello World!",
     "window_width": 640,
     "window_height": 480,
-    "lua_script": "game.lua"
+    "lua_script": "game.lua",
+    "fonts": [
+        {
+        "name": "default",
+        "font_texture": "font.png",
+        "char_width": 8,
+        "char_height": 8,
+        "charset": "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,!?':;()[] "
+        }
+    ]
 }
 ```
 
@@ -20,9 +29,9 @@ We can finally get to it, create game.lua and write some code:
 ```lua
 function _update(delta)
     GFX.cls()    
-    GFX.text("Hello World!",60,60,3,1)
+    GFX.text("Hello World!",60,60,"default",3,1)
 end
 ```
 
-This uses an update callback, which takes in delta parameter - time elapsed since last update. Inside of it we use 2 functions from engine's GFX API: text(txt: String,x:int,y:int,scale:int,spacing:int) and cls(). 
+This uses an update callback, which takes in delta parameter - time elapsed since last update. Inside of it we use 2 functions from engine's GFX API: ```cls()``` and ```text(text: String, x_position:int, y_position:int, font_name: String, scale:int, spacing:int)```. Note that `text`, `x_position`, `y_position` and `font_name` are required.
 The first one clears the screen and the second one prints a message onto the screen from our loaded font.png
