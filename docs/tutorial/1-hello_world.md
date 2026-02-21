@@ -19,8 +19,8 @@ Just pop it into your project root as well! The name is not to be changed.
 We can finally get to it, create game.lua and write some code:
 ```lua
 function _update(delta)
-    GFX.text("Hello World!",60,60,3,1)
     GFX.cls()    
+    GFX.text("Hello World!",60,60,3,1)
 end
 ```
 
