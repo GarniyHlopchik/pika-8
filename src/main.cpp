@@ -35,6 +35,19 @@ int l_load(lua_State* L){
     lua_pushnumber(L,id);
     return 1;
 }
+/*
+* Lua binding for drawing a sprite
+* Arguments:
+* 1. texture (number) - the texture ID to draw
+* 2. x (number) - x position
+* 3. y (number) - y position
+* 4. width (number, optional) - width of the sprite (default: 8)
+* 5. height (number, optional) - height of the sprite (default: 8)
+* 6. u1 (number, optional) - left UV coordinate (default: 0)
+* 7. v1 (number, optional) - top UV coordinate (default: 0)
+* 8. u2 (number, optional) - right UV coordinate (default: 1)
+* 9. v2 (number, optional) - bottom UV coordinate (default: 1)  
+*/
 int l_spr(lua_State* L) {
     // 1. Get required arguments (texture, x, y)
     const unsigned int texture = luaL_checknumber(L, 1);
@@ -60,6 +73,16 @@ int l_cls(lua_State* L){
     glClear(GL_COLOR_BUFFER_BIT);
     return 0;
 }
+
+/*
+* Lua binding for drawing text
+* Arguments:
+* 1. text (string) - the text to draw
+* 2. x (number) - x position
+* 3. y (number) - y position
+* 4. scale (number, optional) - scale of the text (default: 1.0)
+* 5. space_multiplier (number, optional) - multiplier for space character width (default
+*/
 int l_text(lua_State* L){
     const char* text = luaL_checkstring(L,1);
     float x = luaL_checknumber(L,2);
