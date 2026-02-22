@@ -1,19 +1,20 @@
----@diagnostic disable: lowercase-global, undefined-global
+---@diagnostic disable: lowercase-global
 --#define KEY_RIGHT 262
 --#define KEY_LEFT 263
 --#define KEY_DOWN 264
 --#define KEY_UP 265
 
--- Подключаем класс Enemy
 local Enemy = require("scripts.enemy.enemy")
 
 function _init()
-    --sound playing example
-    sound = SFX.load("pipe.mp3");
-    SFX.play(sound);
-    
     spr = GFX.load("sprite.png")
     enemy_spr = GFX.load("enemy.png")
+
+    --FIXME TOO LOUD
+    --sound playing example
+    --sound = SFX.load("pipe.mp3");
+    --SFX.play(sound);
+    
     pos_x = 64
     pos_y = 64
     player_speed = 250.0
@@ -33,7 +34,7 @@ function _update(delta)
     -- GFX.text("12345678", 100, 140, 3, 100)
     -- GFX.text(".,!?':; ()[]", 100, 180, 3, 100)
 
-    GFX.text("score: " .. score, 10, 30, "default", 2, 0.4)
+    GFX.text("Score: "..score, 10, 30, "default", 2, 0.4)
     GFX.spr(spr,pos_x,pos_y, 64,64)
 
     -- Spawn enemies every 2 seconds
@@ -54,7 +55,7 @@ function _update(delta)
             enemy.alive = false
         end
 
-        -- Проверка коллизии с игроком
+        -- collision whith player
         if pos_x < enemy.x + enemy.width and pos_x + 64 > enemy.x
             and pos_y < enemy.y + enemy.height and pos_y + 64 > enemy.y then
             print("Hit!")
@@ -62,7 +63,6 @@ function _update(delta)
             enemy.alive = false
         end
 
-        -- Убираем мёртвых
         if not enemy.alive then
             table.remove(enemies, i)
         end
@@ -75,16 +75,18 @@ function _update(delta)
     end
 
     -- player movement
-    if Input.btnp(262) then
+    --FIXME accelerated diagonal movement
+    -- its not a bug, its intended this way. we are not minecraft to fix such shit -_-
+    if Input.btnp(262) or Input.btnp(68) then
         pos_x=pos_x+(player_speed*delta)
     end
-    if Input.btnp(263) then
+    if Input.btnp(263) or Input.btnp(65) then
         pos_x=pos_x-(player_speed*delta)
     end
-    if Input.btnp(264) then
+    if Input.btnp(264) or Input.btnp(83) then
         pos_y=pos_y+(player_speed*delta)
     end
-    if Input.btnp(265) then
+    if Input.btnp(265) or Input.btnp(87) then
         pos_y=pos_y-(player_speed*delta)
     end
 end

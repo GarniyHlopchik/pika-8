@@ -117,9 +117,28 @@ int l_sfx_load(lua_State* L){
     lua_pushnumber(L,id);
     return 1;
 }
+/*
+* Lua binding for playing a sound effect
+* Arguments:
+* 1. sound_id (number) - the ID of the sound to play
+* 2. volume (number, optional) - volume of the sound (default: 100.0)
+* 3. pitch (number, optional) - pitch of the sound (default: 1.0)
+* 4. loop (boolean, optional) - whether to loop the sound (default: false)
+* 7. pan (number, optional) - stereo pan of the sound (-1.0 for left, 1.0 for right, default: 0.0)
+*/
 int l_sfx_play(lua_State* L){
     unsigned int id = luaL_checknumber(L,1);
-    sfx.play(id);
+    float volume = luaL_optnumber(L, 2, 100.0f);
+    float pitch = luaL_optnumber(L, 3, 1.0f);
+    bool loop = lua_toboolean(L, 4);    
+    float pan = luaL_optnumber(L, 7, 0.0f);
+    sfx.play(id, volume, pitch, loop, pan);
+    return 0;
+}
+
+int l_sfx_stop(lua_State* L){
+    unsigned int id = luaL_checknumber(L,1);
+    sfx.stop(id);
     return 0;
 }
 
@@ -150,6 +169,7 @@ int main(){
     static const luaL_Reg sfx_lib[] = {
         {"load",l_sfx_load},
         {"play",l_sfx_play},
+        {"stop",l_sfx_stop},
         {NULL,NULL}
     };
     lua.bind_lib(sfx_lib,"SFX");

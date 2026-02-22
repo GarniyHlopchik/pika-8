@@ -62,9 +62,16 @@ GFX::GFX(int w, int h, const char* title){
 
 GFX::~GFX(){
     glDeleteProgram(shader);
-    if(font_texture) glDeleteTextures(1, &font_texture);
+    for (auto const& pair : font_cache) {
+        // pair.second gets the LoadedFont struct
+        unsigned int tex = pair.second.texture_id; 
+        glDeleteTextures(1, &tex);
+    }    
     glfwDestroyWindow(window);
     glfwTerminate();
+    for (auto const& [name, font] : font_cache) {
+        glDeleteTextures(1, &font.texture_id);
+    }
 }
 
 GLFWwindow* GFX::getWindow(){
@@ -110,57 +117,75 @@ void GFX::draw(const unsigned int texture, float x, float y, float width, float 
     spritemesh.draw(shader, texture, x, y, width, height, u1, v1, u2, v2);
 }
 
+FontData GFX::get_font_data(const std::string& name) {
+    for (const auto& font : config.get_fonts()) {
+        if (font.name == name) {
+            return font;
+        }
+    }
+    throw std::runtime_error("Font not found: " + name);
+}
 
 void GFX::draw_text(const std::string& text, float x, float y, const std::string& font_name, float scale, float space_multiplier) {
-    // std::cout << "Drawing text with font: " << font_name << std::endl;
-    FontData font_data = get_font_data(font_name);    
-
-    font_texture = load_texture(font_data.path);
-    if (!font_texture) return;
-
-    const float char_width = font_data.char_width;
-    const float char_height = font_data.char_height;
-
-    unsigned int font_img_width = 0, font_img_height = 0;
-    std::ifstream in(font_data.path, std::ios::binary); // MUST be binary!
     
-    if (in) { // Check if the file actually opened
-        unsigned char buf[8];
-        in.seekg(16);
+    if (font_cache.find(font_name) == font_cache.end()) {
+        // --- FONT IS NOT LOADED YET. DO THE HEAVY LIFTING ONCE ---
+        FontData font_data = get_font_data(font_name);    
+        unsigned int tex_id = load_texture(font_data.path);
         
-        // Check if we actually read 8 bytes successfully
-        if (in.read(reinterpret_cast<char*>(&buf), 8)) {
-            font_img_width = (buf[0] << 24) + (buf[1] << 16) + (buf[2] << 8) + (buf[3] << 0);
-            font_img_height = (buf[4] << 24) + (buf[5] << 16) + (buf[6] << 8) + (buf[7] << 0);
+        if (!tex_id) return;
+
+        unsigned int img_width = 0, img_height = 0;
+        std::ifstream in(font_data.path, std::ios::binary); 
+        
+        if (in) { 
+            unsigned char buf[8];
+            in.seekg(16);
+            if (in.read(reinterpret_cast<char*>(&buf), 8)) {
+                img_width = (buf[0] << 24) + (buf[1] << 16) + (buf[2] << 8) + (buf[3] << 0);
+                img_height = (buf[4] << 24) + (buf[5] << 16) + (buf[6] << 8) + (buf[7] << 0);
+            }
+        } else {
+            std::cerr << "Error: Could not open " << font_data.path << " to read dimensions." << std::endl;
+            return;
         }
-    } else {
-        std::cerr << "Error: Could not open " << font_data.path << " to read dimensions." << std::endl;
+
+        // Save the loaded data into the cache so we never do this again!
+        font_cache[font_name] = {tex_id, img_width, img_height, font_data};
     }
-    
-    const int chars_per_row = font_img_width / char_width;
-    const int total_rows = font_img_height / char_height;
+
+    const LoadedFont& font = font_cache[font_name];
+
+    const float char_width = font.data.char_width;
+    const float char_height = font.data.char_height;
+    const int chars_per_row = font.width / char_width;
+    const int total_rows = font.height / char_height;
 
     float draw_width = char_width * scale; 
     float draw_height = char_height * scale; 
-
     float cursor_x = x; 
+    const std::string& charset = font.data.charset;
 
-    std::string charset = font_data.charset;
-
+    // Drawing text by charecter
     for (size_t i = 0; i < text.length(); ++i) {
         if (text[i] == ' ') {
             cursor_x += (draw_width * space_multiplier); 
             continue;
         }
 
-        char c = toupper(text[i]); 
+        char c = text[i];
         size_t index = charset.find(c);
-        if (index == std::string::npos) continue;
+
+        if (index == std::string::npos) {
+            char upperC = static_cast<char>(toupper(static_cast<unsigned char>(c)));
+            index = charset.find(upperC);
+            if (index == std::string::npos) continue;
+        }
 
         int col = index % chars_per_row;
         int row = index / chars_per_row;
 
-        const float tex_width = 64.0f; 
+        const float tex_width = 64.0f; // Note: Are you sure these shouldn't be font.width / font.height?
         const float tex_height = 48.0f;
 
         const float margin_u = (.1f / tex_width);
@@ -171,7 +196,8 @@ void GFX::draw_text(const std::string& text, float x, float y, const std::string
         float u2 = ((float)(col + 1) / chars_per_row) - margin_u;
         float v2 = ((float)(row + 1) / total_rows) - margin_v;
 
-        draw(font_texture, cursor_x, y, draw_width, draw_height, u1, v1, u2, v2);
+        // Use the cached texture ID
+        draw(font.texture_id, cursor_x, y, draw_width, draw_height, u1, v1, u2, v2);
 
         cursor_x += draw_width; 
     }
