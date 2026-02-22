@@ -1,6 +1,43 @@
 {
-    "window_title": "Pika-8",
-    "window_width": 512,
-    "window_height": 512,
-    "lua_script": "main.lua"
+    "window_title": "Hello World!",
+    "window_width": 640,
+    "window_height": 480,
+    "lua_script": "main.lua",
+    "fonts": [
+        {
+        "name": "default",
+        "font_texture": "fonts/default_font.png",
+        "char_width": 8,
+        "char_height": 8,
+        "charset": " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+        },
+        {
+        "name": "ascii",
+        "font_texture": "fonts/font.png",
+        "char_width": 8,
+        "char_height": 8,
+        "charset": "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,!?':;()[] "
+        },
+        {
+        "name": "standard_galactic",
+        "font_texture": "fonts/ascii_sga.png",
+        "char_width": 8,
+        "char_height": 8,
+        "charset": " ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        },
+        {
+        "name": "llager",
+        "font_texture": "fonts/asciillager.png",
+        "char_width": 8,
+        "char_height": 8,
+        "charset": "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,!?':;()[] "
+        },
+        {
+        "name": "PixBobLite",
+        "font_texture": "fonts/PixBobLite.png",
+        "char_width": 5,
+        "char_height": 5,
+        "charset": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?()"
+        }
+    ]
 }

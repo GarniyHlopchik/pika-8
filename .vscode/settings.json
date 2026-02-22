@@ -1,0 +1,16 @@
+{
+    "C_Cpp.errorSquiggles": "disabled",
+
+    "todo-tree.filtering.excludeGlobs": [
+    "**/build/**",
+    "**/_deps/**",
+    "**/.git/**",
+    "**/dependencies/**",
+  ],
+  "todo-tree.regex.regex": "(//|#|<!--|;|/\\*|--|^)\\s*($TAGS)",
+  "todo-tree.highlights.customHighlight": {
+    "FIXME": {
+        "iconColour": "yellow",
+    }
+  }
+}
