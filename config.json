@@ -2,7 +2,7 @@
     "window_title": "Hello World!",
     "window_width": 640,
     "window_height": 480,
-    "lua_script": "game.lua",
+    "lua_script": "main.lua",
     "fonts": [
         {
         "name": "default",
@@ -34,7 +34,7 @@
         },
         {
         "name": "PixBobLite",
-        "font_texture": "fonts/PixBobLigte.png",
+        "font_texture": "fonts/PixBobLite.png",
         "char_width": 6,
         "char_height": 6,
         "charset": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?()"

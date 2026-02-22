@@ -9,6 +9,12 @@ local Enemy = require("scripts.enemy.enemy")
 function _init()
     spr = GFX.load("sprite.png")
     enemy_spr = GFX.load("enemy.png")
+
+    --FIXME TOO LOUD
+    --sound playing example
+    --sound = SFX.load("pipe.mp3");
+    --SFX.play(sound);
+    
     pos_x = 64
     pos_y = 64
     player_speed = 250.0
@@ -28,7 +34,7 @@ function _update(delta)
     -- GFX.text("12345678", 100, 140, 3, 100)
     -- GFX.text(".,!?':; ()[]", 100, 180, 3, 100)
 
-    GFX.text("score: " .. score, 10, 30, 2, 0.4)
+    GFX.text("Score: "..score, 10, 30, "default", 2, 0.4)
     GFX.spr(spr,pos_x,pos_y, 64,64)
 
     -- Spawn enemies every 2 seconds
@@ -63,12 +69,13 @@ function _update(delta)
     end
 
     if #enemies > 0 then
-        GFX.text("enemies: " .. #enemies .. "  state: " .. enemies[1]:get_state_name(), 10, 10, 2, 0.4)
+        GFX.text("enemies: " .. #enemies .. "  state: " .. enemies[1]:get_state_name(), 10, 10, "default", 2, 0.4)
     else 
-        GFX.text("enemies: 0", 10, 10, 2, 0.4)
+        GFX.text("enemies: 0", 10, 10, "default", 2, 0.4)
     end
 
     -- player movement
+    --FIXME accelerated diagonal movement
     if Input.btnp(262) or Input.btnp(68) then
         pos_x=pos_x+(player_speed*delta)
     end
