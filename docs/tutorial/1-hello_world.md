@@ -12,10 +12,10 @@ Pika-8 generally doesn't require a configuration file to run. In that case it wi
     "fonts": [
         {
         "name": "default",
-        "font_texture": "font.png",
+        "font_texture": "default_font.png",
         "char_width": 8,
         "char_height": 8,
-        "charset": "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,!?':;()[] "
+        "charset": " !\"#$%&'()*+,-./0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
         }
     ]
 }
@@ -33,6 +33,6 @@ function _update(delta)
 end
 ```
 
-This uses an update callback, which takes in delta parameter - time elapsed since last update. Inside of it we use 2 functions from engine's GFX API: ```cls()``` and ```text(text: String, x_position:int, y_position:int, font_name: String, scale:int, spacing:int)```. Note that `text`, `x_position`, `y_position` and `font_name` are required.
+This uses an update callback, which takes in delta parameter - time elapsed since last update. Inside of it we use 2 functions from engine's GFX API: ```cls()``` and ```text(text: String, x_position: int, y_position: int, font_name: String, scale: int, spacing: int)```. Note that `text`, `x_position`, `y_position` and `font_name` are required.
 
 The first one clears the screen and the second one prints a message onto the screen from our loaded font.png
