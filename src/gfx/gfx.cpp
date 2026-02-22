@@ -157,15 +157,14 @@ void GFX::draw_text(const std::string& text, float x, float y, const std::string
             continue;
         }
 
-        char c = text[i]; 
-        size_t index;
-        try{
-            index = charset.find(c);
-        } catch (const std::exception& e) {
-            c = toupper(text[i]);
-            size_t index = charset.find(c);
+        char c = text[i];
+        size_t index = charset.find(c);
+
+        if (index == std::string::npos) {
+            char upperC = static_cast<char>(toupper(static_cast<unsigned char>(c)));
+            index = charset.find(upperC);
             if (index == std::string::npos) {
-                std::cerr << "Error finding character '" << c << "' in charset: " << e.what() << std::endl;
+                std::cerr << "Error: Character '" << c << "' not found in charset." << std::endl;
                 continue;
             }
         }
