@@ -22,7 +22,7 @@ Pika-8 generally doesn't require a configuration file to run. In that case it wi
 ```
 
 Notice that we set the lua script to "game.lua". This means that "main.lua" will no longer be used by the engine, so the file we should define is "game.lua". This is where we will write our first hello world, but first we need to add a font to render it with. Pika uses bitmap fonts, which happen to be just a spritesheet .png image containing every usable character. Let's grab a font from this repo:
-[Right here](../data/font.png)
+[Right here](../data/default_font.png)
 Just pop it into your project root as well! The name is not to be changed.  
 ## Coding
 We can finally get to it, create game.lua and write some code:
