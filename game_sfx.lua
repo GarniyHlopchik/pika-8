@@ -1,7 +1,7 @@
 function _init()
-    sound = SFX.load("pipe.mp3");
-    sound1 = SFX.load("pipe.mp3");
-    sound2 = SFX.load("pipe.mp3");
+    sound = SFX.load("monster.mp3");
+    sound1 = SFX.load("Its_Going_Down_Now.mp3");
+    sound2 = SFX.load("Kingslayer.mp3");
 
     time = 0;
 
@@ -22,12 +22,12 @@ function _update(delta)
     end
 
     if math.floor(time) == 5 then
-        SFX.play(sound1, 1.0, 1.0, false, 0.0);
+        SFX.play(sound2, 1.0, 1.0, false, 0.0);
         GFX.text("play 2", 60, 120, "PixBobLite", 3, 1)
     end
 
     if math.floor(time) == 8 then
-        SFX.play(sound1, 1.0, 1.0, false, 0.0);
+        SFX.play(sound3, 1.0, 1.0, false, 0.0);
         GFX.text("play 3", 60, 180, "PixBobLite", 3, 1)
     end
 
