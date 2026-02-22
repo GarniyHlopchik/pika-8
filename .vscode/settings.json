@@ -7,10 +7,24 @@
     "**/.git/**",
     "**/dependencies/**",
   ],
+
   "todo-tree.regex.regex": "(//|#|<!--|;|/\\*|--|^)\\s*($TAGS)",
+
   "todo-tree.highlights.customHighlight": {
+    "TODO": {
+        "iconColour": "#00ff00",
+    },
     "FIXME": {
-        "iconColour": "yellow",
+        "iconColour": "#ffff00",
+    },
+    "BRAINFUCK":{
+        "icon": "alert",
+        "iconColour": "#ff00ff",
     }
-  }
+  },
+  "Lua.diagnostics.disable": [
+    "undefined-global",
+    "undefined-doc-param",
+    "lowercase-global"
+  ]
 }

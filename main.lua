@@ -5,10 +5,19 @@
 --#define KEY_UP 265
 
 local Enemy = require("scripts.enemy.enemy")
+local EnemySpawner = require("scripts.enemy.enemy_spawner")
 
 function _init()
     spr = GFX.load("sprite.png")
-    enemy_spr = GFX.load("enemy.png")
+
+    enemy_spr = {
+        GFX.load("assets/sprites/enemies/enemy1.png"),
+        GFX.load("assets/sprites/enemies/enemy2.png"),
+    }
+
+    generator = EnemySpawner.create_generator(512, 512, enemy_spr) -- screen width, height, enemy sprites
+    spawn_state = EnemySpawner.create_state(8, 1)  -- spawn for 8 seconds, 1 enemy per second
+    enemies_counter = 0
 
     --TODO too loud
     --sound playing example
@@ -19,15 +28,14 @@ function _init()
     pos_y = 64
     player_speed = 250.0
     enemies = {}
-    spawn_timer = 0
     score = 0
 end
 
 function _update(delta)
-    fps = 1/delta
-    if(fps < 300) then
-        print("FPS: "..fps)
-    end
+    -- fps = 1/delta
+    -- if(fps < 300) then
+    --     print("FPS: "..fps)
+    -- end
     GFX.cls()
 
     -- GFX.text("a quick brown fox jumps over the lazy dog", 100, 100, 3, .4)
@@ -37,12 +45,11 @@ function _update(delta)
     GFX.text("Score: "..score, 10, 30, "default", 2, 0.4)
     GFX.spr(spr,pos_x,pos_y, 64,64)
 
-    -- Spawn enemies every 2 seconds
-    spawn_timer = spawn_timer + delta
-    if spawn_timer >= 2 then
-        local e = Enemy:new(math.random(10, 502), 10, enemy_spr)
+    local x, y, sprite = EnemySpawner.spawn_for_duration(generator, spawn_state, delta)
+    if x then
+        local e = Enemy:new(x, y, sprite)
         table.insert(enemies, e)
-        spawn_timer = 0
+        enemies_counter = enemies_counter + 1
     end
 
     -- Update enemies
@@ -73,6 +80,7 @@ function _update(delta)
     else 
         GFX.text("enemies: 0", 10, 10, "default", 2, 0.4)
     end
+    GFX.text("enemies spawned: "..enemies_counter, 10, 50, "default", 2, 0.4)
 
     -- player movement
     --FIXME accelerated diagonal movement
