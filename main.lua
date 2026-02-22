@@ -1,17 +1,12 @@
----@diagnostic disable: lowercase-global, undefined-global
+---@diagnostic disable: lowercase-global
 --#define KEY_RIGHT 262
 --#define KEY_LEFT 263
 --#define KEY_DOWN 264
 --#define KEY_UP 265
 
--- Подключаем класс Enemy
 local Enemy = require("scripts.enemy.enemy")
 
 function _init()
-    --sound playing example
-    sound = SFX.load("pipe.mp3");
-    SFX.play(sound);
-    
     spr = GFX.load("sprite.png")
     enemy_spr = GFX.load("enemy.png")
     pos_x = 64
@@ -25,7 +20,7 @@ end
 function _update(delta)
     fps = 1/delta
     if(fps < 300) then
-        -- print("FPS: "..fps)
+        print("FPS: "..fps)
     end
     GFX.cls()
 
@@ -33,7 +28,7 @@ function _update(delta)
     -- GFX.text("12345678", 100, 140, 3, 100)
     -- GFX.text(".,!?':; ()[]", 100, 180, 3, 100)
 
-    GFX.text("score: " .. score, 10, 30, "default", 2)
+    GFX.text("score: " .. score, 10, 30, 2, 0.4)
     GFX.spr(spr,pos_x,pos_y, 64,64)
 
     -- Spawn enemies every 2 seconds
@@ -54,37 +49,36 @@ function _update(delta)
             enemy.alive = false
         end
 
-        -- Проверка коллизии с игроком
+        -- collision whith player
         if pos_x < enemy.x + enemy.width and pos_x + 64 > enemy.x
-            and pos_y < enemy.y + enemy.height and pos_y + 64 > enemy.y then
+           and pos_y < enemy.y + enemy.height and pos_y + 64 > enemy.y then
             print("Hit!")
             score = score + 1
             enemy.alive = false
         end
 
-        -- Убираем мёртвых
         if not enemy.alive then
             table.remove(enemies, i)
         end
     end
 
     if #enemies > 0 then
-        GFX.text("enemies: " .. #enemies .. "  state: " .. enemies[1]:get_state_name(), 10, 10, "default", 2, 0.4)
+        GFX.text("enemies: " .. #enemies .. "  state: " .. enemies[1]:get_state_name(), 10, 10, 2, 0.4)
     else 
-        GFX.text("enemies: 0", 10, 10, "default", 2, 0.4)
+        GFX.text("enemies: 0", 10, 10, 2, 0.4)
     end
 
     -- player movement
-    if Input.btnp(262) then
+    if Input.btnp(262) or Input.btnp(68) then
         pos_x=pos_x+(player_speed*delta)
     end
-    if Input.btnp(263) then
+    if Input.btnp(263) or Input.btnp(65) then
         pos_x=pos_x-(player_speed*delta)
     end
-    if Input.btnp(264) then
+    if Input.btnp(264) or Input.btnp(83) then
         pos_y=pos_y+(player_speed*delta)
     end
-    if Input.btnp(265) then
+    if Input.btnp(265) or Input.btnp(87) then
         pos_y=pos_y-(player_speed*delta)
     end
 end
