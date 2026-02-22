@@ -34,9 +34,9 @@
         },
         {
         "name": "PixBobLite",
-        "font_texture": "fonts/PixBobLigte.png",
-        "char_width": 6,
-        "char_height": 6,
+        "font_texture": "fonts/PixBobLite.png",
+        "char_width": 5,
+        "char_height": 5,
         "charset": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?()"
         }
     ]
