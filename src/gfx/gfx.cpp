@@ -140,12 +140,16 @@ void GFX::draw_text(const std::string& text, float x, float y, const std::string
     const int chars_per_row = font_img_width / char_width;
     const int total_rows = font_img_height / char_height;
 
+    // std::cout << "Font image dimensions: " << font_img_width << "x" << font_img_height << std::endl;
+
+
     float draw_width = char_width * scale; 
     float draw_height = char_height * scale; 
 
     float cursor_x = x; 
 
     std::string charset = font_data.charset;
+    // std::cout << "Font charset: " << charset << std::endl;
 
     for (size_t i = 0; i < text.length(); ++i) {
         if (text[i] == ' ') {
@@ -153,8 +157,18 @@ void GFX::draw_text(const std::string& text, float x, float y, const std::string
             continue;
         }
 
-        char c = toupper(text[i]); 
-        size_t index = charset.find(c);
+        char c = text[i]; 
+        size_t index;
+        try{
+            index = charset.find(c);
+        } catch (const std::exception& e) {
+            c = toupper(text[i]);
+            size_t index = charset.find(c);
+            if (index == std::string::npos) {
+                std::cerr << "Error finding character '" << c << "' in charset: " << e.what() << std::endl;
+                continue;
+            }
+        }
         if (index == std::string::npos) continue;
 
         int col = index % chars_per_row;

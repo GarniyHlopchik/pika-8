@@ -76,7 +76,7 @@ public:
 
                 if (!font.path.empty()) {
                     fonts.push_back(font);
-                    std::cout << "Successfully loaded font: " << font.name << std::endl;
+                    // std::cout << "Successfully loaded font: " << font.name << std::endl;
                 }
             }
         }

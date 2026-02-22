@@ -25,7 +25,7 @@ end
 function _update(delta)
     fps = 1/delta
     if(fps < 300) then
-        print("FPS: "..fps)
+        -- print("FPS: "..fps)
     end
     GFX.cls()
 
@@ -33,7 +33,7 @@ function _update(delta)
     -- GFX.text("12345678", 100, 140, 3, 100)
     -- GFX.text(".,!?':; ()[]", 100, 180, 3, 100)
 
-    GFX.text("score: " .. score, 10, 30, "default", 2, 0.4)
+    GFX.text("score: " .. score, 10, 30, "default", 2)
     GFX.spr(spr,pos_x,pos_y, 64,64)
 
     -- Spawn enemies every 2 seconds
