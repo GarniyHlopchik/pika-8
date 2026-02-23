@@ -19,4 +19,4 @@ extern "C" {
 #include "algorithm"
 #include "list"
 #include "iterator"
-#include "pugixml.hpp"
+#include "pugixml/pugixml.hpp"

@@ -3,7 +3,7 @@
 
 class Node{
     public:
-    Node(Node* p_parent,int p_id);
+    Node(Node* p_parent,int p_id,int p_script_ref);
     virtual ~Node();
     void add_child(Node* child);
     void remove_child(Node* child);
