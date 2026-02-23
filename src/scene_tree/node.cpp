@@ -1,8 +1,12 @@
 #include "node.h"
 
-Node::Node(Node* p_parent,int p_id){
+Node::Node(Node* p_parent,int p_id,int p_script_ref){
     parent = p_parent;
     id = p_id;
+    if(p_script_ref){
+        script_ref = p_script_ref;
+    }
+
 }
 Node::~Node(){
     for (std::vector<Node*>::iterator it = children.begin(); it != children.end(); ++it) {
@@ -18,3 +22,4 @@ void Node::remove_child(Node* child){
 }
 void Node::_init(){}
 void Node::_update(float dt){}
+void queue_free(){}

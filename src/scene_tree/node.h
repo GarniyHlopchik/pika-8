@@ -7,10 +7,13 @@ class Node{
     virtual ~Node();
     void add_child(Node* child);
     void remove_child(Node* child);
+    void queue_free();
     virtual void _init();
     virtual void _update(float dt);
+
     private:
     Node* parent;
     std::vector<Node*> children;
     int id;
+    int script_ref;
 };
