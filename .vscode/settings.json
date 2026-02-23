@@ -25,6 +25,8 @@
   "Lua.diagnostics.disable": [
     "undefined-global",
     "undefined-doc-param",
-    "lowercase-global"
+    "lowercase-global",
+    "param-type-mismatch",
+    "missing-parameter"
   ]
 }
