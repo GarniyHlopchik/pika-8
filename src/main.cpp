@@ -43,6 +43,37 @@ int l_load(lua_State* L){
     lua_pushnumber(L,id);
     return 1;
 }
+
+struct SpriteCut{
+    float x1, x2, y1, y2;
+}
+
+UVCoords calculate_uv(SpriteCut sprite, unsigned int texture) {
+    if (sprite.x2 > sprite.x1 && sprite.y2 > sprite.y1) {
+        UVCoords uv;
+
+        std::vector<int> dims = GFX::get_image_dimensions(texture){
+        float tex_w = (float)dims[0];
+        float tex_h = (float)dims[1];
+
+        // Protect against division by zero
+        if (tex_w > 0.0f && tex_h > 0.0f) {
+            // UVs are normalized (0.0 to 1.0). Divide the pixel coordinate by the total dimension.
+            uv.u1 = sprite.x1 / tex_w;
+            uv.v1 = sprite.y1 / tex_h;
+            uv.u2 = sprite.x2 / tex_w;
+            uv.v2 = sprite.y2 / tex_h;
+        } else {
+            // Fallback if the texture fails to load properly
+            uv.u1 = 0.0f; uv.v1 = 0.0f; uv.u2 = 1.0f; uv.v2 = 1.0f;
+        }
+    } else {
+        // Default UV coordinates (draws the entire texture)
+        uv.u1 = 0.0f; uv.v1 = 0.0f; 
+        uv.u2 = 1.0f; uv.v2 = 1.0f;
+    }
+}
+
 /*
 * Lua binding for drawing a sprite
 * Arguments:
@@ -67,43 +98,18 @@ int l_spr(lua_State* L) {
     float height = luaL_optnumber(L, 5, 8.0f);
 
     // 3. (Optional) You can also expose the UV coordinates to Lua for sprite animations
-    float sprite_x1 = luaL_optnumber(L, 6, 0.0f); // Left
-    float sprite_x2 = luaL_optnumber(L, 7, 0.0f); // Right
-    float sprite_y1 = luaL_optnumber(L, 8, 0.0f); // Top
-    float sprite_y2 = luaL_optnumber(L, 9, 0.0f); // Bottom 
+    SpriteCut sprite;
+    float sprite.x1 = luaL_optnumber(L, 6, 0.0f); // Left
+    float sprite.x2 = luaL_optnumber(L, 7, 0.0f); // Right
+    float sprite.y1 = luaL_optnumber(L, 8, 0.0f); // Top
+    float sprite.y2 = luaL_optnumber(L, 9, 0.0f); // Bottom 
     
-    float u1, v1, u2, v2;
-
-    if (sprite_x2 > sprite_x1 && sprite_y2 > sprite_y1) {
-        // Fetch texture dimensions ONCE to improve performance
-        std::vector<int> dims = GFX::get_image_dimensions(GFX::get_texture_path(texture));
-
-        float tex_w = (float)dims[0];
-        float tex_h = (float)dims[1];
-
-        // Protect against division by zero
-        if (tex_w > 0.0f && tex_h > 0.0f) {
-            // UVs are normalized (0.0 to 1.0). Divide the pixel coordinate by the total dimension.
-            u1 = sprite_x1 / tex_w;
-            v1 = sprite_y1 / tex_h;
-            u2 = sprite_x2 / tex_w;
-            v2 = sprite_y2 / tex_h;
-        } else {
-            // Fallback if the texture fails to load properly
-            u1 = 0.0f; v1 = 0.0f; u2 = 1.0f; v2 = 1.0f;
-        }
-    } else {
-        // Default UV coordinates (draws the entire texture)
-        u1 = 0.0f;
-        v1 = 0.0f;
-        u2 = 1.0f;
-        v2 = 1.0f;
-    }
+    UVCoords uv = calculate_uv(sprite, texture);
 
     // std::cout << u1 << v1 << u2 << v2 << std::endl;
 
     // Pass everything to your updated C++ draw function
-    gfx.draw(texture, x, y, width, height, u1, v1, u2, v2);
+    gfx.draw(texture, x, y, width, height, uv);
     
     return 0;
 }

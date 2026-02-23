@@ -74,7 +74,7 @@ GFX::~GFX(){
     }
 }
 
-GLFWwindow* GFX::get_window(){
+GLFWwindow* GFX::get_window() {
     return GFX::window;
 }
 
@@ -86,6 +86,10 @@ std::vector<int> GFX::get_image_dimensions(const std::string& path) {
     }
     stbi_image_free(data);
     return {width, height};
+}
+
+static std::vector<int> GFX::get_image_dimensions(const unsigned int texture) {
+    return get_image_dimensions(get_texture_path(texture));
 }
 
 std::string GFX::get_texture_path(const unsigned int id){
@@ -140,8 +144,8 @@ unsigned int GFX::load_texture(const std::string& path){
 
 
 
-void GFX::draw(const unsigned int texture, float x, float y, float width, float height, float u1, float v1, float u2, float v2) {
-    spritemesh.draw(shader, texture, x, y, width, height, u1, v1, u2, v2);
+void GFX::draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv) const {
+    spritemesh.draw(shader, texture, x, y, width, height, uv.u1, uv.v1, uv.u2, uv.v2);
 }
 
 
@@ -154,73 +158,89 @@ FontData GFX::get_font_data(const std::string& name) {
     throw std::runtime_error("Font not found: " + name);
 }
 
+bool GFX::is_font_loaded(const std::string& font_name){
+    return (font_cache.find(font_name) != font_cache.end());
+}
 
+void GFX::load_font(const std::string& font_name){
+    FontData font_data = get_font_data(font_name);    
+    unsigned int tex_id = load_texture(font_data.path);
+    
+    if (!tex_id) return;
 
+    unsigned int img_width = 0, img_height = 0;
+    std::vector<int> dims = get_image_dimensions(font_data.path);
+    img_width = dims[0];
+    img_height = dims[1];
 
+    font_cache[font_name] = {tex_id, img_width, img_height, font_data};
+}
 
+size_t GFX::get_char_index(char c, const std::string& charset) const {
+    size_t index = charset.find(c);
+    
+    // Fallback to uppercase if lowercase isn't found
+    if (index == std::string::npos) {
+        char upper_c = static_cast<char>(toupper(static_cast<unsigned char>(c)));
+        index = charset.find(upper_c);
+    }
+    
+    return index;
+}
+
+UVCoords GFX::calculate_uv_coords(size_t index, const LoadedFont& font) const {
+    const int chars_per_row = font.width / font.data.char_width;
+    const int total_rows = font.height / font.data.char_height;
+
+    int col = index % chars_per_row;
+    int row = index / chars_per_row;
+    
+    // Note: Are you sure these shouldn't be font.width / font.height?
+    /// Should be exactly that. No clue how it worked....
+    const float tex_width = font.width; 
+    const float tex_height = font.height;
+
+    const float margin_u = 0.1f / tex_width;
+    const float margin_v = 0.1f / tex_height;
+        
+    return {
+        (static_cast<float>(col) / chars_per_row) + margin_u,
+        (static_cast<float>(row) / total_rows) + margin_v,
+        (static_cast<float>(col + 1) / chars_per_row) - margin_u,
+        (static_cast<float>(row + 1) / total_rows) - margin_v
+    };
+}
 
 void GFX::draw_text(const std::string& text, float x, float y, const std::string& font_name, float scale, float space_multiplier) {
     
-    if (font_cache.find(font_name) == font_cache.end()) {
-        // --- FONT IS NOT LOADED YET. DO THE HEAVY LIFTING ONCE ---
-        FontData font_data = get_font_data(font_name);    
-        unsigned int tex_id = load_texture(font_data.path);
-        
-        if (!tex_id) return;
-
-        unsigned int img_width = 0, img_height = 0;
-        std::vector<int> dims = get_image_dimensions(font_data.path);
-        img_width = dims[0];
-        img_height = dims[1];
-
-        // Save the loaded data into the cache so we never do this again!
-        font_cache[font_name] = {tex_id, img_width, img_height, font_data};
+    // load font to cash onse
+    if (is_font_loaded(font_name) == false) {
+        load_font(font_name);
     }
+    
+    if (is_font_loaded(font_name) == false) return;
 
     const LoadedFont& font = font_cache[font_name];
 
-    const float char_width = font.data.char_width;
-    const float char_height = font.data.char_height;
-    const int chars_per_row = font.width / char_width;
-    const int total_rows = font.height / char_height;
+    float draw_width = font.data.char_width * scale; 
+    float draw_height = font.data.char_height * scale; 
 
-    float draw_width = char_width * scale; 
-    float draw_height = char_height * scale; 
     float cursor_x = x; 
-    const std::string& charset = font.data.charset;
 
     // Drawing text by charecter
-    for (size_t i = 0; i < text.length(); ++i) {
-        if (text[i] == ' ') {
+    for (char c : text) {
+        if (c == ' ') {
             cursor_x += (draw_width * space_multiplier); 
             continue;
         }
 
-        char c = text[i];
-        size_t index = charset.find(c);
-
-        if (index == std::string::npos) {
-            char upperC = static_cast<char>(toupper(static_cast<unsigned char>(c)));
-            index = charset.find(upperC);
-            if (index == std::string::npos) continue;
-        }
-
-        int col = index % chars_per_row;
-        int row = index / chars_per_row;
-
-        const float tex_width = 64.0f; // Note: Are you sure these shouldn't be font.width / font.height?
-        const float tex_height = 48.0f;
-
-        const float margin_u = (.1f / tex_width);
-        const float margin_v = (.1f / tex_height);
-            
-        float u1 = ((float)col / chars_per_row) + margin_u;
-        float v1 = ((float)row / total_rows) + margin_v;
-        float u2 = ((float)(col + 1) / chars_per_row) - margin_u;
-        float v2 = ((float)(row + 1) / total_rows) - margin_v;
+        size_t index = get_char_index(c, font.data.charset);
+        if (index == std::string::npos) continue;
+        
+        UVCoords uv = calculate_uv_coords(index, font);
 
         // Use the cached texture ID
-        draw(font.texture_id, cursor_x, y, draw_width, draw_height, u1, v1, u2, v2);
+        draw(font.texture_id, cursor_x, y, draw_width, draw_height, uv);
 
         cursor_x += draw_width; 
     }
