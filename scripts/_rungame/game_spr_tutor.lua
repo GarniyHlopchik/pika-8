@@ -1,6 +1,6 @@
 function _init()
     -- Load assets, initialize game state, etc.
-    spr = GFX.load("sprite.png")
+    spr = GFX.load("assets/sprites/player/player.png")
 end
 
 function _update(delta)

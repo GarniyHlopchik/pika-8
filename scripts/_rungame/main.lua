@@ -8,7 +8,7 @@ local Enemy = require("scripts.enemy.enemy")
 local EnemySpawner = require("scripts.enemy.enemy_spawner")
 
 function _init()
-    spr = GFX.load("sprite.png")
+    spr = GFX.load("assets/sprites/player/player.png")
 
     enemy_spr = {
         GFX.load("assets/sprites/enemies/enemy1.png"),
@@ -16,12 +16,12 @@ function _init()
     }
 
     generator = EnemySpawner.create_generator(512, 512, enemy_spr) -- screen width, height, enemy sprites
-    spawn_state = EnemySpawner.create_state(8, 1)  -- spawn for 8 seconds, 1 enemy per second
+    spawn_state = EnemySpawner.create_state(8, 1)  -- spawn for X seconds, enemy per X seconds
     enemies_counter = 0
 
     --TODO too loud
     --sound playing example
-    --sound = SFX.load("pipe.mp3");
+    --sound = SFX.load("assets/sounds/pipe.mp3");
     --SFX.play(sound);
     
     pos_x = 64

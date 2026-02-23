@@ -1,3 +1,5 @@
+--TODO optimize spawn_for_duration() (or refactoring)
+
 local EnemySpawner = {}
 
 -- generator
@@ -40,7 +42,6 @@ function EnemySpawner.spawn_for_duration(generator, state, dt)
 
         local ok, x, y, sprite = coroutine.resume(generator) -- get data from generator 
                                                              -- ok is boolean status from courutine
-        print("ok: "..tostring(ok))
         if not ok then
             state.finished = true
             print("[Spawner] Generator error: " .. tostring(x)) -- x is an error message (2nd return value of resume)
