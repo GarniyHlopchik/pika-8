@@ -32,7 +32,11 @@ unsigned int SFX::load(const std::string& path){
         sounds.pop_back(); // Remove failed entry
         return 0;
     }
-
+    //auto gen = get_id();
+    //auto it = gen.begin();
+    //if (it != gen.end()) {
+    //    s.id = *it;
+    //}
     s.id = get_id();
     return s.id;
 }
@@ -76,3 +80,10 @@ unsigned int SFX::get_id(){
     static unsigned int id = 0;
     return id++;
 }
+//std::generator<int> SFX::get_id() {
+//    int id = 0;
+//    while (true) {
+//        co_yield id;
+//        id++;
+//    }
+//}

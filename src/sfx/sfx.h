@@ -16,6 +16,7 @@ public:
     void stop(unsigned int sound_id);
 
 private:
+    //std::generator<int> SFX::get_id();
     unsigned int get_id();
     ma_engine engine;
     std::list<SoundRes> sounds;
