@@ -88,7 +88,7 @@ std::vector<int> GFX::get_image_dimensions(const std::string& path) {
     return {width, height};
 }
 
-static std::vector<int> GFX::get_image_dimensions(const unsigned int texture) {
+std::vector<int> GFX::get_image_dimensions(const unsigned int texture) {
     return get_image_dimensions(get_texture_path(texture));
 }
 
@@ -144,8 +144,8 @@ unsigned int GFX::load_texture(const std::string& path){
 
 
 
-void GFX::draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv) const {
-    spritemesh.draw(shader, texture, x, y, width, height, uv.u1, uv.v1, uv.u2, uv.v2);
+void GFX::draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv) {
+    spritemesh.draw(shader, texture, x, y, width, height, (float)uv.u1, (float)uv.v1, (float)uv.u2, (float)uv.v2);
 }
 
 

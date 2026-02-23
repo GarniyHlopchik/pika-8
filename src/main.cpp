@@ -46,13 +46,12 @@ int l_load(lua_State* L){
 
 struct SpriteCut{
     float x1, x2, y1, y2;
-}
+};
 
 UVCoords calculate_uv(SpriteCut sprite, unsigned int texture) {
+    UVCoords uv;
     if (sprite.x2 > sprite.x1 && sprite.y2 > sprite.y1) {
-        UVCoords uv;
-
-        std::vector<int> dims = GFX::get_image_dimensions(texture){
+        std::vector<int> dims = GFX::get_image_dimensions(texture);
         float tex_w = (float)dims[0];
         float tex_h = (float)dims[1];
 
@@ -72,6 +71,7 @@ UVCoords calculate_uv(SpriteCut sprite, unsigned int texture) {
         uv.u1 = 0.0f; uv.v1 = 0.0f; 
         uv.u2 = 1.0f; uv.v2 = 1.0f;
     }
+    return uv;
 }
 
 /*
@@ -99,10 +99,10 @@ int l_spr(lua_State* L) {
 
     // 3. (Optional) You can also expose the UV coordinates to Lua for sprite animations
     SpriteCut sprite;
-    float sprite.x1 = luaL_optnumber(L, 6, 0.0f); // Left
-    float sprite.x2 = luaL_optnumber(L, 7, 0.0f); // Right
-    float sprite.y1 = luaL_optnumber(L, 8, 0.0f); // Top
-    float sprite.y2 = luaL_optnumber(L, 9, 0.0f); // Bottom 
+    sprite.x1 = luaL_optnumber(L, 6, 0.0f); // Left
+    sprite.x2 = luaL_optnumber(L, 7, 0.0f); // Right
+    sprite.y1 = luaL_optnumber(L, 8, 0.0f); // Top
+    sprite.y2 = luaL_optnumber(L, 9, 0.0f); // Bottom 
     
     UVCoords uv = calculate_uv(sprite, texture);
 
@@ -118,6 +118,25 @@ int l_cls(lua_State* L){
     return 0;
 }
 
+
+void draw_text(const char* text, int x, int y, std::string font_name, float scale, float space_multiplier){
+    try {
+        gfx.draw_text(text, x, y, font_name, scale, space_multiplier);
+    } 
+    catch (const std::exception& e) {
+        if (std::string(e.what()).find("Font not found") != std::string::npos) {
+            font_name = "default";
+            std::cerr << "Warning: " << e.what() << " Falling back to default font." << std::endl;
+            try {
+                gfx.draw_text(text, x, y, font_name, scale, space_multiplier);
+            } catch (const std::exception& e) {
+                std::cerr << "Error: Default font also not found. Cannot draw text." << std::endl;
+            }
+        } else {
+            std::cerr << "Error in l_text: " << e.what() << std::endl;
+        }
+    }
+}
 /*
 * Lua binding for drawing text
 * Arguments:
@@ -135,23 +154,8 @@ int l_text(lua_State* L){
     std::string font_name = luaL_checkstring(L, 4);
     float scale = luaL_optnumber(L, 5, 1.0f);
     float space_multiplier = luaL_optnumber(L, 6, 0.4f);
-    try {
-    gfx.draw_text(text,x, y, font_name, scale, space_multiplier);
-    } 
-    catch (const std::exception& e) {
-        if (std::string(e.what()).find("Font not found") != std::string::npos) {
-            font_name = "default";
-            std::cerr << "Warning: " << e.what() << " Falling back to default font." << std::endl;
-            try {
-                gfx.draw_text(text,x, y, font_name, scale, space_multiplier);
-            } catch (const std::exception& e) {
-                std::cerr << "Error: Default font also not found. Cannot draw text." << std::endl;
-            }
-        } else {
-            std::cerr << "Error in l_text: " << e.what() << std::endl;
-        }
-    }
     
+    draw_text(text, x, y, font_name, scale, space_multiplier);
     return 0;
 }
 

@@ -35,7 +35,7 @@ public:
 
     bool window_should_close();
     unsigned int load_texture(const std::string& path);
-    void draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv) const;    
+    void draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv);    
     void draw_text(const std::string& text, float x, float y, const std::string& font_name = "default",  float scale = 1.0f, float space_multiplier = 0.4f);
     
     UVCoords calculate_uv_coords(size_t index, const LoadedFont& font) const;
