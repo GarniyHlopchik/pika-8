@@ -13,6 +13,13 @@ struct LoadedFont {
     FontData data;
 };
 
+struct LoadedImages
+{
+    std::string path;
+    unsigned int id;
+};
+
+
 class GFX {
 public:
     GFX(int w, int h, const char* title);
@@ -23,11 +30,18 @@ public:
     void draw(const unsigned int texture, float x, float y, float width, float height, float u1 = 0.0f, float v1 = 0.0f, float u2 = 1.0f, float v2 = 1.0f);    
     void draw_text(const std::string& text, float x, float y, const std::string& font_name = "default",  float scale = 1.0f, float space_multiplier = 0.4f);
     
-    static GLFWwindow* getWindow();
-    static unsigned int getShader();
+    static GLFWwindow* get_window();
+    static unsigned int get_shader();
     void update();
 
     FontData get_font_data(const std::string& name);
+
+    static std::vector<int> get_image_dimensions(const std::string& path);
+
+    static std::string get_texture_path(const unsigned int id);
+    static void add_new_image(const LoadedImages img);
+    // std::vector<LoadedImages> loaded_images;
+    // std::vector<LoadedImages> get_loaded_images() const { return loaded_images; };
 
 private:
     Config config;
@@ -35,6 +49,5 @@ private:
     SpriteMesh spritemesh;
     static unsigned int shader;
     
-    // Replace font_texture, font_texture_width, etc. with a cache map
     std::unordered_map<std::string, LoadedFont> font_cache; 
 };

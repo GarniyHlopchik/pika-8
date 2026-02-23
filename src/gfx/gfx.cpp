@@ -2,7 +2,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
 
-
+std::vector<LoadedImages> loaded_images;
 GLFWwindow* GFX::window = nullptr;
 unsigned int GFX::shader = 0;
 void send_projection(int width, int height);
@@ -13,7 +13,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     
 }  
 void send_projection(int width, int height){
-    unsigned int shader = GFX::getShader();
+    unsigned int shader = GFX::get_shader();
     glUseProgram(shader);
     unsigned int location = glGetUniformLocation(shader,"uProjection");
     float proj[16] = {
@@ -26,7 +26,7 @@ void send_projection(int width, int height){
     glUniformMatrix4fv(location, 1, GL_TRUE, proj);
 
 }
-unsigned int GFX::getShader(){
+unsigned int GFX::get_shader(){
     return GFX::shader;
 }
 GFX::GFX(int w, int h, const char* title){
@@ -74,9 +74,33 @@ GFX::~GFX(){
     }
 }
 
-GLFWwindow* GFX::getWindow(){
+GLFWwindow* GFX::get_window(){
     return GFX::window;
 }
+
+std::vector<int> GFX::get_image_dimensions(const std::string& path) {
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+    if(!data){
+        return {0,0};
+    }
+    stbi_image_free(data);
+    return {width, height};
+}
+
+std::string GFX::get_texture_path(const unsigned int id){
+    for (const LoadedImages& img : loaded_images) {
+        if (img.id == id) {
+            return img.path;
+        }
+    }
+    throw std::runtime_error("Image not found with id: " + id);
+}
+
+void GFX::add_new_image(const LoadedImages img){
+    loaded_images.push_back(img);
+}
+
 
 bool GFX::window_should_close(){
     return glfwWindowShouldClose(window);
@@ -110,12 +134,16 @@ unsigned int GFX::load_texture(const std::string& path){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
+
     return texture;
 }
+
+
 
 void GFX::draw(const unsigned int texture, float x, float y, float width, float height, float u1, float v1, float u2, float v2) {
     spritemesh.draw(shader, texture, x, y, width, height, u1, v1, u2, v2);
 }
+
 
 FontData GFX::get_font_data(const std::string& name) {
     for (const auto& font : config.get_fonts()) {
@@ -125,6 +153,11 @@ FontData GFX::get_font_data(const std::string& name) {
     }
     throw std::runtime_error("Font not found: " + name);
 }
+
+
+
+
+
 
 void GFX::draw_text(const std::string& text, float x, float y, const std::string& font_name, float scale, float space_multiplier) {
     
@@ -136,19 +169,9 @@ void GFX::draw_text(const std::string& text, float x, float y, const std::string
         if (!tex_id) return;
 
         unsigned int img_width = 0, img_height = 0;
-        std::ifstream in(font_data.path, std::ios::binary); 
-        
-        if (in) { 
-            unsigned char buf[8];
-            in.seekg(16);
-            if (in.read(reinterpret_cast<char*>(&buf), 8)) {
-                img_width = (buf[0] << 24) + (buf[1] << 16) + (buf[2] << 8) + (buf[3] << 0);
-                img_height = (buf[4] << 24) + (buf[5] << 16) + (buf[6] << 8) + (buf[7] << 0);
-            }
-        } else {
-            std::cerr << "Error: Could not open " << font_data.path << " to read dimensions." << std::endl;
-            return;
-        }
+        std::vector<int> dims = get_image_dimensions(font_data.path);
+        img_width = dims[0];
+        img_height = dims[1];
 
         // Save the loaded data into the cache so we never do this again!
         font_cache[font_name] = {tex_id, img_width, img_height, font_data};

@@ -5,6 +5,7 @@
 #include "user_input/user_input.h"
 #include "json_reader/get_config.h"
 #include "sfx/sfx.h"
+
 Config config;
 
 GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str());
@@ -32,6 +33,12 @@ int l_load(lua_State* L){
     const char* path = luaL_checkstring(L, 1);
     std::cout << "Loading " << path << std::endl;
     const unsigned int id = gfx.load_texture(path);
+    
+    LoadedImages img;
+    img.id = id;
+    img.path = path;
+    GFX::add_new_image(img);
+
     std::cout << "Loaded id " << id << std::endl;
     lua_pushnumber(L,id);
     return 1;
@@ -40,14 +47,14 @@ int l_load(lua_State* L){
 * Lua binding for drawing a sprite
 * Arguments:
 * 1. texture (number) - the texture ID to draw
-* 2. x (number) - x position
-* 3. y (number) - y position
-* 4. width (number, optional) - width of the sprite (default: 8)
-* 5. height (number, optional) - height of the sprite (default: 8)
-* 6. u1 (number, optional) - left UV coordinate (default: 0)
-* 7. v1 (number, optional) - top UV coordinate (default: 0)
-* 8. u2 (number, optional) - right UV coordinate (default: 1)
-* 9. v2 (number, optional) - bottom UV coordinate (default: 1)  
+* 2. x (number) - destination x position on screen
+* 3. y (number) - destination y position on screen
+* 4. width (number, optional) - destination width on screen (default: 8)
+* 5. height (number, optional) - destination height on screen (default: 8)
+* 6. sprite_x1 (number, optional) - starting X pixel on the sprite sheet (left)
+* 7. sprite_x2 (number, optional) - ending X pixel on the sprite sheet (right)
+* 8. sprite_y1 (number, optional) - starting Y pixel on the sprite sheet (top)
+* 9. sprite_y2 (number, optional) - ending Y pixel on the sprite sheet (bottom)
 */
 int l_spr(lua_State* L) {
     // 1. Get required arguments (texture, x, y)
@@ -60,10 +67,40 @@ int l_spr(lua_State* L) {
     float height = luaL_optnumber(L, 5, 8.0f);
 
     // 3. (Optional) You can also expose the UV coordinates to Lua for sprite animations
-    float u1 = luaL_optnumber(L, 6, 0.0f);
-    float v1 = luaL_optnumber(L, 7, 0.0f);
-    float u2 = luaL_optnumber(L, 8, 1.0f);
-    float v2 = luaL_optnumber(L, 9, 1.0f);
+    float sprite_x1 = luaL_optnumber(L, 6, 0.0f); // Left
+    float sprite_x2 = luaL_optnumber(L, 7, 0.0f); // Right
+    float sprite_y1 = luaL_optnumber(L, 8, 0.0f); // Top
+    float sprite_y2 = luaL_optnumber(L, 9, 0.0f); // Bottom 
+    
+    float u1, v1, u2, v2;
+
+    if (sprite_x2 > sprite_x1 && sprite_y2 > sprite_y1) {
+        // Fetch texture dimensions ONCE to improve performance
+        std::vector<int> dims = GFX::get_image_dimensions(GFX::get_texture_path(texture));
+
+        float tex_w = (float)dims[0];
+        float tex_h = (float)dims[1];
+
+        // Protect against division by zero
+        if (tex_w > 0.0f && tex_h > 0.0f) {
+            // UVs are normalized (0.0 to 1.0). Divide the pixel coordinate by the total dimension.
+            u1 = sprite_x1 / tex_w;
+            v1 = sprite_y1 / tex_h;
+            u2 = sprite_x2 / tex_w;
+            v2 = sprite_y2 / tex_h;
+        } else {
+            // Fallback if the texture fails to load properly
+            u1 = 0.0f; v1 = 0.0f; u2 = 1.0f; v2 = 1.0f;
+        }
+    } else {
+        // Default UV coordinates (draws the entire texture)
+        u1 = 0.0f;
+        v1 = 0.0f;
+        u2 = 1.0f;
+        v2 = 1.0f;
+    }
+
+    // std::cout << u1 << v1 << u2 << v2 << std::endl;
 
     // Pass everything to your updated C++ draw function
     gfx.draw(texture, x, y, width, height, u1, v1, u2, v2);
@@ -111,6 +148,8 @@ int l_text(lua_State* L){
     
     return 0;
 }
+
+//// SFX Lua bindings
 int l_sfx_load(lua_State* L){
     const char* path = luaL_checkstring(L,1);
     unsigned int id = sfx.load(path);
@@ -174,10 +213,12 @@ int main(){
     };
     lua.bind_lib(sfx_lib,"SFX");
 
+
     lua.load_script(config.get_lua_script());
     lua.call("_init");
     //----------------------
 
+    
     //update loop
     auto last_time = std::chrono::high_resolution_clock::now();
     while(!gfx.window_should_close()){
@@ -188,7 +229,6 @@ int main(){
         float dt = delta.count();
         lua.call_update(dt);
         gfx.update();
-        
     }
     return 0;
 }
