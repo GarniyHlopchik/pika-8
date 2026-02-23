@@ -5,6 +5,7 @@
 #include "user_input/user_input.h"
 #include "json_reader/get_config.h"
 #include "sfx/sfx.h"
+
 Config config;
 
 GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str());
@@ -32,22 +33,59 @@ int l_load(lua_State* L){
     const char* path = luaL_checkstring(L, 1);
     std::cout << "Loading " << path << std::endl;
     const unsigned int id = gfx.load_texture(path);
+    
+    LoadedImages img;
+    img.id = id;
+    img.path = path;
+    GFX::add_new_image(img);
+
     std::cout << "Loaded id " << id << std::endl;
     lua_pushnumber(L,id);
     return 1;
 }
+
+struct SpriteCut{
+    float x1, x2, y1, y2;
+}
+
+UVCoords calculate_uv(SpriteCut sprite, unsigned int texture) {
+    if (sprite.x2 > sprite.x1 && sprite.y2 > sprite.y1) {
+        UVCoords uv;
+
+        std::vector<int> dims = GFX::get_image_dimensions(texture){
+        float tex_w = (float)dims[0];
+        float tex_h = (float)dims[1];
+
+        // Protect against division by zero
+        if (tex_w > 0.0f && tex_h > 0.0f) {
+            // UVs are normalized (0.0 to 1.0). Divide the pixel coordinate by the total dimension.
+            uv.u1 = sprite.x1 / tex_w;
+            uv.v1 = sprite.y1 / tex_h;
+            uv.u2 = sprite.x2 / tex_w;
+            uv.v2 = sprite.y2 / tex_h;
+        } else {
+            // Fallback if the texture fails to load properly
+            uv.u1 = 0.0f; uv.v1 = 0.0f; uv.u2 = 1.0f; uv.v2 = 1.0f;
+        }
+    } else {
+        // Default UV coordinates (draws the entire texture)
+        uv.u1 = 0.0f; uv.v1 = 0.0f; 
+        uv.u2 = 1.0f; uv.v2 = 1.0f;
+    }
+}
+
 /*
 * Lua binding for drawing a sprite
 * Arguments:
 * 1. texture (number) - the texture ID to draw
-* 2. x (number) - x position
-* 3. y (number) - y position
-* 4. width (number, optional) - width of the sprite (default: 8)
-* 5. height (number, optional) - height of the sprite (default: 8)
-* 6. u1 (number, optional) - left UV coordinate (default: 0)
-* 7. v1 (number, optional) - top UV coordinate (default: 0)
-* 8. u2 (number, optional) - right UV coordinate (default: 1)
-* 9. v2 (number, optional) - bottom UV coordinate (default: 1)  
+* 2. x (number) - destination x position on screen
+* 3. y (number) - destination y position on screen
+* 4. width (number, optional) - destination width on screen (default: 8)
+* 5. height (number, optional) - destination height on screen (default: 8)
+* 6. sprite_x1 (number, optional) - starting X pixel on the sprite sheet (left)
+* 7. sprite_x2 (number, optional) - ending X pixel on the sprite sheet (right)
+* 8. sprite_y1 (number, optional) - starting Y pixel on the sprite sheet (top)
+* 9. sprite_y2 (number, optional) - ending Y pixel on the sprite sheet (bottom)
 */
 int l_spr(lua_State* L) {
     // 1. Get required arguments (texture, x, y)
@@ -60,13 +98,18 @@ int l_spr(lua_State* L) {
     float height = luaL_optnumber(L, 5, 8.0f);
 
     // 3. (Optional) You can also expose the UV coordinates to Lua for sprite animations
-    float u1 = luaL_optnumber(L, 6, 0.0f);
-    float v1 = luaL_optnumber(L, 7, 0.0f);
-    float u2 = luaL_optnumber(L, 8, 1.0f);
-    float v2 = luaL_optnumber(L, 9, 1.0f);
+    SpriteCut sprite;
+    float sprite.x1 = luaL_optnumber(L, 6, 0.0f); // Left
+    float sprite.x2 = luaL_optnumber(L, 7, 0.0f); // Right
+    float sprite.y1 = luaL_optnumber(L, 8, 0.0f); // Top
+    float sprite.y2 = luaL_optnumber(L, 9, 0.0f); // Bottom 
+    
+    UVCoords uv = calculate_uv(sprite, texture);
+
+    // std::cout << u1 << v1 << u2 << v2 << std::endl;
 
     // Pass everything to your updated C++ draw function
-    gfx.draw(texture, x, y, width, height, u1, v1, u2, v2);
+    gfx.draw(texture, x, y, width, height, uv);
     
     return 0;
 }
@@ -111,15 +154,36 @@ int l_text(lua_State* L){
     
     return 0;
 }
+
+//// SFX Lua bindings
 int l_sfx_load(lua_State* L){
     const char* path = luaL_checkstring(L,1);
     unsigned int id = sfx.load(path);
     lua_pushnumber(L,id);
     return 1;
 }
+/*
+* Lua binding for playing a sound effect
+* Arguments:
+* 1. sound_id (number) - the ID of the sound to play
+* 2. volume (number, optional) - volume of the sound (default: 100.0)
+* 3. pitch (number, optional) - pitch of the sound (default: 1.0)
+* 4. loop (boolean, optional) - whether to loop the sound (default: false)
+* 7. pan (number, optional) - stereo pan of the sound (-1.0 for left, 1.0 for right, default: 0.0)
+*/
 int l_sfx_play(lua_State* L){
     unsigned int id = luaL_checknumber(L,1);
-    sfx.play(id);
+    float volume = luaL_optnumber(L, 2, 100.0f);
+    float pitch = luaL_optnumber(L, 3, 1.0f);
+    bool loop = lua_toboolean(L, 4);    
+    float pan = luaL_optnumber(L, 7, 0.0f);
+    sfx.play(id, volume, pitch, loop, pan);
+    return 0;
+}
+
+int l_sfx_stop(lua_State* L){
+    unsigned int id = luaL_checknumber(L,1);
+    sfx.stop(id);
     return 0;
 }
 
@@ -150,14 +214,17 @@ int main(){
     static const luaL_Reg sfx_lib[] = {
         {"load",l_sfx_load},
         {"play",l_sfx_play},
+        {"stop",l_sfx_stop},
         {NULL,NULL}
     };
     lua.bind_lib(sfx_lib,"SFX");
+
 
     lua.load_script(config.get_lua_script());
     lua.call("_init");
     //----------------------
 
+    
     //update loop
     auto last_time = std::chrono::high_resolution_clock::now();
     while(!gfx.window_should_close()){
@@ -168,7 +235,6 @@ int main(){
         float dt = delta.count();
         lua.call_update(dt);
         gfx.update();
-        
     }
     return 0;
 }

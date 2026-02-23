@@ -64,7 +64,7 @@ function _update(delta)
 
         -- collision whith player
         if pos_x < enemy.x + enemy.width and pos_x + 64 > enemy.x
-           and pos_y < enemy.y + enemy.height and pos_y + 64 > enemy.y then
+            and pos_y < enemy.y + enemy.height and pos_y + 64 > enemy.y then
             print("Hit!")
             score = score + 1
             enemy.alive = false
@@ -84,6 +84,7 @@ function _update(delta)
 
     -- player movement
     --FIXME accelerated diagonal movement
+    -- its not a bug, its intended this way. we are not minecraft to fix such shit -_-
     if Input.btnp(262) or Input.btnp(68) then
         pos_x=pos_x+(player_speed*delta)
     end
