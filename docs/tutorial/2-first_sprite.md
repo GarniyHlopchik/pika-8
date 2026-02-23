@@ -16,22 +16,6 @@ end
 
 Here we are utilizing the `GFX.load(path: String)` function from the engine's API. The `path` parameter simply points to the location and name of the image you want to load, storing the resulting texture data inside our `player` variable.
 
-## The Rendering Function
-
-The primary tool for drawing textures is `GFX.spr()`. While it can draw a full image, its true power lies in its ability to "cut" or "clip" specific sections of a larger sprite sheet.
-
-### Function Signature
-
-`GFX.spr(texture, x, y, [width], [height], [x1], [x2], [y1], [y2])`
-
-| Parameter | Description | Required |
-| --- | --- | --- |
-| **texture** | The variable containing your loaded image | YES |
-| **x, y** | The position on the screen where the sprite will appear | YES |
-| **w, h** | The width and height of the sprite as it appears on screen | NOPE |
-| **x1, x2** | The horizontal start and end points of the "cut" from the source image | NUH-UH |
-| **y1, y2** | The vertical start and end points of the "cut" from the source image | NO |
-
 
 ## Rendering the Sprite
 
