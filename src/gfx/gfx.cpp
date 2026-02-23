@@ -220,8 +220,9 @@ void GFX::draw_text(const std::string& text, float x, float y, const std::string
         float v2 = ((float)(row + 1) / total_rows) - margin_v;
 
         // Use the cached texture ID
+        glColor3f(1.0f, 0.0f, 0.0f);
         draw(font.texture_id, cursor_x, y, draw_width, draw_height, u1, v1, u2, v2);
-
+        glColor3f(0.0f, 0.0f, 0.0f);
         cursor_x += draw_width; 
     }
 }

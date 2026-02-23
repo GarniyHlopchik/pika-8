@@ -16,6 +16,23 @@ end
 
 Here we are utilizing the `GFX.load(path: String)` function from the engine's API. The `path` parameter simply points to the location and name of the image you want to load, storing the resulting texture data inside our `player` variable.
 
+## The Rendering Function
+
+The primary tool for drawing textures is `GFX.spr()`. While it can draw a full image, its true power lies in its ability to "cut" or "clip" specific sections of a larger sprite sheet.
+
+### Function Signature
+
+`GFX.spr(texture, x, y, [width], [height], [x1], [x2], [y1], [y2])`
+
+| Parameter | Description | Required |
+| --- | --- | --- |
+| **texture** | The variable containing your loaded image | YES |
+| **x, y** | The position on the screen where the sprite will appear | YES |
+| **w, h** | The width and height of the sprite as it appears on screen | NOPE |
+| **x1, x2** | The horizontal start and end points of the "cut" from the source image | NUH-UH |
+| **y1, y2** | The vertical start and end points of the "cut" from the source image | NO |
+
+
 ## Rendering the Sprite
 
 With the texture loaded into memory, we can finally display it. To do this, we will use the `_update(delta)` callback from the previous tutorial.
@@ -25,19 +42,22 @@ Every frame, we need to clear the old screen and draw our sprite at its designat
 ```lua
 function _update(delta)
     GFX.cls()
-    GFX.spr(player, 50, 50, 48, 48)
+    -- GFX.spr(texture, x, y, w, h, x1, x2, y1, y2)
+    GFX.spr(my_texture, 50, 50, 48, 48, 3, 11, 2, 5)
 end
 
 ```
 
 Just like before, `GFX.cls()` wipes the screen clean.
-Then, we call a new function: `GFX.spr(texture, x, y, [width], [height], [u1], [v1], [u2], [v2])`.
+Then, we call a new function: `GFX.spr(texture, x, y, [width], [height], [x1], [x2], [y1], [y2])`.
 
 This function is quite flexible. Let's break down its arguments:
 
 * **texture (required):** The texture variable we loaded in `_init()`.
 * **x & y (required):** The screen coordinates where the sprite will be drawn.
 * **width & height (optional):** The dimensions to render the sprite. If left blank, Pika-8 defaults to an 8x8 size.
-* **u1, v1, u2, v2 (optional):** The UV coordinates (ranging from 0 to 1). These are used if your image is a sprite sheet and you only want to draw a specific section of it. By default, it draws the entire image (0, 0, 1, 1).
+* **x1, y1, x2, y2 (optional):** The coordinates. These are used if your image is a sprite sheet and you only want to draw a specific section of it. By default, it draws the entire image.
+
+
 
 Run the engine, and you should now see your player sprite sitting perfectly on the screen!
