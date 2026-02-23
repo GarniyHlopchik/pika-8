@@ -32,15 +32,7 @@ function _init()
 end
 
 function _update(delta)
-    -- fps = 1/delta
-    -- if(fps < 300) then
-    --     print("FPS: "..fps)
-    -- end
     GFX.cls()
-
-    -- GFX.text("a quick brown fox jumps over the lazy dog", 100, 100, 3, .4)
-    -- GFX.text("12345678", 100, 140, 3, 100)
-    -- GFX.text(".,!?':; ()[]", 100, 180, 3, 100)
 
     GFX.text("Score: "..score, 10, 30, "default", 2, 0.4)
     GFX.spr(spr,pos_x,pos_y, 64,64)
@@ -76,7 +68,7 @@ function _update(delta)
     end
 
     if #enemies > 0 then
-        GFX.text("enemies: " .. #enemies .. "  state: " .. enemies[1]:get_state_name(), 10, 10, "default", 2, 0.4)
+        GFX.text("enemies: " .. #enemies, 10, 10, "default", 2, 0.4)
     else 
         GFX.text("enemies: 0", 10, 10, "default", 2, 0.4)
     end

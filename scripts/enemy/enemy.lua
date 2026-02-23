@@ -6,12 +6,14 @@ local Enemy = {}
 Enemy.__index = Enemy
 
 --- Class constructor
---- @param x number начальная позиция X
---- @param y number начальная позиция Y
---- @param speed number скорость движения
---- @param sprite number ID текстуры (от GFX.load)
---- @return table новый объект Enemy
-function Enemy:new(x, y, sprite)
+--- @param x number starting position X
+--- @param y number starting position Y
+--- @param sprite number ID of the sprite to draw
+--- @param width number width of the sprite (default 32)
+--- @param height number height of the sprite (default 32)
+--- @param speed number movement speed (default 50)
+--- @return table new Enemy object
+function Enemy:new(x, y, sprite, width, height, speed)
     local self = setmetatable({}, Enemy)
 
     -- pos
@@ -19,10 +21,10 @@ function Enemy:new(x, y, sprite)
     self.y = y
 
     -- sprite size
-    self.width = 16
-    self.height = 16
+    self.width = width or 32
+    self.height = height or 32
 
-    self.speed = 50
+    self.speed = speed or 50
     self.sprite = sprite
     self.alive = true
 

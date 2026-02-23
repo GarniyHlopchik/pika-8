@@ -6,8 +6,8 @@ local State = {}
 State.__index = State
 
 --- Class constructor
---- @param name string имя состояния (для отладки)
---- @return table новый объект State
+--- @param name string state name (for debug)
+--- @return table new state object
 function State:new(name)
     local self = setmetatable({}, State)
     self.name = name or "unnamed"
