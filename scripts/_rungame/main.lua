@@ -6,6 +6,7 @@
 
 local Enemy = require("scripts.enemy.enemy")
 local EnemySpawner = require("scripts.enemy.enemy_spawner")
+local Vec2 = require("scripts.libs.vec2")
 
 function _init()
     spr = GFX.load("assets/sprites/player/player.png")
@@ -16,7 +17,7 @@ function _init()
     }
 
     generator = EnemySpawner.create_generator(512, 512, enemy_spr) -- screen width, height, enemy sprites
-    spawn_state = EnemySpawner.create_state(8, 1)  -- spawn for X seconds, enemy per X seconds
+    spawn_state = EnemySpawner.create_state(8, 1)  -- spawn for X seconds, 1 enemy per N seconds
     enemies_counter = 0
 
     --TODO too loud
@@ -24,8 +25,7 @@ function _init()
     --sound = SFX.load("assets/sounds/pipe.mp3");
     --SFX.play(sound);
     
-    pos_x = 64
-    pos_y = 64
+    player_pos = Vec2:new(64, 64)
     player_speed = 250.0
     enemies = {}
     score = 0
@@ -34,8 +34,9 @@ end
 function _update(delta)
     GFX.cls()
 
-    GFX.text("Score: "..score, 10, 30, "default", 2, 0.4)
-    GFX.spr(spr,pos_x,pos_y, 64,64)
+    --BUG TEXT
+    --GFX.text("Score: "..score, 10, 30, "default", 2, 0.4)
+    GFX.spr(spr, player_pos.x, player_pos.y, 64,64)
 
     local x, y, sprite = EnemySpawner.spawn_for_duration(generator, spawn_state, delta)
     if x then
@@ -55,8 +56,8 @@ function _update(delta)
         end
 
         -- collision whith player
-        if pos_x < enemy.x + enemy.width and pos_x + 64 > enemy.x
-            and pos_y < enemy.y + enemy.height and pos_y + 64 > enemy.y then
+        if player_pos.x < enemy.x + enemy.width and player_pos.x + 64 > enemy.x
+            and player_pos.y < enemy.y + enemy.height and player_pos.y + 64 > enemy.y then
             print("Hit!")
             score = score + 1
             enemy.alive = false
@@ -67,26 +68,33 @@ function _update(delta)
         end
     end
 
-    if #enemies > 0 then
-        GFX.text("enemies: " .. #enemies, 10, 10, "default", 2, 0.4)
-    else 
-        GFX.text("enemies: 0", 10, 10, "default", 2, 0.4)
-    end
-    GFX.text("enemies spawned: "..enemies_counter, 10, 50, "default", 2, 0.4)
+    --BUG TEXT
+    -- if #enemies > 0 then
+    --     GFX.text("enemies: " .. #enemies, 10, 10, "default", 2, 0.4)
+    -- else 
+    --     GFX.text("enemies: 0", 10, 10, "default", 2, 0.4)
+    -- end
+    -- GFX.text("enemies spawned: "..enemies_counter, 10, 50, "default", 2, 0.4)
+
+
 
     -- player movement
-    --FIXME accelerated diagonal movement
-    -- its not a bug, its intended this way. we are not minecraft to fix such shit -_-
+    local dir = Vec2.ZERO:copy()
+
     if Input.btnp(262) or Input.btnp(68) then
-        pos_x=pos_x+(player_speed*delta)
+        dir = dir + Vec2.RIGHT
     end
     if Input.btnp(263) or Input.btnp(65) then
-        pos_x=pos_x-(player_speed*delta)
+        dir = dir + Vec2.LEFT
     end
     if Input.btnp(264) or Input.btnp(83) then
-        pos_y=pos_y+(player_speed*delta)
+        dir = dir + Vec2.DOWN
     end
     if Input.btnp(265) or Input.btnp(87) then
-        pos_y=pos_y-(player_speed*delta)
+        dir = dir + Vec2.UP
     end
+    if dir:length_sq() > 0 then 
+        dir = dir:normalize()
+    end
+    player_pos = player_pos + dir * player_speed * delta
 end

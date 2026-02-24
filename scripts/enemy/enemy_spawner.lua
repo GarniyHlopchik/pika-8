@@ -12,7 +12,7 @@ function EnemySpawner.create_generator(screen_w, screen_h, enemy_spr)
             local i = 0 -- iterating sprites
             while true do
                 local x = math.random(16, screen_w - 16)
-                local y = 20
+                local y = math.random(16, screen_h - 16)
                 local sprite = enemy_spr[i % #enemy_spr + 1] --BRAINFUCK lua indexes starts at 1
                 coroutine.yield(x, y, sprite) -- return data
                 i = i + 1
