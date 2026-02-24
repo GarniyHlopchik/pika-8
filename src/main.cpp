@@ -151,8 +151,8 @@ int l_text(lua_State* L){
     const char* text = luaL_checkstring(L,1);
     float x = luaL_checknumber(L,2);
     float y = luaL_checknumber(L,3);
-    std::string font_name = luaL_checkstring(L, 4);
-    float scale = luaL_optnumber(L, 5, 1.0f);
+    float scale = luaL_optnumber(L, 4, 1.0f);
+    std::string font_name = luaL_checkstring(L, 5);
     float space_multiplier = luaL_optnumber(L, 6, 0.4f);
     
     draw_text(text, x, y, font_name, scale, space_multiplier);
