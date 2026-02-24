@@ -32,7 +32,6 @@ unsigned int SFX::load(const std::string& path){
         sounds.pop_back(); // Remove failed entry
         return 0;
     }
-
     s.id = get_id();
     return s.id;
 }

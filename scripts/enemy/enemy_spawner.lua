@@ -1,13 +1,18 @@
+--TODO optimize spawn_for_duration() (or refactoring)
+
 local EnemySpawner = {}
 
--- generator
+--- Generator for enemy spawn positions and sprites
+--- @param screen_w number width of the game screen
+--- @param screen_h number height of the game screen
+--- @param enemy_spr table list of enemy sprite IDs
 function EnemySpawner.create_generator(screen_w, screen_h, enemy_spr)
     return coroutine.create( -- ~~yield
         function()
             local i = 0 -- iterating sprites
             while true do
                 local x = math.random(16, screen_w - 16)
-                local y = 10
+                local y = 20
                 local sprite = enemy_spr[i % #enemy_spr + 1] --BRAINFUCK lua indexes starts at 1
                 coroutine.yield(x, y, sprite) -- return data
                 i = i + 1
@@ -16,7 +21,10 @@ function EnemySpawner.create_generator(screen_w, screen_h, enemy_spr)
     )
 end
 
-
+--- EnemySpawner.spawn_for_duration() should be called every frame to spawn enemies according to the given state
+--- @param generator thread coroutine created by EnemySpawner.create_generator()
+--- @param state table created by EnemySpawner.create_state()
+--- @param dt number delta time (time since last frame)
 function EnemySpawner.spawn_for_duration(generator, state, dt)
     -- if true, the iterator does nothing 
     if state.finished then
@@ -40,7 +48,6 @@ function EnemySpawner.spawn_for_duration(generator, state, dt)
 
         local ok, x, y, sprite = coroutine.resume(generator) -- get data from generator 
                                                              -- ok is boolean status from courutine
-        print("ok: "..tostring(ok))
         if not ok then
             state.finished = true
             print("[Spawner] Generator error: " .. tostring(x)) -- x is an error message (2nd return value of resume)
@@ -55,6 +62,10 @@ function EnemySpawner.spawn_for_duration(generator, state, dt)
     return nil
 end
 
+
+--- Create a state for enemy spawning
+--- @param _duration number how many seconds spawn enemies
+--- @param _interval number how many seconds between spawns
 function EnemySpawner.create_state(_duration, _interval)
     return {
         time = 0,

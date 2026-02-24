@@ -1,7 +1,7 @@
 function _init()
-    sound = SFX.load("monster.mp3");
-    sound1 = SFX.load("Its_Going_Down_Now.mp3");
-    sound2 = SFX.load("Kingslayer.mp3");
+    sound = SFX.load("assets/sounds/monster.mp3");
+    sound1 = SFX.load("assets/sounds/Its_Going_Down_Now.mp3");
+    sound2 = SFX.load("assets/sounds/Kingslayer.mp3");
 
     time = 0;
 

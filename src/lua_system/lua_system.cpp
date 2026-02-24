@@ -8,12 +8,119 @@ LuaSystem::LuaSystem(){
 }
 LuaSystem::~LuaSystem(){
     lua_close(L);
+    for(int t : tables){
+        luaL_unref(L, LUA_REGISTRYINDEX, t);
+    }
 }
 void LuaSystem::load_script(const std::string& path){
     if (luaL_dofile(L, path.c_str()) != LUA_OK) {
         const char* err = lua_tostring(L, -1);
         std::cout << "Issue loading " << path << std::endl;
         std::cout << err << std::endl;
+    }
+}
+int LuaSystem::load_script_table(const std::string& path) {
+    // Load + run script
+    if (luaL_dofile(L, path.c_str()) != LUA_OK) {
+        std::cerr << "Lua error: " << lua_tostring(L, -1) << std::endl;
+        lua_pop(L, 1);
+        return LUA_REFNIL;
+    }
+
+    // Ensure it returned a table
+    if (!lua_istable(L, -1)) {
+        std::cerr << "Lua script did not return a table!" << std::endl;
+        lua_pop(L, 1);
+        return LUA_REFNIL;
+    }
+
+    // Store table in registry
+    int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+    tables.push_back(ref);
+    return ref;
+}
+void LuaSystem::remove_table(int id){
+    // Find the iterator pointing to the first occurrence of the value
+    auto it = std::find(tables.begin(), tables.end(), id);
+
+    // If the value is found, erase it
+    if (it != tables.end()) {
+        tables.erase(it);
+    }
+}
+void LuaSystem::call_init(int table_ref, int node_id) {
+    // Push table (self)
+    lua_rawgeti(L, LUA_REGISTRYINDEX, table_ref);
+
+    if (!lua_istable(L, -1)) {
+        std::cerr << "Invalid Lua table reference!" << std::endl;
+        lua_pop(L, 1);
+        return;
+    }
+
+    // Get _init function
+    lua_getfield(L, -1, "_init");
+
+    if (!lua_isfunction(L, -1)) {
+        // No _init defined — not an error
+        lua_pop(L, 2); // function + table
+        return;
+    }
+
+    // Stack now:
+    // [ table ][ function ]
+
+    // Push self
+    lua_pushvalue(L, -2); // table
+
+    // Push node_id
+    lua_pushinteger(L, node_id);
+
+    // Call function(self, node_id)
+    if (lua_pcall(L, 2, 0, 0) != LUA_OK) {
+        std::cerr << "Lua _init error: " << lua_tostring(L, -1) << std::endl;
+        lua_pop(L, 1);
+    }
+
+    // Pop table
+    lua_pop(L, 1);
+}
+void LuaSystem::call_script_update(float dt)
+{
+    for (int table_ref : tables)
+    {
+        // Push table onto stack (self)
+        lua_rawgeti(L, LUA_REGISTRYINDEX, table_ref);
+
+        if (!lua_istable(L, -1)) {
+            lua_pop(L, 1);
+            continue;
+        }
+
+        // Get table._update
+        lua_getfield(L, -1, "_update");
+
+        if (!lua_isfunction(L, -1)) {
+            // No update method → pop function + table
+            lua_pop(L, 2);
+            continue;
+        }
+
+        // Push self
+        lua_pushvalue(L, -2);
+
+        // Push dt
+        lua_pushnumber(L, dt);
+
+        // Call _update(self, dt)
+        if (lua_pcall(L, 2, 0, 0) != LUA_OK) {
+            std::cerr << "Lua _update error: "
+                      << lua_tostring(L, -1) << std::endl;
+            lua_pop(L, 1); // error message
+        }
+
+        // Pop table
+        lua_pop(L, 1);
     }
 }
 void LuaSystem::call_update(float dt){

@@ -8,7 +8,7 @@ local Enemy = require("scripts.enemy.enemy")
 local EnemySpawner = require("scripts.enemy.enemy_spawner")
 
 function _init()
-    spr = GFX.load("sprite.png")
+    spr = GFX.load("assets/sprites/player/player.png")
 
     enemy_spr = {
         GFX.load("assets/sprites/enemies/enemy1.png"),
@@ -16,12 +16,12 @@ function _init()
     }
 
     generator = EnemySpawner.create_generator(512, 512, enemy_spr) -- screen width, height, enemy sprites
-    spawn_state = EnemySpawner.create_state(8, 1)  -- spawn for 8 seconds, 1 enemy per second
+    spawn_state = EnemySpawner.create_state(8, 1)  -- spawn for X seconds, enemy per X seconds
     enemies_counter = 0
 
     --TODO too loud
     --sound playing example
-    --sound = SFX.load("pipe.mp3");
+    --sound = SFX.load("assets/sounds/pipe.mp3");
     --SFX.play(sound);
     
     pos_x = 64
@@ -32,15 +32,7 @@ function _init()
 end
 
 function _update(delta)
-    -- fps = 1/delta
-    -- if(fps < 300) then
-    --     print("FPS: "..fps)
-    -- end
     GFX.cls()
-
-    -- GFX.text("a quick brown fox jumps over the lazy dog", 100, 100, 3, .4)
-    -- GFX.text("12345678", 100, 140, 3, 100)
-    -- GFX.text(".,!?':; ()[]", 100, 180, 3, 100)
 
     GFX.text("Score: "..score, 10, 30, "default", 2, 0.4)
     GFX.spr(spr,pos_x,pos_y, 64,64)
@@ -76,7 +68,7 @@ function _update(delta)
     end
 
     if #enemies > 0 then
-        GFX.text("enemies: " .. #enemies .. "  state: " .. enemies[1]:get_state_name(), 10, 10, "default", 2, 0.4)
+        GFX.text("enemies: " .. #enemies, 10, 10, "default", 2, 0.4)
     else 
         GFX.text("enemies: 0", 10, 10, "default", 2, 0.4)
     end

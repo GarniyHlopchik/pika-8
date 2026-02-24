@@ -1,20 +1,17 @@
-function extend(parent)
+function extend(parent) -- extend (OOP)
     local child = {}
     setmetatable(child,{__index = parent})
     return child
 end
 
--- scripts/enemy/states/idle.lua
--- Состояние Idle: враг стоит на месте
 
 local State = require("scripts.enemy.states.state")
 
--- Создаём IdleState, который наследует от State
+-- IddleState extends State
 local IdleState = extend(State)
 IdleState.__index = IdleState
 
---- Создать новый IdleState
---- @return table новый объект IdleState
+-- constructor
 function IdleState:new()
     local self = State.new(self, "idle")
     setmetatable(self, IdleState)          -- switch metatable to IdleState
@@ -24,17 +21,20 @@ end
 
 function IdleState:enter(enemy)
     print("[IdleState] Enemy entered idle")
+    enemy.idle_timer = 0
+    enemy.base_y = enemy.y -- base_y and timer are bound to an object
 end
 
 function IdleState:update(enemy, dt)
-    enemy.y = enemy.y + enemy.speed * dt
+    enemy.idle_timer = enemy.idle_timer + dt
+    enemy.y = enemy.base_y + math.sin(enemy.idle_timer * 2) * 3
     -- Здесь позже можно добавить:
-    --   idle-анимацию (покачивание, мигание)
     --   таймер перехода в patrol
     --   проверку "вижу ли игрока" → переход в chase
 end
 
 function IdleState:exit(enemy)
+    enemy.y = enemy.base_y -- reset y position
     print("[IdleState] Enemy left idle")
 end
 
