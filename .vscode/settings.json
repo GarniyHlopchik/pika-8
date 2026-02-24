@@ -30,6 +30,8 @@
     "undefined-doc-param",
     "lowercase-global",
     "param-type-mismatch",
-    "missing-parameter"
+    "missing-parameter",
+    "undefined-field",
+    "undefined-doc-name"
   ]
 }

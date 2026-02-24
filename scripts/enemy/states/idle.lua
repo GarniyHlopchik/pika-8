@@ -26,13 +26,13 @@ function IdleState:enter(enemy)
     enemy.base_x = enemy.x
     enemy.rand_direction = math.random() < 0.5 and -1 or 1 -- randomize direction of idle movement
     amplitude = 3
-    speed = 3
 end
 
 function IdleState:update(enemy, dt)
     enemy.idle_timer = enemy.idle_timer + dt
-    enemy.y = enemy.base_y + math.sin(enemy.idle_timer * speed) * amplitude
-    enemy.x = enemy.base_x + math.cos(enemy.idle_timer * speed) * amplitude * enemy.rand_direction
+    enemy.x = enemy.base_x + math.cos(enemy.idle_timer * 2) * amplitude * enemy.rand_direction
+    enemy.y = enemy.base_y + math.sin(enemy.idle_timer * 4) * amplitude
+
     -- Здесь позже можно добавить:
     --   таймер перехода в patrol
     --   проверку "вижу ли игрока" → переход в chase
