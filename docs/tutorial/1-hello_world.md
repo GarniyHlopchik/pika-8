@@ -29,7 +29,7 @@ We can finally get to it, create game.lua and write some code:
 ```lua
 function _update(delta)
     GFX.cls()    
-    GFX.text("Hello World!",60,60,"default",3,1)
+    GFX.text("Hello World!",60,60,3,"default",1)
 end
 ```
 
