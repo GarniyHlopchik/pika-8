@@ -4,8 +4,8 @@ function _init()
 end
 
 function _update(delta)
-    GFX.cls()    
-    --  
+    GFX.cls()
+    
     GFX.text("ABC", 60, 60, "ascii", 6, 1)
     GFX.spr(spr,60,60, 164,164, 0, 24, 0, 24)
 end
