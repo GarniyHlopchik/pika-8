@@ -17,6 +17,9 @@
     "FIXME": {
         "iconColour": "#ffff00",
     },
+    "BUG": {
+        "iconColour": "#ff0000",
+    },
     "BRAINFUCK":{
         "icon": "alert",
         "iconColour": "#ff00ff",

@@ -16,7 +16,7 @@ function _init()
     }
 
     generator = EnemySpawner.create_generator(512, 512, enemy_spr) -- screen width, height, enemy sprites
-    spawn_state = EnemySpawner.create_state(8, 1)  -- spawn for X seconds, enemy per X seconds
+    spawn_state = EnemySpawner.create_state(8, 1)  -- spawn for X seconds, 1 enemy per N seconds
     enemies_counter = 0
 
     --TODO too loud
@@ -34,7 +34,8 @@ end
 function _update(delta)
     GFX.cls()
 
-    GFX.text("Score: "..score, 10, 30, "default", 2, 0.4)
+    --BUG TEXT
+    --GFX.text("Score: "..score, 10, 30, "default", 2, 0.4)
     GFX.spr(spr,pos_x,pos_y, 64,64)
 
     local x, y, sprite = EnemySpawner.spawn_for_duration(generator, spawn_state, delta)
@@ -67,12 +68,13 @@ function _update(delta)
         end
     end
 
-    if #enemies > 0 then
-        GFX.text("enemies: " .. #enemies, 10, 10, "default", 2, 0.4)
-    else 
-        GFX.text("enemies: 0", 10, 10, "default", 2, 0.4)
-    end
-    GFX.text("enemies spawned: "..enemies_counter, 10, 50, "default", 2, 0.4)
+    --BUG TEXT
+    -- if #enemies > 0 then
+    --     GFX.text("enemies: " .. #enemies, 10, 10, "default", 2, 0.4)
+    -- else 
+    --     GFX.text("enemies: 0", 10, 10, "default", 2, 0.4)
+    -- end
+    -- GFX.text("enemies spawned: "..enemies_counter, 10, 50, "default", 2, 0.4)
 
     -- player movement
     --FIXME accelerated diagonal movement
