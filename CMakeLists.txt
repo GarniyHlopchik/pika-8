@@ -9,7 +9,7 @@ src/sprite_mesh/mesh.h src/sprite_mesh/mesh.cpp src/shader_utils/shader_utils.h
 src/shader_utils/shader_utils.cpp src/lua_system/lua_system.cpp src/lua_system/lua_system.h 
 src/gfx/gfx.h src/gfx/gfx.cpp dependencies/stb_image/stb_image.h src/json_reader/json_reader.cpp src/user_input/user_input.cpp
 dependencies/miniaudio/miniaudio.h src/sfx/sfx.h src/sfx/sfx.cpp src/scene_tree/node.cpp src/scene_tree/node.h
-dependencies/pugixml/pugixml.cpp dependencies/pugixml/pugixml.hpp)
+dependencies/pugixml/pugixml.cpp dependencies/pugixml/pugixml.hpp src/scene_tree/scene_tree.h)
 
 target_include_directories(pika-8 PRIVATE dependencies)
 

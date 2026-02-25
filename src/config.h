@@ -20,3 +20,8 @@ extern "C" {
 #include "list"
 #include "iterator"
 #include "pugixml/pugixml.hpp"
+#include "memory"
+#include "utility"
+#include "lua_system/lua_system.h"
+#include "scene_tree/scene_tree.h"
+#include "scene_tree/node.h"

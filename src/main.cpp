@@ -1,6 +1,6 @@
 #include "config.h"
 
-#include "lua_system/lua_system.h"
+
 #include "gfx/gfx.h"
 #include "user_input/user_input.h"
 #include "json_reader/get_config.h"

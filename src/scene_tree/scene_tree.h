@@ -1,6 +1,6 @@
 #pragma once
 #include "config.h"
-
+class Node;
 class SceneTree{
     public:
     
