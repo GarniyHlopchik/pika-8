@@ -34,8 +34,7 @@ end
 function _update(delta)
     GFX.cls()
 
-    --BUG TEXT
-    --GFX.text("Score: "..score, 10, 30, "default", 2, 0.4)
+    GFX.text("Score: "..score, 10, 30, 2, "default", 0.4)
     GFX.spr(spr, player_pos.x, player_pos.y, 64,64)
 
     local x, y, sprite = EnemySpawner.spawn_for_duration(generator, spawn_state, delta)
@@ -68,13 +67,12 @@ function _update(delta)
         end
     end
 
-    --BUG TEXT
-    -- if #enemies > 0 then
-    --     GFX.text("enemies: " .. #enemies, 10, 10, "default", 2, 0.4)
-    -- else 
-    --     GFX.text("enemies: 0", 10, 10, "default", 2, 0.4)
-    -- end
-    -- GFX.text("enemies spawned: "..enemies_counter, 10, 50, "default", 2, 0.4)
+    if #enemies > 0 then
+        GFX.text("enemies: " .. #enemies, 10, 10, 2, "default", 0.4)
+    else 
+        GFX.text("enemies: 0", 10, 10, 2, "default", 0.4)
+    end
+    GFX.text("enemies spawned: "..enemies_counter, 10, 50, 2, "default", 0.4)
 
 
 
