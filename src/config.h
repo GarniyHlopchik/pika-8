@@ -6,6 +6,11 @@ extern "C" {
     #include "lua.h"
     #include "lauxlib.h"
     #include "lualib.h"
+    #include "luasocket.h" 
+    
+    // The entry point for the C library
+    int luaopen_socket_core(lua_State *L);
+    int luaopen_mime_core(lua_State *L);
 }
 
 #include "fstream"

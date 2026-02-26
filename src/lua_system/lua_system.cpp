@@ -4,6 +4,28 @@ LuaSystem::LuaSystem(){
     //lua setup-----------------------------
     L = luaL_newstate();  // Lua vm
     luaL_openlibs(L);               // setup
+
+    // Preload the "socket.core" module
+    lua_getglobal(L, "package");
+    lua_getfield(L, -1, "preload");
+    
+    lua_pushcfunction(L, luaopen_socket_core);
+    lua_setfield(L, -2, "socket.core");
+
+    // Register mime.core
+    lua_pushcfunction(L, luaopen_mime_core);
+    lua_setfield(L, -2, "mime.core");
+    
+    lua_pop(L, 2);
+
+    const char* path_logic = 
+        "local app_path = './lua_modules/?.lua;./lua_modules/?/init.lua;';"
+        "local game_path = './?.lua;./?/init.lua;';"
+        "package.path = app_path .. game_path .. package.path";
+
+    if (luaL_dostring(L, path_logic) != LUA_OK) {
+        std::cout << "Issue setting up lua_modules path" << std::endl;
+    }
     
 }
 LuaSystem::~LuaSystem(){

@@ -75,3 +75,38 @@ endif()
 if (UNIX AND NOT APPLE)
     target_link_libraries(pika-8 PRIVATE dl pthread)
 endif()
+
+# --- LuaSocket Source Setup ---
+set(LUASOCKET_SOURCES
+    dependencies/luasocket/mime.c
+    dependencies/luasocket/luasocket.c
+    dependencies/luasocket/timeout.c
+    dependencies/luasocket/buffer.c
+    dependencies/luasocket/io.c
+    dependencies/luasocket/select.c
+    dependencies/luasocket/auxiliar.c
+    dependencies/luasocket/options.c
+    dependencies/luasocket/inet.c
+    dependencies/luasocket/tcp.c
+    dependencies/luasocket/udp.c
+    dependencies/luasocket/except.c
+    dependencies/luasocket/compat.c
+)
+
+if (WIN32)
+    list(APPEND LUASOCKET_SOURCES dependencies/luasocket/wsocket.c)
+else()
+    list(APPEND LUASOCKET_SOURCES dependencies/luasocket/usocket.c)
+endif()
+
+add_library(luasocket STATIC ${LUASOCKET_SOURCES})
+
+# Ensure LuaSocket can see Lua headers
+target_include_directories(luasocket PUBLIC dependencies/lua dependencies/luasocket)
+
+# --- Link to pika-8 ---
+target_link_libraries(pika-8 PRIVATE luasocket)
+
+if (WIN32)
+    target_link_libraries(pika-8 PRIVATE ws2_32) # Required for Windows sockets
+endif()
