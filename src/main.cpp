@@ -114,10 +114,19 @@ int l_spr(lua_State* L) {
     return 0;
 }
 int l_cls(lua_State* L){
+    float r = luaL_optnumber(L,1,0.0f);
+    float g = luaL_optnumber(L,2,0.0f);
+    float b = luaL_optnumber(L,3,0.0f);
+    glClearColor(r,g,b,1.0);
     glClear(GL_COLOR_BUFFER_BIT);
     return 0;
 }
-
+int l_getscr(lua_State* L){
+    auto [width,height] = gfx.get_screen_size();
+    lua_pushnumber(L,width);
+    lua_pushnumber(L,height);
+    return 2;
+}
 
 void draw_text(const char* text, int x, int y, std::string font_name, float scale, float space_multiplier){
     try {
@@ -204,6 +213,7 @@ int main(){
     {"load", l_load},
     {"spr", l_spr},
     {"text", l_text},
+    {"getscr",l_getscr},
     {NULL, NULL}
     };
     lua.bind_lib(gfx_lib,"GFX");

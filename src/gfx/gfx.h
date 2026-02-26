@@ -44,6 +44,7 @@ public:
     bool is_font_loaded(const std::string& font_name);
 
     static GLFWwindow* get_window();
+    std::tuple<int,int> get_screen_size();
     static unsigned int get_shader();
     void update();
 

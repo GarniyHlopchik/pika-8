@@ -29,6 +29,11 @@ void send_projection(int width, int height){
 unsigned int GFX::get_shader(){
     return GFX::shader;
 }
+std::tuple<int,int> GFX::get_screen_size(){
+    int width, height;
+    glfwGetWindowSize(window,&width,&height);
+    return std::make_tuple(width,height);
+}
 GFX::GFX(int w, int h, const char* title){
     if(!glfwInit()){
         std::cout << "GLFW couldn't start" << std::endl;
@@ -53,7 +58,7 @@ GFX::GFX(int w, int h, const char* title){
     glViewport(0,0,w,h);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glClearColor(0.11f,0.79f,0.88f,1.0f);
+    //glClearColor(0.11f,0.79f,0.88f,1.0f);
     shader = make_shader(    );
     send_projection(w,h);
 

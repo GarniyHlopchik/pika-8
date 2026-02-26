@@ -2,9 +2,9 @@
 
 A low-level graphics API for Pika. It allows to render items onto the screen.
 
-## GFX.cls()
+## GFX.cls(r: Number, g: Number, b: Number)
 
-Takes no arguments. Clears the screen. The correct usage is putting it before any other rendering functions to make sure that nothing is drawn over the previous frame.
+Takes optional rgb arguments that determine the clear color. Clears the screen. The correct usage is putting it before any other rendering functions to make sure that nothing is drawn over the previous frame.
 
 ## GFX.load(path: String) -> int
 
@@ -73,3 +73,7 @@ if we apply those
 ## GFX.text(text: String, x: Number, y:Number, font_name: String, scale: Number,spacing: Number)
 
 Renders `text` onto the screen. X and Y are screen rendering coordinates, font_name corresponds to the font_name set up in config.json, scale is the size of the characters, and spacing is the space between words. 
+
+## GFX.getscr() -> int width, int height
+
+Returns current screen width and height.
