@@ -5,11 +5,14 @@
 #include "user_input/user_input.h"
 #include "json_reader/get_config.h"
 #include "sfx/sfx.h"
-
+#include "scene_tree/scene_tree.h"
 Config config;
 
 GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str());
 SFX sfx;
+LuaSystem lua;
+SceneTree scene_tree(&lua);
+
 int l_btn(lua_State* L){
     int key = luaL_checknumber(L,1);
     bool result = IsKeyPressed(key);
@@ -206,7 +209,7 @@ int main(){
     //opengl setup------------------------
     
     //lua setup-----------------------------
-    LuaSystem lua;
+    
 
     static const luaL_Reg gfx_lib[] = {
     {"cls", l_cls},

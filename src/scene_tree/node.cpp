@@ -1,15 +1,19 @@
 #include "node.h"
 
-Node::Node(Node* p_parent,int p_id,int p_script_ref, LuaSystem* p_L, SceneTree* p_tree){
-    parent = p_parent;
+Node::Node(int p_id, LuaSystem* p_L, SceneTree* p_tree){
     id = p_id;
-    if(p_script_ref){
-        script_ref = p_script_ref;
-    }
     lua = p_L;
     scene_tree = p_tree;
-}
 
+    if (lua && script_ref) {
+        lua->call_init(script_ref, id);
+    }
+
+    
+}
+Node::~Node(){
+    lua->remove_table(script_ref);
+}
 void Node::add_child(std::unique_ptr<Node> child) {
     child->parent = this;
     children.push_back(std::move(child));
@@ -24,15 +28,7 @@ void Node::remove_child(Node* child_ptr) {
         children.end()
     );
 }
-void Node::_init() {
-    if (lua && script_ref) {
-        lua->call_init(script_ref, id);
-    }
 
-    for (auto& child : children) { 
-        child->_init();
-    }
-}
 void Node::_update(float dt) {
     for (auto& child : children) {
         child->_update(dt);
