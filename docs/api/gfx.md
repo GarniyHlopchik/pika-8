@@ -77,3 +77,7 @@ Renders `text` onto the screen. X and Y are screen rendering coordinates, font_n
 ## GFX.getscr() -> int width, int height
 
 Returns current screen width and height.
+
+## GFX.close()
+
+Ends the game's execution. _exit() will still run before that.

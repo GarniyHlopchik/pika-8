@@ -172,6 +172,10 @@ int l_text(lua_State* L){
     draw_text(text, x, y, font_name, scale, space_multiplier);
     return 0;
 }
+int l_close(lua_State* L){
+    glfwSetWindowShouldClose(GFX::get_window(), GLFW_TRUE);
+    return 0;
+}
 
 //// SFX Lua bindings
 int l_sfx_load(lua_State* L){
@@ -228,6 +232,7 @@ int main(){
     {"spr", l_spr},
     {"text", l_text},
     {"getscr",l_getscr},
+    {"close",l_close},
     {NULL, NULL}
     };
     lua.bind_lib(gfx_lib,"GFX");
