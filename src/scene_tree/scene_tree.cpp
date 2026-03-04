@@ -12,5 +12,5 @@ void SceneTree::set_root(std::unique_ptr<Node> p_root){
     root = std::move(p_root);
 }
 void SceneTree::update(float dt){
-    lua->call_script_update(dt);
+    //lua->call_script_update(dt);
 }

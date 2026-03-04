@@ -29,7 +29,27 @@ LuaSystem::LuaSystem(){
     
     //sol setup
     sol::state_view lua(L);
-    lua.new_usertype<Node>("Node");
+    lua.new_usertype<Node>("Node",
+        "_update", &Node::_update,
+        "add_child", [](Node& self, sol::stack_object child_obj) {
+
+    auto& lua_uptr = child_obj.as<std::unique_ptr<Node>&>();
+
+    if (!lua_uptr) {
+        luaL_error(child_obj.lua_state(),
+                   "Pika-8 Error: Node is null or already owned by C++");
+        return;
+    }
+
+    // Move ownership
+    std::unique_ptr<Node> child_ptr = std::move(lua_uptr);
+
+    // Now Lua's unique_ptr is empty (nullptr)
+
+    self.add_child(std::move(child_ptr));
+},
+        "id", &Node::id
+    );
 }
 LuaSystem::~LuaSystem(){
     lua_close(L);
@@ -62,6 +82,7 @@ int LuaSystem::load_script_table(const std::string& path) {
     // Store table in registry
     int ref = luaL_ref(L, LUA_REGISTRYINDEX);
     tables.push_back(ref);
+    std::cout << "Loaded script, ref = " << ref << std::endl;
     return ref;
 }
 void LuaSystem::remove_table(int id){
@@ -110,16 +131,15 @@ void LuaSystem::call_init(int table_ref, int node_id) {
     // Pop table
     lua_pop(L, 1);
 }
-void LuaSystem::call_script_update(float dt)
+void LuaSystem::call_script_update(int table_ref, float dt)
 {
-    for (int table_ref : tables)
-    {
+   
         // Push table onto stack (self)
         lua_rawgeti(L, LUA_REGISTRYINDEX, table_ref);
 
         if (!lua_istable(L, -1)) {
             lua_pop(L, 1);
-            continue;
+            return;
         }
 
         // Get table._update
@@ -128,7 +148,7 @@ void LuaSystem::call_script_update(float dt)
         if (!lua_isfunction(L, -1)) {
             // No update method → pop function + table
             lua_pop(L, 2);
-            continue;
+            return;
         }
 
         // Push self
@@ -146,7 +166,7 @@ void LuaSystem::call_script_update(float dt)
 
         // Pop table
         lua_pop(L, 1);
-    }
+    
 }
 void LuaSystem::call_update(float dt){
     lua_getglobal(L, "_update");

@@ -6,7 +6,8 @@ Node::Node(int p_id, LuaSystem* p_L, SceneTree* p_tree){
     scene_tree = p_tree;
     
 }
-void Node::_init(int script_ref){
+void Node::_init(int p_script_ref){
+    script_ref=p_script_ref;
     if (lua && script_ref) {
         lua->call_init(script_ref, id);
     }
@@ -33,4 +34,6 @@ void Node::_update(float dt) {
     for (auto& child : children) {
         child->_update(dt);
     }
+    
+    lua->call_script_update(script_ref,dt);
 }

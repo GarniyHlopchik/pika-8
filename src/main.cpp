@@ -270,5 +270,6 @@ int main(){
         lua.call_update(dt);
         gfx.update();
     }
+    lua.call("_exit");
     return 0;
 }
