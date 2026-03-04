@@ -6,6 +6,7 @@
 #include "json_reader/get_config.h"
 #include "sfx/sfx.h"
 #include "scene_tree/scene_tree.h"
+#include "scene_tree/node_factory.h"
 Config config;
 
 GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str());
@@ -203,6 +204,16 @@ int l_sfx_stop(lua_State* L){
     sfx.stop(id);
     return 0;
 }
+// scenetree, node, factory stuff
+
+int l_create(lua_State* L){
+    std::string type = luaL_checkstring(L,1);
+    std::string script_path = luaL_optstring(L,2,"");
+    std::unique_ptr<Node> node = NodeFactory::create(type,&lua,&scene_tree,script_path);
+    sol::stack::push(L, std::move(node));
+    return 1;
+}
+
 
 int main(){
 
@@ -237,6 +248,11 @@ int main(){
     };
     lua.bind_lib(sfx_lib,"SFX");
 
+    static const luaL_Reg node_lib[] = {
+    {"create", l_create},
+    {NULL, NULL}
+    };
+    lua.bind_lib(node_lib,"Node");
 
     lua.load_script(config.get_lua_script());
     lua.call("_init");

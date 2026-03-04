@@ -4,12 +4,12 @@ Node::Node(int p_id, LuaSystem* p_L, SceneTree* p_tree){
     id = p_id;
     lua = p_L;
     scene_tree = p_tree;
-
+    
+}
+void Node::_init(int script_ref){
     if (lua && script_ref) {
         lua->call_init(script_ref, id);
     }
-
-    
 }
 Node::~Node(){
     lua->remove_table(script_ref);

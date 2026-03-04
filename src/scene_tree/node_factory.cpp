@@ -9,7 +9,8 @@ std::unique_ptr<Node> NodeFactory::create(const std::string& type, LuaSystem* lu
         std::unique_ptr<Node> node = std::make_unique<Node>(id,lua,tree);
         
         if(script_name!=""){
-            node->script_ref = lua->load_script_table(script_name);
+            int script_ref = lua->load_script_table(script_name);
+            node->_init(script_ref);
         }
 
         return node;

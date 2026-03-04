@@ -2,6 +2,7 @@
 #include "glad/glad.h"
 #include "iostream"
 #include "GLFW/glfw3.h"
+
 extern "C" {
     #include "lua.h"
     #include "lauxlib.h"
@@ -30,3 +31,4 @@ extern "C" {
 #include "lua_system/lua_system.h"
 #include "scene_tree/scene_tree.h"
 #include "scene_tree/node.h"
+#include "sol/sol.hpp"

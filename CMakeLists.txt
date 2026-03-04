@@ -10,9 +10,9 @@ src/shader_utils/shader_utils.cpp src/lua_system/lua_system.cpp src/lua_system/l
 src/gfx/gfx.h src/gfx/gfx.cpp dependencies/stb_image/stb_image.h src/json_reader/json_reader.cpp src/user_input/user_input.cpp
 dependencies/miniaudio/miniaudio.h src/sfx/sfx.h src/sfx/sfx.cpp src/scene_tree/node.cpp src/scene_tree/node.h
 dependencies/pugixml/pugixml.cpp dependencies/pugixml/pugixml.hpp src/scene_tree/scene_tree.h src/scene_tree/scene_tree.cpp
-src/scene_tree/node_factory.cpp src/scene_tree/node_factory.h)
+src/scene_tree/node_factory.cpp src/scene_tree/node_factory.h dependencies/sol/sol.hpp)
 
-target_include_directories(pika-8 PRIVATE dependencies)
+target_include_directories(pika-8 PRIVATE dependencies dependencies/lua dependencies/sol)
 
 
 include(FetchContent)
@@ -40,6 +40,11 @@ target_link_libraries(pika-8 PRIVATE OpenGL::GL)
 
 file(GLOB LUA_SOURCES
     dependencies/lua/*.c
+)
+list(REMOVE_ITEM LUA_SOURCES
+    ${CMAKE_SOURCE_DIR}/dependencies/lua/lua.c
+    ${CMAKE_SOURCE_DIR}/dependencies/lua/luac.c
+    ${CMAKE_SOURCE_DIR}/dependencies/lua/onelua.c
 )
 
 # Exclude Lua files that define `main()` (lua and luac are standalone programs)

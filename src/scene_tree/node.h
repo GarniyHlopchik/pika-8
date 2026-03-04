@@ -9,7 +9,7 @@ class Node{
     void add_child(std::unique_ptr<Node> child);
     void remove_child(Node* child);
     virtual void _update(float dt);
-
+    void _init(int script_ref);
     int script_ref;
     private:
     Node* parent;

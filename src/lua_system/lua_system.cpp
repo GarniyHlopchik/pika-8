@@ -27,6 +27,9 @@ LuaSystem::LuaSystem(){
         std::cout << "Issue setting up lua_modules path" << std::endl;
     }
     
+    //sol setup
+    sol::state_view lua(L);
+    lua.new_usertype<Node>("Node");
 }
 LuaSystem::~LuaSystem(){
     lua_close(L);
