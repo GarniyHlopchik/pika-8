@@ -57,6 +57,13 @@ LuaSystem::~LuaSystem(){
         luaL_unref(L, LUA_REGISTRYINDEX, t);
     }
 }
+lua_State* LuaSystem::get_state(){
+    return L;
+}
+void LuaSystem::set_context(EngineContext* ctx) {
+    lua_pushlightuserdata(L, ctx);
+    lua_setfield(L, LUA_REGISTRYINDEX, "engine_ctx");
+}
 void LuaSystem::load_script(const std::string& path){
     if (luaL_dofile(L, path.c_str()) != LUA_OK) {
         const char* err = lua_tostring(L, -1);

@@ -12,6 +12,8 @@ extern "C" {
     // The entry point for the C library
     int luaopen_socket_core(lua_State *L);
     int luaopen_mime_core(lua_State *L);
+
+    #include "miniz/miniz.h"
 }
 
 #include "fstream"
@@ -32,3 +34,4 @@ extern "C" {
 #include "scene_tree/scene_tree.h"
 #include "scene_tree/node.h"
 #include "sol/sol.hpp"
+#include "globals.h"

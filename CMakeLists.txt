@@ -10,7 +10,10 @@ src/shader_utils/shader_utils.cpp src/lua_system/lua_system.cpp src/lua_system/l
 src/gfx/gfx.h src/gfx/gfx.cpp dependencies/stb_image/stb_image.h src/json_reader/json_reader.cpp src/user_input/user_input.cpp
 dependencies/miniaudio/miniaudio.h src/sfx/sfx.h src/sfx/sfx.cpp src/scene_tree/node.cpp src/scene_tree/node.h
 dependencies/pugixml/pugixml.cpp dependencies/pugixml/pugixml.hpp src/scene_tree/scene_tree.h src/scene_tree/scene_tree.cpp
-src/scene_tree/node_factory.cpp src/scene_tree/node_factory.h dependencies/sol/sol.hpp)
+src/scene_tree/node_factory.cpp src/scene_tree/node_factory.h dependencies/sol/sol.hpp dependencies/miniz/miniz.h 
+dependencies/miniz/miniz.c src/globals.h src/lua_bindings/engine_context.cpp src/lua_bindings/engine_context.h 
+src/lua_bindings/lua_bind_gfx.cpp src/lua_bindings/lua_bindings.h src/lua_bindings/lua_bind_input.cpp 
+src/lua_bindings/lua_bind_sfx.cpp src/lua_bindings/lua_bind_node.cpp)
 
 target_include_directories(pika-8 PRIVATE dependencies dependencies/lua dependencies/sol)
 

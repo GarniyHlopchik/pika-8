@@ -1,10 +1,12 @@
 #pragma once
 #include "config.h"
-
+struct EngineContext;
 class LuaSystem{
     public:
     LuaSystem();
     ~LuaSystem();
+    lua_State* get_state();
+    void set_context(EngineContext* ctx);
     void load_script(const std::string& path);
     int load_script_table(const std::string& path);
     void call_init(int table_ref, int node_id);
