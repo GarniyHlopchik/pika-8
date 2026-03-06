@@ -1,6 +1,8 @@
+
 #ifndef ENGINE_GLOBALS
 #define ENGINE_GLOBALS
-
+#include "memory"
+#include "miniz/miniz.h"
 enum class EngineReadState { // the way engine looks for files: 
     DIRECTORY, //just in a folder
     ZIP,       //in a .zip archive 

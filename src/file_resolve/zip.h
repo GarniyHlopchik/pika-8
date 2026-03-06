@@ -6,7 +6,7 @@ private:
     static bool s_is_initialized;
 
     // Private constructor prevents instantiation
-    ResourceManager() = default;
+    Zip() = default;
 
 public:
     static bool init(const std::string& zip_path);

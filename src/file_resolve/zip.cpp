@@ -43,5 +43,5 @@ void Zip::shutdown(){
     }
 }
 
-mz_zip_archive ResourceManager::s_archive = {};
-bool ResourceManager::s_is_initialized = false;
+mz_zip_archive Zip::s_archive = {};
+bool Zip::s_is_initialized = false;

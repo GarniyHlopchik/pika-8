@@ -13,7 +13,8 @@ dependencies/pugixml/pugixml.cpp dependencies/pugixml/pugixml.hpp src/scene_tree
 src/scene_tree/node_factory.cpp src/scene_tree/node_factory.h dependencies/sol/sol.hpp dependencies/miniz/miniz.h 
 dependencies/miniz/miniz.c src/globals.h src/lua_bindings/engine_context.cpp src/lua_bindings/engine_context.h 
 src/lua_bindings/lua_bind_gfx.cpp src/lua_bindings/lua_bindings.h src/lua_bindings/lua_bind_input.cpp 
-src/lua_bindings/lua_bind_sfx.cpp src/lua_bindings/lua_bind_node.cpp)
+src/lua_bindings/lua_bind_sfx.cpp src/lua_bindings/lua_bind_node.cpp src/file_resolve/file_system.cpp 
+src/file_resolve/file_system.h src/file_resolve/zip.cpp)
 
 target_include_directories(pika-8 PRIVATE dependencies dependencies/lua dependencies/sol)
 
