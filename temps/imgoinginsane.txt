@@ -12,7 +12,9 @@ __gfx__
 0 0 8 8 8 0 16 8 ...#four numbers represent a sprite, here 2 are made: 0,0->8,8; ...
 
 what needs to be memoryified for zip/embed load
--stb sprite loading
--lua everything that loads from path
--miniaudio sound loading
+~~-stb sprite loading~~
+~~-lua everything that loads from path~~
+~~-miniaudio sound loading~~
+~~-config.json~~ 
+yay all done celebration and stuff!!
 -later xml loading

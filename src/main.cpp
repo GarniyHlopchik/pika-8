@@ -5,12 +5,19 @@
 #include "scene_tree/scene_tree.h"
 #include "lua_bindings/lua_bindings.h"
 #include "lua_bindings/engine_context.h"
+#include "file_resolve/file_system.h"
+#include "globals.h"
 
 
 
-
-int main(){
-
+int main(int argc, char** argv){
+    //data source setup
+    if(std::string(argv[argc-1]) == "ZIP"){
+        FileSystem::init(EngineReadState::ZIP,"game.pika");
+    }
+    else{
+        FileSystem::init(EngineReadState::DIRECTORY,"");
+    }
     //context setup------------------------
     Config config;
     GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str());
@@ -25,7 +32,7 @@ int main(){
         &config
     };
     lua.set_context(&ctx);
-    //lua setup-----------------------------
+    
 
     bind_gfx(lua.get_state());
     bind_input(lua.get_state());

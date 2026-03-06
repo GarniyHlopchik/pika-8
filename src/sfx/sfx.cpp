@@ -1,6 +1,7 @@
 #include "sfx.h"
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio/miniaudio.h"
+#include "file_resolve/file_system.h"
 
 
 SFX::SFX(){
@@ -13,26 +14,54 @@ SFX::SFX(){
 SFX::~SFX(){
     for (SoundRes& s : sounds) {
         ma_sound_uninit(&s.sound);
+        ma_decoder_uninit(&s.decoder);
     }
     ma_engine_uninit(&engine);
 }
 unsigned int SFX::load(const std::string& path){
-    // 1. Create the entry directly in the list
-    sounds.emplace_back(); 
-    SoundRes& s = sounds.back(); 
-    
-    // 2. Clear memory to be safe
+    sounds.emplace_back();
+    SoundRes& s = sounds.back();
+
     memset(&s.sound, 0, sizeof(ma_sound));
 
-    // 3. Initialize directly into the list's memory
-    ma_result result = ma_sound_init_from_file(&engine, path.c_str(), 0, NULL, NULL, &s.sound);
-    
-    if (result != MA_SUCCESS) {
+    Resource res = FileSystem::get_resource(path);
+
+    if (!res.is_valid()) {
         std::cout << "Sound file could not be loaded: " << path << std::endl;
-        sounds.pop_back(); // Remove failed entry
+        sounds.pop_back();
         return 0;
     }
+
+    ma_result result = ma_decoder_init_memory(
+    res.data.get(),
+    res.size,
+    NULL,
+    &s.decoder
+    );
+
+    if (result != MA_SUCCESS) {
+        std::cout << "Failed to decode sound: " << path << std::endl;
+        sounds.pop_back();
+        return 0;
+    }
+
+    result = ma_sound_init_from_data_source(
+        &engine,
+        &s.decoder,
+        0,
+        NULL,
+        &s.sound
+    );
+
+    if (result != MA_SUCCESS) {
+        std::cout << "Failed to create sound: " << path << std::endl;
+        sounds.pop_back();
+        return 0;
+    }
+
+    s.data = std::move(res); // keep memory alive
     s.id = get_id();
+
     return s.id;
 }
 

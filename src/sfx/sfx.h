@@ -1,9 +1,12 @@
 #include "miniaudio/miniaudio.h"
 #include "config.h"
+#include "globals.h"
 struct SoundRes{
     unsigned int id;
-    bool is_playing;
+    bool is_playing = false;
     ma_sound sound;
+    Resource data;
+    ma_decoder decoder;
 };
 
 class SFX{

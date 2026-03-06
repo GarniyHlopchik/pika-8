@@ -1,5 +1,5 @@
 #include "lua_system.h"
-
+#include "file_resolve/file_system.h"
 LuaSystem::LuaSystem(){
     //lua setup-----------------------------
     L = luaL_newstate();  // Lua vm
@@ -65,31 +65,65 @@ void LuaSystem::set_context(EngineContext* ctx) {
     lua_setfield(L, LUA_REGISTRYINDEX, "engine_ctx");
 }
 void LuaSystem::load_script(const std::string& path){
-    if (luaL_dofile(L, path.c_str()) != LUA_OK) {
-        const char* err = lua_tostring(L, -1);
+    Resource res = FileSystem::get_resource(path);
+
+    if(!res.is_valid()){
         std::cout << "Issue loading " << path << std::endl;
-        std::cout << err << std::endl;
+        return;
+    }
+
+    if(luaL_loadbuffer(
+        L,
+        (const char*)res.data.get(),
+        res.size,
+        path.c_str()
+    ) != LUA_OK){
+        std::cout << "Lua compile error: " << lua_tostring(L,-1) << std::endl;
+        lua_pop(L,1);
+        return;
+    }
+
+    if(lua_pcall(L,0,0,0) != LUA_OK){
+        std::cout << "Lua runtime error: " << lua_tostring(L,-1) << std::endl;
+        lua_pop(L,1);
     }
 }
-int LuaSystem::load_script_table(const std::string& path) {
-    // Load + run script
-    if (luaL_dofile(L, path.c_str()) != LUA_OK) {
-        std::cerr << "Lua error: " << lua_tostring(L, -1) << std::endl;
-        lua_pop(L, 1);
+int LuaSystem::load_script_table(const std::string& path){
+    Resource res = FileSystem::get_resource(path);
+
+    if(!res.is_valid()){
+        std::cerr << "Failed to load script: " << path << std::endl;
         return LUA_REFNIL;
     }
 
-    // Ensure it returned a table
-    if (!lua_istable(L, -1)) {
+    if(luaL_loadbuffer(
+        L,
+        (const char*)res.data.get(),
+        res.size,
+        path.c_str()
+    ) != LUA_OK){
+        std::cerr << "Lua compile error: " << lua_tostring(L,-1) << std::endl;
+        lua_pop(L,1);
+        return LUA_REFNIL;
+    }
+
+    if(lua_pcall(L,0,1,0) != LUA_OK){
+        std::cerr << "Lua runtime error: " << lua_tostring(L,-1) << std::endl;
+        lua_pop(L,1);
+        return LUA_REFNIL;
+    }
+
+    if(!lua_istable(L,-1)){
         std::cerr << "Lua script did not return a table!" << std::endl;
-        lua_pop(L, 1);
+        lua_pop(L,1);
         return LUA_REFNIL;
     }
 
-    // Store table in registry
     int ref = luaL_ref(L, LUA_REGISTRYINDEX);
     tables.push_back(ref);
+
     std::cout << "Loaded script, ref = " << ref << std::endl;
+
     return ref;
 }
 void LuaSystem::remove_table(int id){

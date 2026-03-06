@@ -1,3 +1,4 @@
+#pragma once
 #include "globals.h"
 #include <filesystem>
 #include "file_resolve/zip.h"

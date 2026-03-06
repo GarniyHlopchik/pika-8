@@ -1,6 +1,7 @@
 #include "gfx.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
+#include "file_resolve/file_system.h"
 
 std::vector<LoadedImages> loaded_images;
 GLFWwindow* GFX::window = nullptr;
@@ -125,7 +126,13 @@ void GFX::update(){
 
 unsigned int GFX::load_texture(const std::string& path){
     int width, height, nrChannels;
-    unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+
+    Resource res = FileSystem::get_resource(path);
+    if(!res.is_valid()){
+        return 0;
+    }
+
+    unsigned char *data = stbi_load_from_memory(res.data.get(),res.size, &width, &height, &nrChannels, 0);
     if(!data){
         return 0;
     }

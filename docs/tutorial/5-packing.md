@@ -1,0 +1,3 @@
+## Overview
+
+There is currently a way to take your game's source code and pack it into a single neat file that the engine's executable can interpret just as well as the plain files in the current directory. You do this by packing the game's source code into a zip archive and renaming it to game.pika. After that make sure that this file is in the same directory as the engine executable and run the engine with ZIP argument (e.g. .\pika-8 ZIP). This makes the game run from that game.pika file you created.

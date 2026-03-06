@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
+#include "file_resolve/file_system.h"
 #define CONFIG_FILE_PATH "config.json"
 
 struct FontData {
@@ -30,7 +30,14 @@ public:
         simdjson::dom::element doc;
         
         // 2. Load the file ONCE
-        auto error = parser.load(CONFIG_FILE_PATH).get(doc);
+        Resource res = FileSystem::get_resource(CONFIG_FILE_PATH);
+
+        if (!res.is_valid()) {
+            std::cerr << "Failed to load config.json. Using defaults." << std::endl;
+            return;
+        }
+        //we now parse by data, not just load from file
+        auto error = parser.parse(res.data.get(), res.size).get(doc);
         if (error) {
             std::cerr << "Failed to load config.json: " << error << ". Using defaults." << std::endl;
             return; 
