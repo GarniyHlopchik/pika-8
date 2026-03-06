@@ -7,15 +7,50 @@
 #include "lua_bindings/engine_context.h"
 #include "file_resolve/file_system.h"
 #include "globals.h"
+#include <fstream>
+#include <filesystem>
+#include <algorithm> 
 
+bool has_embedded_zip(const std::string& exe_path)
+{
+    std::ifstream file(exe_path, std::ios::binary | std::ios::ate);
+    if (!file) return false;
 
+    auto size = file.tellg();
+    size_t read_size = std::min<size_t>(size, 65536);
+
+    file.seekg(size - read_size);
+
+    std::vector<char> buf(read_size);
+    file.read(buf.data(), read_size);
+
+    for (size_t i = 0; i < read_size - 4; i++) {
+        if ((unsigned char)buf[i] == 0x50 &&
+            (unsigned char)buf[i+1] == 0x4B &&
+            (unsigned char)buf[i+2] == 0x05 &&
+            (unsigned char)buf[i+3] == 0x06) {
+            return true;
+        }
+    }
+
+    return false;
+}
+bool has_external_zip(const std::string& path)
+{
+    return std::filesystem::exists(path);
+}
 
 int main(int argc, char** argv){
     //data source setup
-    if(std::string(argv[argc-1]) == "ZIP"){
+    if(has_embedded_zip(argv[0])){
+        std::cout << "Running embedded" << std::endl;
+        FileSystem::init(EngineReadState::ZIP,argv[0]);
+    }else if(has_external_zip("game.pika")){
+        std::cout << "Running external zip" << std::endl;
         FileSystem::init(EngineReadState::ZIP,"game.pika");
     }
     else{
+        std::cout << "Running directory" << std::endl;
         FileSystem::init(EngineReadState::DIRECTORY,"");
     }
     //context setup------------------------
