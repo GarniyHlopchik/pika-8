@@ -50,7 +50,34 @@ Resource FileSystem::get_resource(const std::string& relative_path){
         std::filesystem::path base = root_path;
         std::filesystem::path file = relative_path;
         std::filesystem::path full = base / file;
-        return load_resource_from_directory(full.string());
+
+        // Try to load the resource directly first
+        Resource res = load_resource_from_directory(full.string());
+        if (res.is_valid()) {
+            return res;
+        }
+
+        // Fallback: some builds / runtimes place assets alongside the executable
+        // (e.g., "fonts/" instead of "assets/fonts/"). If the requested
+        // resource starts with "assets/", try loading without the prefix.
+        const std::string assetsPrefixPosix = "assets/";
+        const std::string assetsPrefixWin = "assets\\";
+
+        auto tryStripPrefix = [&](const std::string& prefix) {
+            if (relative_path.rfind(prefix, 0) != 0) return Resource{};
+            std::filesystem::path stripped = relative_path.substr(prefix.size());
+            std::filesystem::path p = base / stripped;
+            return load_resource_from_directory(p.string());
+        };
+
+        if (Resource res2 = tryStripPrefix(assetsPrefixPosix); res2.is_valid()) {
+            return res2;
+        }
+        if (Resource res3 = tryStripPrefix(assetsPrefixWin); res3.is_valid()) {
+            return res3;
+        }
+
+        return res;
     }
 }
 void FileSystem::shutdown(){

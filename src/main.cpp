@@ -1,6 +1,7 @@
 #include "config.h"
 #include "gfx/gfx.h"
 #include "sfx/sfx.h"
+#include "gfx/text/text.h"
 #include "json_reader/get_config.h"
 #include "scene_tree/scene_tree.h"
 #include "lua_bindings/lua_bindings.h"
@@ -21,6 +22,7 @@ int main(int argc, char** argv){
     //context setup------------------------
     Config config;
     GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str());
+    Text text(gfx);
     SFX sfx;
     LuaSystem lua;
     SceneTree scene_tree(&lua);
@@ -29,6 +31,7 @@ int main(int argc, char** argv){
         &scene_tree,
         &gfx,
         &sfx,
+        &text,
         &config
     };
     lua.set_context(&ctx);

@@ -20,6 +20,7 @@ struct Resource {
 class LuaSystem;
 class SceneTree;
 class GFX;
+class Text;
 class SFX;
 class Config;
 struct EngineContext {
@@ -27,6 +28,7 @@ struct EngineContext {
     SceneTree* scene_tree;
     GFX* gfx;
     SFX* sfx;
+    Text* text;
     Config* config;
 };
 #endif

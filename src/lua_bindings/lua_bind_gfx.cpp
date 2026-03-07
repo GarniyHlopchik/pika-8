@@ -1,6 +1,7 @@
 #include "lua_bindings.h"
 #include "engine_context.h"
 #include "../gfx/gfx.h"
+#include "../gfx/text/text.h"
 
 static int l_cls(lua_State* L){
     float r = luaL_optnumber(L,1,0.0f);
@@ -104,16 +105,17 @@ static int l_getscr(lua_State* L){
     return 2;
 }
 
-static void draw_text(const char* text, int x, int y, std::string font_name, float scale, float space_multiplier,GFX* gfx){
+static void draw_text(const char* text, int x, int y, 
+    std::string font_name, float scale, float space_multiplier, Text* text_obj){
     try {
-        gfx->draw_text(text, x, y, font_name, scale, space_multiplier);
+        text_obj->draw_text(text, x, y, font_name, scale, space_multiplier);
     } 
     catch (const std::exception& e) {
         if (std::string(e.what()).find("Font not found") != std::string::npos) {
             font_name = "default";
             std::cerr << "Warning: " << e.what() << " Falling back to default font." << std::endl;
             try {
-                gfx->draw_text(text, x, y, font_name, scale, space_multiplier);
+                text_obj->draw_text(text, x, y, font_name, scale, space_multiplier);
             } catch (const std::exception& e) {
                 std::cerr << "Error: Default font also not found. Cannot draw text." << std::endl;
             }
@@ -140,9 +142,8 @@ static int l_text(lua_State* L){
     float scale = luaL_optnumber(L, 4, 1.0f);
     std::string font_name = luaL_checkstring(L, 5);
     float space_multiplier = luaL_optnumber(L, 6, 0.4f);
-
     
-    draw_text(text, x, y, font_name, scale, space_multiplier,ctx->gfx);
+    draw_text(text, x, y, font_name, scale, space_multiplier, ctx->text);
     return 0;
 }
 static int l_close(lua_State* L){

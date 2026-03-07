@@ -3,7 +3,7 @@
 SceneTree::SceneTree(LuaSystem* p_lua){
     lua = p_lua;
 }
-pugi::xml_document SceneTree::find_in_scenes(const std::string& name){}
+// pugi::xml_document SceneTree::find_in_scenes(const std::string& name){} Temporary disabled
 void SceneTree::change_scene(const std::string& name){}
 void SceneTree::remove_root(){
     root.reset();
