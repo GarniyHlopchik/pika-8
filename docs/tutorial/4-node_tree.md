@@ -45,7 +45,7 @@ return Player
 ```
 'Player' can be anything really, as long as it is what you return
 
-The idea behind scripting in pika is based around lua tables. A script in pika is just a file that is executed once when a node it's attached to is created. This file **must** return a table with _init and _update functions acting as callbacks. _init is called immediately after the script is executed. It receives a node, which is an id of the node it's attached to (later in development will become a reference to said node), as well as a hidden 'self' parameter, which is, well, the tables own context. _update receives delta and also self. It's called whenever its node is updated, which is where this is going. This way a simple table in lua registry acts as a proper script.
+The idea behind scripting in pika is based around lua tables. A script in pika is just a file that is executed once when a node it's attached to is created. This file **must** return a table with _init and _update functions acting as callbacks. _init is called immediately after the script is executed. It receives a reference to the node it's attached to, as well as a hidden 'self' parameter, which is, well, the tables own context. _update receives delta and also self. It's called whenever its node is updated, which is where this is going. This way a simple table in lua registry acts as a proper script.
 
 Now we can modify our main.lua to attach a script to the node we created:
 
