@@ -9,7 +9,7 @@ Node::Node(int p_id, LuaSystem* p_L, SceneTree* p_tree){
 void Node::_init(int p_script_ref){
     script_ref=p_script_ref;
     if (lua && script_ref) {
-        lua->call_init(script_ref, id);
+        lua->call_init(script_ref, *this);
     }
 }
 Node::~Node(){

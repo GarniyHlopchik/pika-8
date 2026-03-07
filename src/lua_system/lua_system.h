@@ -1,6 +1,8 @@
 #pragma once
 #include "config.h"
+#include "scene_tree/node.h"
 struct EngineContext;
+class Node;
 class LuaSystem{
     public:
     LuaSystem();
@@ -9,7 +11,7 @@ class LuaSystem{
     void set_context(EngineContext* ctx);
     void load_script(const std::string& path);
     int load_script_table(const std::string& path);
-    void call_init(int table_ref, int node_id);
+    void call_init(int table_ref, Node& node);
     void call_script_update(int table_ref,float dt);
     void call_update(float dt);
     void call(const char* name);

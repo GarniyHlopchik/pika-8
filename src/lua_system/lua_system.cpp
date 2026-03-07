@@ -135,41 +135,39 @@ void LuaSystem::remove_table(int id){
         tables.erase(it);
     }
 }
-void LuaSystem::call_init(int table_ref, int node_id) {
-    // Push table (self)
+void LuaSystem::call_init(int table_ref, Node& node_ref) {
+    // 1. Get the table from registry
     lua_rawgeti(L, LUA_REGISTRYINDEX, table_ref);
 
     if (!lua_istable(L, -1)) {
-        std::cerr << "Invalid Lua table reference!" << std::endl;
         lua_pop(L, 1);
         return;
     }
 
-    // Get _init function
+    // 2. Get the _init function from the table
     lua_getfield(L, -1, "_init");
 
     if (!lua_isfunction(L, -1)) {
-        // No _init defined — not an error
-        lua_pop(L, 2); // function + table
+        lua_pop(L, 2); 
         return;
     }
 
-    // Stack now:
-    // [ table ][ function ]
+    // 3. Push 'self' (the table)
+    lua_pushvalue(L, -2); 
 
-    // Push self
-    lua_pushvalue(L, -2); // table
+    // 4. Push the Node reference using sol2
+    // This uses the bindings you already defined for the Node class
+    sol::stack::push(L, std::ref(node_ref)); 
 
-    // Push node_id
-    lua_pushinteger(L, node_id);
-
-    // Call function(self, node_id)
+    // Stack is now: [table] [function] [self] [node_userdata]
+    
+    // 5. Call function(self, node)
     if (lua_pcall(L, 2, 0, 0) != LUA_OK) {
         std::cerr << "Lua _init error: " << lua_tostring(L, -1) << std::endl;
         lua_pop(L, 1);
     }
 
-    // Pop table
+    // 6. Pop the original table
     lua_pop(L, 1);
 }
 void LuaSystem::call_script_update(int table_ref, float dt)
