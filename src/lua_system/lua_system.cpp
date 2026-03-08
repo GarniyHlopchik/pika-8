@@ -56,7 +56,10 @@ LuaSystem::LuaSystem(){
 
     lua_rawgeti(s, LUA_REGISTRYINDEX, self.script_ref);
     return sol::stack::pop<sol::object>(s);
-})
+}),
+    "remove_child", &Node::remove_child,
+    "parent", &Node::parent,
+    "children", sol::readonly(&Node::children)
     );
 }
 LuaSystem::~LuaSystem(){

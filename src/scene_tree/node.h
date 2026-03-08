@@ -12,7 +12,7 @@ class Node{
     void _init(int script_ref);
     int script_ref;
     int id;
-    private:
+
     Node* parent;
     std::vector<std::unique_ptr<Node>> children;
     
