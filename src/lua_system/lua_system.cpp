@@ -47,8 +47,19 @@ LuaSystem::LuaSystem(){
     // Now Lua's unique_ptr is empty (nullptr)
 
     self.add_child(std::move(child_ptr));
-},
-        "id", &Node::id
+    },
+        "id", &Node::id,
+        "script", sol::property([](Node& self, sol::this_state s) -> sol::object {
+    if (self.script_ref == LUA_REFNIL) {
+        return sol::make_object(s, sol::lua_nil);
+    }
+
+    lua_rawgeti(s, LUA_REGISTRYINDEX, self.script_ref);
+    return sol::stack::pop<sol::object>(s);
+}),
+    "remove_child", &Node::remove_child,
+    "parent", &Node::parent,
+    "children", sol::readonly(&Node::children)
     );
 }
 LuaSystem::~LuaSystem(){
@@ -57,6 +68,7 @@ LuaSystem::~LuaSystem(){
         luaL_unref(L, LUA_REGISTRYINDEX, t);
     }
 }
+
 lua_State* LuaSystem::get_state(){
     return L;
 }

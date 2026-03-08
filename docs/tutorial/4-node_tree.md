@@ -96,3 +96,5 @@ end
 ```
 
 node:add_child(other: Node) makes the other node a child of the current one. The reference to the node2 remains valid, but no longer holds ownership over the object. Now its ownership belongs to its parent. Every node cleans up its children when it is destructed, but later the functionality will be extended to include methods like remove_child() for direct manipulation. Note that we only call update on 'node', not node2. That is because every node's update method calls update on every child it has. This means that in a large node tree you only need to call _update on its root and it will propagate down.
+
+Node also has properties `parent` and `children` that can be accessed with node.parent and node.children. Parent is a reference to the parent node, while children are a userdata that behaves as an array of node references, meaning you can access its members by index or iterate through them with ipairs. Keep in mind that lua is 1-indexed.
