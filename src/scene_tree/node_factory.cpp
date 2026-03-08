@@ -15,9 +15,9 @@ std::unique_ptr<Node> NodeFactory::create(const std::string& type, LuaSystem* lu
 
         return node;
     }
-    else{
-        std::cout << "No such node name found: " << type << std::endl;
-    }
+    
+    std::cout << "No such node name found: " << type << std::endl;
+    return nullptr;
 }
 int NodeFactory::get_id(){
     static int id = 1;

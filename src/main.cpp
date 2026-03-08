@@ -18,9 +18,10 @@ bool has_embedded_zip(const std::string& exe_path)
     if (!file) return false;
 
     auto size = file.tellg();
-    size_t read_size = std::min<size_t>(size, 65536);
-
-    file.seekg(size - read_size);
+    size_t read_size = std::min<size_t>(static_cast<size_t>(size), 65536);
+    
+    // Cast read_size to streamoff to resolve the ambiguity
+    file.seekg(size - static_cast<std::streamoff>(read_size));
 
     std::vector<char> buf(read_size);
     file.read(buf.data(), read_size);
