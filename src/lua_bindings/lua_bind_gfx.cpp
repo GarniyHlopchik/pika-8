@@ -130,7 +130,6 @@ static int l_spr(lua_State* L) {
     SpriteCut sprite = get_sprite_cut(L, 6); // expects a table {x1, x2, y1, y2}    
 
     Color color = get_color(L, 7); // expects a table {r, g, b, a}
-    color.print("spr_color");
 
     UVCoords uv = calculate_uv(sprite, texture);
 
