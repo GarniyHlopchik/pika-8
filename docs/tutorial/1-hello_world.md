@@ -29,10 +29,12 @@ We can finally get to it, create game.lua and write some code:
 ```lua
 function _update(delta)
     GFX.cls()    
-    GFX.text("Hello World!",60,60,3,"default",1)
+    GFX.text("Hello World!", 60, 60, 3, "default", {255, 255, 255, 255}, 1)
 end
 ```
 
-This uses an update callback, which takes in delta parameter - time elapsed since last update. Inside of it we use 2 functions from engine's GFX API: ```cls()``` and ```text(text: String, x_position: int, y_position: int, scale: int, font_name: String, spacing: int)```. Note that `text`, `x_position`, `y_position`, `scale` and `font_name` are required.
+This uses an update callback, which takes in delta parameter - time elapsed since last update. Inside of it we use 2 functions from engine's GFX API: ```cls()``` and ```text(text: String, x_position: int, y_position: int, scale: int, font_name: String, color: Table, spacing: int)```. Note that `text`, `x_position`, `y_position`, `scale` and `font_name` are required. 
+
+Color parametr is RGBA values 0-255. You can insted replace it with `{ }` and Color will default to `{255, 255, 255, 255}`
 
 The first one clears the screen and the second one prints a message onto the screen from our loaded font.png

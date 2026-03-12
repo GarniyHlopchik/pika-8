@@ -158,5 +158,16 @@ FontData GFX::get_font_data(const std::string& name) {
 }
 
 void GFX::draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv) {
-    spritemesh.draw(shader, texture, x, y, width, height, (float)uv.u1, (float)uv.v1, (float)uv.u2, (float)uv.v2);
+    // Color color = {0.7843f, 0.6353f, 0.7843f, 1.0f}; // default purple color
+    Color color = {1.0f, 1.0f, 1.0f, 1.0f}; // default white color
+    spritemesh.draw(shader, texture, x, y, width, height, uv, color);
+}
+
+void GFX::draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color) {
+    Color white = {1.0f, 1.0f, 1.0f, 1.0f};
+    if (color > white) color = white; // clamp to white if any component is above 1.0f
+    Color black = {0.0f, 0.0f, 0.0f, 1.0f};
+    if (color < black) color = black; // clamp to black if any component is below 0.0f
+
+    spritemesh.draw(shader, texture, x, y, width, height, uv, color);
 }

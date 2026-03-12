@@ -6,9 +6,10 @@ const char* fragSource =
     "in vec2 vUV;\n"
     "out vec4 screenColor;\n"
     "uniform sampler2D ourTexture;\n"
+    "uniform vec4 uColor;\n"
     "void main()\n"
     "{\n"
-    "        screenColor = texture(ourTexture, vUV);\n"
+    "        screenColor = texture(ourTexture, vUV) * uColor;\n"
     "}\n";
 
 const char* vertexSource =

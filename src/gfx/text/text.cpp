@@ -5,7 +5,7 @@
 Text::Text(GFX& gfx)
     : gfx(gfx)
 {
-  Text::gfx = gfx;
+    Text::gfx = gfx;
 }
 
 Text::~Text() {
@@ -68,8 +68,7 @@ UVCoords Text::calculate_uv_coords(size_t index, const LoadedFont& font) const {
     };
 }
 
-void Text::draw_text(const std::string& text, float x, float y, const std::string& font_name, float scale, float space_multiplier) {
-    
+void Text::draw_text(const std::string& text, float x, float y, const std::string& font_name, float scale, Color color, float space_multiplier) {
     // load font to cash onse
     if (is_font_loaded(font_name) == false) {
         load_font(font_name);
@@ -97,7 +96,7 @@ void Text::draw_text(const std::string& text, float x, float y, const std::strin
         UVCoords uv = calculate_uv_coords(index, font);
 
         // Use the cached texture ID
-        gfx.draw(font.texture_id, cursor_x, y, draw_width, draw_height, uv);
+        gfx.draw(font.texture_id, cursor_x, y, draw_width, draw_height, uv, color);
 
         cursor_x += draw_width; 
     }

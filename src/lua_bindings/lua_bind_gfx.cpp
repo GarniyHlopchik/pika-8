@@ -57,6 +57,51 @@ static UVCoords calculate_uv(SpriteCut sprite, unsigned int texture) {
     return uv;
 }
 
+static std::vector<float> get_table_floats(lua_State* L, int index, int count, float fallback = 1.0f) {
+    
+    // return a fallback value if NOT the table 
+    if (!lua_istable(L, index)) {
+        return std::vector<float>(count, fallback);
+    }
+    
+    std::vector<float> values;
+    values.reserve(count); // reserve space on RAM
+
+    for (int i = 1; i <= count; i++) {
+        // Pushes the value at table[i] to the top of the stack (-1)
+        lua_rawgeti(L, index, i);
+        // If the table is empty {}, optnumber will use the fallback
+        values.push_back((float)luaL_optnumber(L, -1, fallback));
+        // Pop the value immediately to keep the stack clean
+        lua_pop(L, 1);
+    }
+    
+    return values;
+}
+
+static Color get_color(lua_State* L, int index, float default_color = 255.0f) {
+    std::vector<float> color_values = get_table_floats(L, index, 4, default_color);
+    Color color = Color{
+        color_values[0],
+        color_values[1],
+        color_values[2],
+        color_values[3]
+    };
+    color.normalize(); // make colors between 0 and 1
+    return color;
+}
+
+static SpriteCut get_sprite_cut(lua_State* L, int index) {
+    std::vector<float> cut_values = get_table_floats(L, index, 4, 0.0f);
+    SpriteCut cut = SpriteCut{
+        cut_values[0],
+        cut_values[1],
+        cut_values[2],
+        cut_values[3]
+    };
+    return cut;
+}
+
 /*
 * Lua binding for drawing a sprite
 * Arguments:
@@ -82,21 +127,21 @@ static int l_spr(lua_State* L) {
     float height = luaL_optnumber(L, 5, 8.0f);
 
     // 3. (Optional) You can also expose the UV coordinates to Lua for sprite animations
-    SpriteCut sprite;
-    sprite.x1 = luaL_optnumber(L, 6, 0.0f); // Left
-    sprite.x2 = luaL_optnumber(L, 7, 0.0f); // Right
-    sprite.y1 = luaL_optnumber(L, 8, 0.0f); // Top
-    sprite.y2 = luaL_optnumber(L, 9, 0.0f); // Bottom 
-    
+    SpriteCut sprite = get_sprite_cut(L, 6); // expects a table {x1, x2, y1, y2}    
+
+    Color color = get_color(L, 7); // expects a table {r, g, b, a}
+    color.print("spr_color");
+
     UVCoords uv = calculate_uv(sprite, texture);
 
     // std::cout << u1 << v1 << u2 << v2 << std::endl;
 
     // Pass everything to your updated C++ draw function
-    ctx->gfx->draw(texture, x, y, width, height, uv);
+    ctx->gfx->draw(texture, x, y, width, height, uv, color);
     
     return 0;
 }
+
 static int l_getscr(lua_State* L){
     EngineContext* ctx = get_ctx(L);
     auto [width,height] = ctx->gfx->get_screen_size();
@@ -106,16 +151,16 @@ static int l_getscr(lua_State* L){
 }
 
 static void draw_text(const char* text, int x, int y, 
-    std::string font_name, float scale, float space_multiplier, Text* text_obj){
+    std::string font_name, float scale, Color color, float space_multiplier, Text* text_obj){
     try {
-        text_obj->draw_text(text, x, y, font_name, scale, space_multiplier);
+        text_obj->draw_text(text, x, y, font_name, scale, color, space_multiplier);
     } 
     catch (const std::exception& e) {
         if (std::string(e.what()).find("Font not found") != std::string::npos) {
             font_name = "default";
             std::cerr << "Warning: " << e.what() << " Falling back to default font." << std::endl;
             try {
-                text_obj->draw_text(text, x, y, font_name, scale, space_multiplier);
+                text_obj->draw_text(text, x, y, font_name, scale, color, space_multiplier);
             } catch (const std::exception& e) {
                 std::cerr << "Error: Default font also not found. Cannot draw text." << std::endl;
             }
@@ -124,6 +169,7 @@ static void draw_text(const char* text, int x, int y,
         }
     }
 }
+
 /*
 * Lua binding for drawing text
 * Arguments:
@@ -132,7 +178,8 @@ static void draw_text(const char* text, int x, int y,
 * 3. y (number) - y position
 * 4. font_name (string) - name of the font to use
 * 5. scale (number, optional) - scale of the text (default: 1.0)
-* 6. space_multiplier (number, optional) - multiplier for space character width (default: 0.4)
+* 6. color (table, optional) - color of the text as a table {r=..., g=..., b=..., a=...} (default: white)
+* 7. space_multiplier (number, optional) - multiplier for space character width (default: 0.4)
 */
 static int l_text(lua_State* L){
     EngineContext* ctx = get_ctx(L);
@@ -141,11 +188,15 @@ static int l_text(lua_State* L){
     float y = luaL_checknumber(L,3);
     float scale = luaL_optnumber(L, 4, 1.0f);
     std::string font_name = luaL_checkstring(L, 5);
-    float space_multiplier = luaL_optnumber(L, 6, 0.4f);
     
-    draw_text(text, x, y, font_name, scale, space_multiplier, ctx->text);
+    Color color = get_color(L, 6);
+
+    float space_multiplier = luaL_optnumber(L, 7, 0.4f);
+    
+    draw_text(text, x, y, font_name, scale, color, space_multiplier, ctx->text);
     return 0;
 }
+
 static int l_close(lua_State* L){
     glfwSetWindowShouldClose(GFX::get_window(), GLFW_TRUE);
     return 0;

@@ -11,7 +11,7 @@ public:
   explicit Text(GFX& gfx);
   ~Text();
 
-  void draw_text(const std::string& text, float x, float y, const std::string& font_name = "default",  float scale = 1.0f, float space_multiplier = 0.4f);
+  void Text::draw_text(const std::string& text, float x, float y, const std::string& font_name, float scale, Color color, float space_multiplier);
 
   UVCoords calculate_uv_coords(size_t index, const LoadedFont& font) const;
   size_t get_char_index(char c, const std::string& charset) const;

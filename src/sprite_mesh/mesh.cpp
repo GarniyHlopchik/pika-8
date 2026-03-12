@@ -29,7 +29,7 @@ void SpriteMesh::init(){
     glEnableVertexAttribArray(1);
 }
 
-void SpriteMesh::draw(unsigned int shader, unsigned int texture, float posX, float posY, float width, float height, float u1, float v1, float u2, float v2) {
+void SpriteMesh::draw(unsigned int shader, unsigned int texture, float posX, float posY, float width, float height, UVCoords uv, Color color) {
     glUseProgram(shader);
     
     GLint posLoc = glGetUniformLocation(shader, "uPos");
@@ -40,19 +40,22 @@ void SpriteMesh::draw(unsigned int shader, unsigned int texture, float posX, flo
     glUniform2f(sizeLoc, width, height);
 
     GLint uU1Loc = glGetUniformLocation(shader, "uU1");
-    glUniform1f(uU1Loc, u1);
+    glUniform1f(uU1Loc, uv.u1);
     GLint uV1Loc = glGetUniformLocation(shader, "uV1");
-    glUniform1f(uV1Loc, v1);
+    glUniform1f(uV1Loc, uv.v1);
     GLint uU2Loc = glGetUniformLocation(shader, "uU2");
-    glUniform1f(uU2Loc, u2);
+    glUniform1f(uU2Loc, uv.u2);
     GLint uV2Loc = glGetUniformLocation(shader, "uV2");
-    glUniform1f(uV2Loc, v2);
+    glUniform1f(uV2Loc, uv.v2);
     
     glActiveTexture(GL_TEXTURE0);  
     glBindTexture(GL_TEXTURE_2D, texture);
 
     unsigned int location = glGetUniformLocation(shader, "ourTexture");
     glUniform1i(location, 0); 
+
+    GLint colorLoc = glGetUniformLocation(shader, "uColor");
+    glUniform4f(colorLoc, color.r, color.g, color.b, color.a);
 
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, vertex_count);

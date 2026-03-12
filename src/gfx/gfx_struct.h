@@ -1,4 +1,5 @@
 #pragma once
+#include "sprite_mesh/mesh_struct.h"
 
 struct LoadedFont {
     unsigned int texture_id;
@@ -11,13 +12,4 @@ struct LoadedImages
 {
     std::string path;
     unsigned int id;
-};
-
-struct Color
-{
-    int r, g, b, a;
-};
-
-struct UVCoords {
-    float u1, v1, u2, v2;
 };
