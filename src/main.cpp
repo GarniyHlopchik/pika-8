@@ -12,6 +12,7 @@
 #include <fstream>
 #include <filesystem>
 #include <algorithm> 
+#include <SDL3/SDL_main.h>
 
 bool has_embedded_zip(const std::string& exe_path)
 {
@@ -45,6 +46,11 @@ bool has_external_zip(const std::string& path)
 
 int main(int argc, char** argv){
     //data source setup
+    #ifdef __ANDROID__
+    if(!FileSystem::init(EngineReadState::ZIP,"game.pika")){
+        SDL_Log("ERROR: No game.pika found on android apk.")
+    }
+    #else
     if(has_embedded_zip(argv[0])){
         std::cout << "Running embedded" << std::endl;
         FileSystem::init(EngineReadState::ZIP,argv[0]);
@@ -56,6 +62,7 @@ int main(int argc, char** argv){
         std::cout << "Running directory" << std::endl;
         FileSystem::init(EngineReadState::DIRECTORY,"");
     }
+    #endif
     //context setup------------------------
     Config config;
     InputState input_state;

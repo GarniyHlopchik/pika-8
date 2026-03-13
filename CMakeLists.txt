@@ -30,12 +30,27 @@ FetchContent_Declare(
 # SDL3 has many options; you can disable what you don't need before MakeAvailable
 set(SDL_TEST OFF CACHE BOOL "" FORCE)
 set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
-
+if(ANDROID)
+    set(SDL_STATIC ON CACHE BOOL "" FORCE)
+    set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+endif()
 FetchContent_MakeAvailable(SDL3)
 
 # Link your target to SDL3
 # SDL3::SDL3 is the standard target name
 target_link_libraries(pika-8 PRIVATE SDL3::SDL3)
+
+if(ANDROID)
+    # Android needs these specifically for GLAD to link to the driver
+    target_link_libraries(pika-8 PRIVATE GLESv2 log android)
+    
+    # Optional: Define a macro so your code knows it's on GLES
+    target_compile_definitions(pika-8 PRIVATE PIKA_GLES)
+else()
+    # Your existing Windows/Desktop GL logic
+    find_package(OpenGL REQUIRED)
+    target_link_libraries(pika-8 PRIVATE OpenGL::GL)
+endif()
 
 FetchContent_Declare(
     simdjson
@@ -46,8 +61,16 @@ FetchContent_MakeAvailable(simdjson)
 
 target_link_libraries(pika-8 PRIVATE simdjson::simdjson)
 
-find_package(OpenGL REQUIRED)
-target_link_libraries(pika-8 PRIVATE OpenGL::GL)
+if(ANDROID)
+    # Link against OpenGL ES 2 or 3 and the Android logging library
+    target_link_libraries(pika-8 PRIVATE GLESv2 log android)
+else()
+    find_package(OpenGL REQUIRED)
+    target_link_libraries(pika-8 PRIVATE OpenGL::GL)
+    if (WIN32)
+        target_link_libraries(pika-8 PRIVATE opengl32 ws2_32)
+    endif()
+endif()
 
 file(GLOB LUA_SOURCES
     dependencies/lua/*.c

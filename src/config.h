@@ -1,8 +1,13 @@
 #pragma once
-#include "glad/glad.h"
+#ifdef __ANDROID__
+    #include <glad/gles2.h> // Or gles3.h if you generated for 3.0
+#else
+    #include <glad/glad.h>
+#endif
 #include "iostream"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_opengl.h>
+
 extern "C" {
     #include "lua.h"
     #include "lauxlib.h"

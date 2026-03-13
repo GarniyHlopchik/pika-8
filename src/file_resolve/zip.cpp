@@ -25,27 +25,47 @@ bool Zip::init(const std::string& zip_path)
 
     memset(&s_archive, 0, sizeof(s_archive));
 
-    std::ifstream file(zip_path, std::ios::binary | std::ios::ate);
-    size_t size = file.tellg();
-    file.seekg(0);
+    SDL_IOStream* io = SDL_IOFromFile(zip_path.c_str(), "rb");
+    if (!io) {
+        std::cout << "Failed to open file: " << zip_path << "\n";
+        return false;
+    }
+
+    Sint64 size = SDL_GetIOSize(io);
+    if (size <= 0) {
+        std::cout << "Failed to get IO size\n";
+        SDL_CloseIO(io);
+        return false;
+    }
 
     unsigned char* mem = (unsigned char*)malloc(size);
-    file.read((char*)mem, size);
+
+    Sint64 read = SDL_ReadIO(io, mem, size);
+    SDL_CloseIO(io);
+
+    if (read != size) {
+        std::cout << "Failed to read file\n";
+        free(mem);
+        return false;
+    }
 
     size_t zip_start_offset = find_zip_start(mem, size);
     if (zip_start_offset == SIZE_MAX) {
         std::cout << "Could not find ZIP header\n";
+        free(mem);
         return false;
     }
-    
 
     if (!mz_zip_reader_init_mem(&s_archive, mem + zip_start_offset, size - zip_start_offset, 0)) {
         std::cout << "Failed to init ZIP at offset " << zip_start_offset << "\n";
+
         mz_zip_error err = mz_zip_get_last_error(&s_archive);
         std::cout << "Miniz Error Code: " << mz_zip_get_error_string(err) << std::endl;
+
+        free(mem);
         return false;
     }
-
+    my_mem = mem;
     s_is_initialized = true;
     return true;
 }
@@ -71,9 +91,11 @@ void Zip::shutdown(){
         if (s_is_initialized) {
             mz_zip_reader_end(&s_archive);
             s_is_initialized = false;
+            free(my_mem);
         }
     }
 }
 
 mz_zip_archive Zip::s_archive = {};
 bool Zip::s_is_initialized = false;
+unsigned char* Zip::my_mem = nullptr;

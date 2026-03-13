@@ -1,5 +1,37 @@
 #include "lua_system.h"
 #include "file_resolve/file_system.h"
+#include <iostream>
+int lua_zip_searcher(lua_State* L) {
+    const char* module = luaL_checkstring(L, 1);
+    
+    std::string path = module;
+    std::replace(path.begin(), path.end(), '.', '/');
+    path += ".lua";
+
+    Resource res = FileSystem::get_resource(path);
+
+    if (!res.is_valid()) {
+        lua_pushfstring(L, "\n\tno file '%s' in zip", path.c_str());
+        return 1; 
+    }
+
+    // Use the path for the chunk name (for debug traces)
+    int status = luaL_loadbuffer(L, 
+                                (const char*)res.data.get(), 
+                                res.size, 
+                                ("@" + path).c_str());
+
+    if (status != LUA_OK) {
+        // Let Lua handle the syntax error
+        return lua_error(L); 
+    }
+
+    // SUCCESS: 
+    // Return 1: The compiled function (already on stack from loadbuffer)
+    // Return 2: The ORIGINAL module name (with dots). This is what Lua expects!
+    lua_pushstring(L, module); 
+    return 2;
+}
 LuaSystem::LuaSystem(){
     //lua setup-----------------------------
     L = luaL_newstate();  // Lua vm
@@ -61,6 +93,29 @@ LuaSystem::LuaSystem(){
     "parent", &Node::parent,
     "children", sol::readonly(&Node::children)
     );
+
+    //allows lua to seek for require in zip instead of directory
+    // 1. Get package.searchers onto the stack
+    lua_getglobal(L, "package");
+    lua_getfield(L, -1, "searchers");    // Stack: [package, searchers]
+
+    // 2. Get table.insert onto the stack
+    lua_getglobal(L, "table");
+    lua_getfield(L, -1, "insert");       // Stack: [package, searchers, table, insert]
+
+    // 3. Prepare arguments for table.insert(searchers, 2, lua_zip_searcher)
+    lua_pushvalue(L, -3);                // Push searchers table (Arg 1)
+    lua_pushinteger(L, 2);               // Push index 2 (Arg 2)
+    lua_pushcfunction(L, lua_zip_searcher); // Push function (Arg 3)
+
+    // 4. Call table.insert(searchers, 2, func)
+    if (lua_pcall(L, 3, 0, 0) != LUA_OK) {
+        std::cout << "Error injecting searcher: " << lua_tostring(L, -1) << std::endl;
+        lua_pop(L, 1);
+    }
+
+    // 5. Clean up the stack (pop 'table', 'searchers', and 'package')
+    lua_pop(L, 3);
 }
 LuaSystem::~LuaSystem(){
     lua_close(L);
@@ -233,7 +288,7 @@ void LuaSystem::call_update(float dt){
     // Call: 1 argument, 0 return values
     if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
         const char* err = lua_tostring(L, -1);
-        //log_error(err);   WRITE ERROR LOGGING LATER
+        std::cout << "UPDATE LOOP ERROR" << err << std::endl;
         lua_pop(L, 1);
     }
 }
@@ -245,7 +300,7 @@ void LuaSystem::call(const char* name){
     }
     if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
         const char* err = lua_tostring(L, -1);
-        //log_error(err);
+        std::cout << "ERROR IN CALLBACK " << name << ": "<< err << std::endl;
         lua_pop(L, 1);
     }
 }

@@ -38,13 +38,14 @@ std::tuple<int,int> GFX::get_screen_size(){
     return std::make_tuple(width,height);
 }
 GFX::GFX(int w, int h, const char* title, InputState &p_state) : input_state(p_state){
-    if(SDL_Init(SDL_INIT_VIDEO) != 0){
-        std::cout << "SDL3 video couldn't start: " << SDL_GetError() << std::endl;
+    int result = SDL_Init(SDL_INIT_VIDEO);
+    if(result != 0){
+        std::cout << "SDL3 init return: " << SDL_GetError() << result << std::endl;
     }
-    //use gl es 3.0 on android; else use open gl 3.3
+    //use gl es 2.0 on android; else use open gl 3.3
     #ifdef __ANDROID__
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     #else
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -63,12 +64,17 @@ GFX::GFX(int w, int h, const char* title, InputState &p_state) : input_state(p_s
 
     //glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     
-    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
-        std::cout << "GLAD couldn't start" << std::endl;
-        SDL_DestroyWindow(window);
-        SDL_Quit();
+    #ifdef __ANDROID__
+    if (!gladLoadGLES2Loader((GLADloadproc)SDL_GL_GetProcAddress)) {
+        SDL_Log("Failed to initialize GLAD for GLES");
         return;
-    }  
+    }
+    #else
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
+        SDL_Log("Failed to initialize GLAD for Desktop GL");
+        return;
+    }
+    #endif
     SDL_GetWindowSizeInPixels(window, &w, &h);
     glViewport(0,0,w,h);
     glEnable(GL_BLEND);
@@ -100,14 +106,22 @@ SDL_Window* GFX::get_window() {
 
 std::vector<int> GFX::get_image_dimensions(const std::string& path) {
     int width, height, nrChannels;
-    unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
-    if(!data){
+    
+    // 1. Get from Zip/FileSystem
+    Resource res = FileSystem::get_resource(path);
+    if(!res.is_valid()){
         return {0,0};
     }
-    stbi_image_free(data);
+
+    // 2. Use the "from_memory" version of STB
+    int ok = stbi_info_from_memory(res.data.get(), res.size, &width, &height, &nrChannels);
+    
+    if(!ok){
+        return {0,0};
+    }
+    
     return {width, height};
 }
-
 std::vector<int> GFX::get_image_dimensions(const unsigned int texture) {
     return get_image_dimensions(get_texture_path(texture));
 }
@@ -159,6 +173,7 @@ void GFX::update(){
 
 
 unsigned int GFX::load_texture(const std::string& path){
+    
     int width, height, nrChannels;
 
     Resource res = FileSystem::get_resource(path);
@@ -198,6 +213,11 @@ FontData GFX::get_font_data(const std::string& name) {
     throw std::runtime_error("Font not found: " + name);
 }
 
+
+void GFX::draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv) {
+    Color color = {1.0f, 1.0f, 1.0f, 1.0f};
+    spritemesh.draw(shader, texture, x, y, width, height, uv, color);
+}
 
 void GFX::draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color) {
     Color white = {1.0f, 1.0f, 1.0f, 1.0f};
