@@ -7,6 +7,7 @@
 #include "lua_bindings/lua_bindings.h"
 #include "lua_bindings/engine_context.h"
 #include "file_resolve/file_system.h"
+#include "user_input/user_input.h"
 #include "globals.h"
 #include <fstream>
 #include <filesystem>
@@ -57,7 +58,8 @@ int main(int argc, char** argv){
     }
     //context setup------------------------
     Config config;
-    GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str());
+    InputState input_state;
+    GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str(),input_state);
     Text text(gfx);
     SFX sfx;
     LuaSystem lua;
@@ -68,7 +70,8 @@ int main(int argc, char** argv){
         &gfx,
         &sfx,
         &text,
-        &config
+        &config,
+        &input_state
     };
     lua.set_context(&ctx);
     
@@ -84,7 +87,7 @@ int main(int argc, char** argv){
     
     //update loop
     auto last_time = std::chrono::high_resolution_clock::now();
-    while(!gfx.window_should_close()){
+    while(gfx.is_running()){
         //count delta
         auto now = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> delta = now - last_time;

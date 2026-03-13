@@ -22,13 +22,20 @@ target_include_directories(pika-8 PRIVATE dependencies dependencies/lua dependen
 include(FetchContent)
 
 FetchContent_Declare(
-    glfw
-    GIT_REPOSITORY https://github.com/glfw/glfw.git
-    GIT_TAG 3.4
+    SDL3
+    GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+    GIT_TAG main  # Or a specific version like '3.2.0' once stable
 )
-FetchContent_MakeAvailable(glfw)
 
-target_link_libraries(pika-8 PRIVATE glfw)
+# SDL3 has many options; you can disable what you don't need before MakeAvailable
+set(SDL_TEST OFF CACHE BOOL "" FORCE)
+set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(SDL3)
+
+# Link your target to SDL3
+# SDL3::SDL3 is the standard target name
+target_link_libraries(pika-8 PRIVATE SDL3::SDL3)
 
 FetchContent_Declare(
     simdjson

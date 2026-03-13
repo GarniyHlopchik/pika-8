@@ -2,20 +2,24 @@
 #include "gfx/gfx.h"
 
 
-
-bool IsKeyPressed(int key)
+//check if key was just pressed
+bool IsKeyPressed(InputState state, int key)
 {
-    return !(glfwGetKey(GFX::get_window(), key) == GLFW_PRESS);
+    return (state.keys[key] && !state.previous_keys[key]); //pressed now but wasn't last frame
 }
 
-bool IsKeyDown(int key)
+//check if key is pressed
+bool IsKeyDown(InputState state, int key)
 {
-    return !(glfwGetKey(GFX::get_window(), key) == GLFW_RELEASE);
+    return state.keys[key]; 
 
 }
 
-double* getRelativeCursorPosition(){
+
+double* getRelativeCursorPosition(InputState state){
     double* position = new double[2];
-    glfwGetCursorPos(GFX::get_window(), &position[0], &position[1]);
+    position[0] = state.mouseX;
+    position[1] = state.mouseY;
     return position;
 }
+

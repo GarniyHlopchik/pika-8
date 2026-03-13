@@ -2,17 +2,19 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
 #include "file_resolve/file_system.h"
-
+#include <algorithm>
+#include "user_input/user_input.h"
 std::vector<LoadedImages> loaded_images;
-GLFWwindow* GFX::window = nullptr;
+SDL_Window* GFX::window = nullptr;
+SDL_GLContext GFX::gl_context = nullptr;
 unsigned int GFX::shader = 0;
+bool GFX::running = false;
 void send_projection(int width, int height);
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+void GFX::resize(int width, int height)
 {
     glViewport(0, 0, width, height);
     send_projection(width,height);
-    
-}  
+}
 void send_projection(int width, int height){
     unsigned int shader = GFX::get_shader();
     glUseProgram(shader);
@@ -32,30 +34,42 @@ unsigned int GFX::get_shader(){
 }
 std::tuple<int,int> GFX::get_screen_size(){
     int width, height;
-    glfwGetWindowSize(window,&width,&height);
+    SDL_GetWindowSizeInPixels(window, &width, &height);
     return std::make_tuple(width,height);
 }
-GFX::GFX(int w, int h, const char* title){
-    if(!glfwInit()){
-        std::cout << "GLFW couldn't start" << std::endl;
+GFX::GFX(int w, int h, const char* title, InputState &p_state) : input_state(p_state){
+    if(SDL_Init(SDL_INIT_VIDEO) != 0){
+        std::cout << "SDL3 video couldn't start: " << SDL_GetError() << std::endl;
     }
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    //use gl es 3.0 on android; else use open gl 3.3
+    #ifdef __ANDROID__
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    #else
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    #endif
+    window = SDL_CreateWindow(
+        title,
+        w,
+        h,
+        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
+    );
+    gl_context = SDL_GL_CreateContext(window);
+    SDL_GL_MakeCurrent(window, gl_context);
+    running = true;
 
-    window = glfwCreateWindow(w,h, title,NULL,NULL);
-    glfwMakeContextCurrent(window);
-
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    //glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     
-    if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
-        glfwDestroyWindow(window);
-        glfwTerminate();
-        shader = make_shader();
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
         std::cout << "GLAD couldn't start" << std::endl;
-    }
-    glfwGetFramebufferSize(window, &w,&h);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return;
+    }  
+    SDL_GetWindowSizeInPixels(window, &w, &h);
     glViewport(0,0,w,h);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -69,12 +83,18 @@ GFX::GFX(int w, int h, const char* title){
 GFX::~GFX(){
     glDeleteProgram(shader);
     
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 
 }
+bool GFX::is_running(){
+    return GFX::running;
+}
+void GFX::close(){
+    GFX::running = false;
+}
 
-GLFWwindow* GFX::get_window() {
+SDL_Window* GFX::get_window() {
     return GFX::window;
 }
 
@@ -106,16 +126,36 @@ void GFX::add_new_image(const LoadedImages img){
 }
 
 
-bool GFX::window_should_close(){
-    return glfwWindowShouldClose(window);
-}
-
 void GFX::update(){
-    glfwPollEvents();
-    glfwSwapBuffers(window);
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+            case SDL_EVENT_QUIT:
+                GFX::running = false;
+                break;
+
+            case SDL_EVENT_KEY_DOWN:
+                input_state.keys[event.key.scancode] = true;
+                break;
+
+            case SDL_EVENT_KEY_UP:
+                input_state.keys[event.key.scancode] = false;
+                break;
+
+            case SDL_EVENT_MOUSE_MOTION:
+                input_state.mouseX = event.motion.x;
+                input_state.mouseY = event.motion.y;
+                break;
+
+            case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+                resize(event.window.data1, event.window.data2);
+                break;
+        }
+    }
+    SDL_GL_SwapWindow(window);
+    //set previous input to this for next frame
+    std::copy(std::begin(input_state.keys), std::end(input_state.keys), std::begin(input_state.previous_keys));
 }
-
-
 
 
 unsigned int GFX::load_texture(const std::string& path){
@@ -148,6 +188,7 @@ unsigned int GFX::load_texture(const std::string& path){
     return texture;
 }
 
+
 FontData GFX::get_font_data(const std::string& name) {
     for (const auto& font : config.get_fonts()) {
         if (font.name == name) {
@@ -157,11 +198,6 @@ FontData GFX::get_font_data(const std::string& name) {
     throw std::runtime_error("Font not found: " + name);
 }
 
-void GFX::draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv) {
-    // Color color = {0.7843f, 0.6353f, 0.7843f, 1.0f}; // default purple color
-    Color color = {1.0f, 1.0f, 1.0f, 1.0f}; // default white color
-    spritemesh.draw(shader, texture, x, y, width, height, uv, color);
-}
 
 void GFX::draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color) {
     Color white = {1.0f, 1.0f, 1.0f, 1.0f};

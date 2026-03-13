@@ -6,34 +6,37 @@
 #include <unordered_map>
 #include <string>
 #include "gfx_struct.h"
-
+#include "user_input/user_input.h"
 
 class GFX {
 public:
-    GFX(int w, int h, const char* title);
+    GFX(int w, int h, const char* title, InputState &p_state);
     ~GFX();
 
-    bool window_should_close();
     unsigned int load_texture(const std::string& path);
     void draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv);    
     void draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color);
 
     FontData get_font_data(const std::string& name);
 
-    static GLFWwindow* get_window();
+    static SDL_Window* get_window();
     std::tuple<int,int> get_screen_size();
     static unsigned int get_shader();
+    bool is_running();
     void update();
-
+    void resize(int width, int height);
     static std::vector<int> get_image_dimensions(const std::string& path);
     static std::vector<int> get_image_dimensions(const unsigned int id);
 
     static std::string get_texture_path(const unsigned int id);
     static void add_new_image(const LoadedImages img);
-
+    void close();
 private:
     Config config;
-    static GLFWwindow* window;
+    static SDL_Window* window;
+    static SDL_GLContext gl_context;
+    static bool running;
     SpriteMesh spritemesh;
     static unsigned int shader;
+    InputState &input_state;
 };

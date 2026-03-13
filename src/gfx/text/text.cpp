@@ -2,12 +2,11 @@
 
 #include <vector>
 
-Text::Text(GFX& gfx)
-    : gfx(gfx)
+Text::Text(GFX& p_gfx) 
+    : gfx(p_gfx)  // This binds the reference. You're done!
 {
-    Text::gfx = gfx;
+    //deleted the gfx assignment cause it fucked compilation - denos
 }
-
 Text::~Text() {
     // Destructor can be used to clean up font textures if needed
     for (const auto& [name, font] : font_cache) {
