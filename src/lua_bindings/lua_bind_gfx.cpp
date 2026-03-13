@@ -151,6 +151,7 @@ static int l_getscr(lua_State* L){
 
 static void draw_text(const char* text, int x, int y, 
     std::string font_name, float scale, Color color, float space_multiplier, Text* text_obj){
+    
     try {
         text_obj->draw_text(text, x, y, font_name, scale, color, space_multiplier);
     } 

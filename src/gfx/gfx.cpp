@@ -38,9 +38,8 @@ std::tuple<int,int> GFX::get_screen_size(){
     return std::make_tuple(width,height);
 }
 GFX::GFX(int w, int h, const char* title, InputState &p_state) : input_state(p_state){
-    int result = SDL_Init(SDL_INIT_VIDEO);
-    if(result != 0){
-        std::cout << "SDL3 init return: " << SDL_GetError() << result << std::endl;
+    if(SDL_Init(SDL_INIT_VIDEO) == 0){
+        std::cout << "SDL3 video couldn't start: " << SDL_GetError() << std::endl;
     }
     //use gl es 2.0 on android; else use open gl 3.3
     #ifdef __ANDROID__
@@ -212,7 +211,6 @@ FontData GFX::get_font_data(const std::string& name) {
     }
     throw std::runtime_error("Font not found: " + name);
 }
-
 
 void GFX::draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv) {
     Color color = {1.0f, 1.0f, 1.0f, 1.0f};

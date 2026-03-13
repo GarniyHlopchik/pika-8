@@ -44,9 +44,12 @@ void FileSystem::init(EngineReadState state, const std::string& path){
     }
 }
 Resource FileSystem::get_resource(const std::string& relative_path){
-    if(data_source==EngineReadState::ZIP){
+    if(data_source==EngineReadState::ZIP)
+    {
         return Zip::load(relative_path);
-    }else if(data_source==EngineReadState::DIRECTORY){
+    }
+    else if(data_source==EngineReadState::DIRECTORY)
+    {
         std::filesystem::path base = root_path;
         std::filesystem::path file = relative_path;
         std::filesystem::path full = base / file;
@@ -79,6 +82,7 @@ Resource FileSystem::get_resource(const std::string& relative_path){
 
         return res;
     }
+    return Resource{}; // return empty if nothing found to prevent crash
 }
 void FileSystem::shutdown(){
     if(data_source==EngineReadState::ZIP){
