@@ -1,0 +1,52 @@
+plugins {
+     id 'com.android.application'
+}
+
+def buildWithCMake = project.hasProperty('BUILD_WITH_CMAKE');
+
+android {
+    namespace = "com.pika8.engine"
+    compileSdkVersion 35
+    ndkVersion = "28.2.13676358"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 35
+        versionCode 1
+        versionName "1.0"
+
+        externalNativeBuild {
+            cmake {
+                // We keep the ABI filter to speed up builds (compiles only for modern phones)
+                abiFilters 'arm64-v8a'
+                arguments "-DANDROID_PLATFORM=android-21", "-DANDROID_STL=c++_static"
+            }
+        }
+    }
+
+    // This is where we tell Gradle exactly where your pika-8 root logic is
+    externalNativeBuild {
+        cmake {
+            path "../../CMakeLists.txt" 
+        }
+    }
+
+    sourceSets {
+        main {
+            // This ensures your Lua/assets stay in your root project folder
+            assets.srcDirs = ['../../assets']
+            jniLibs.srcDir 'libs'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    lint {
+        abortOnError = false
+    }
+}
