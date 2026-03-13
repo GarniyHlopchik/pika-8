@@ -38,7 +38,7 @@ std::tuple<int,int> GFX::get_screen_size(){
     return std::make_tuple(width,height);
 }
 GFX::GFX(int w, int h, const char* title, InputState &p_state) : input_state(p_state){
-    if(SDL_Init(SDL_INIT_VIDEO) != 0){
+    if(SDL_Init(SDL_INIT_VIDEO) == 0){
         std::cout << "SDL3 video couldn't start: " << SDL_GetError() << std::endl;
     }
     //use gl es 3.0 on android; else use open gl 3.3
