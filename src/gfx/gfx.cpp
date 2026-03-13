@@ -198,6 +198,10 @@ FontData GFX::get_font_data(const std::string& name) {
     throw std::runtime_error("Font not found: " + name);
 }
 
+void GFX::draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv) {
+    Color color = {1.0f, 1.0f, 1.0f, 1.0f};
+    spritemesh.draw(shader, texture, x, y, width, height, uv, color);
+}
 
 void GFX::draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color) {
     Color white = {1.0f, 1.0f, 1.0f, 1.0f};
