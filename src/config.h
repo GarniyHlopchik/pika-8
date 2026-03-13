@@ -1,8 +1,8 @@
 #pragma once
 #include "glad/glad.h"
 #include "iostream"
-#include "GLFW/glfw3.h"
-
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_opengl.h>
 extern "C" {
     #include "lua.h"
     #include "lauxlib.h"

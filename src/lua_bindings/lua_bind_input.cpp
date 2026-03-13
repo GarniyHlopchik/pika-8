@@ -3,20 +3,22 @@
 #include "user_input/user_input.h"
 
 static int l_btn(lua_State* L){
-    
+    EngineContext* ctx = get_ctx(L);
     int key = luaL_checknumber(L,1);
-    bool result = IsKeyPressed(key);
+    bool result = IsKeyPressed(*(ctx->input_state), key);
     lua_pushboolean(L,result);
     return 1;
 }
 static int l_btnp(lua_State* L){
+    EngineContext* ctx = get_ctx(L);
     int key = luaL_checknumber(L,1);
-    bool result = IsKeyDown(key);
+    bool result = IsKeyDown(*(ctx->input_state), key);
     lua_pushboolean(L,result);
     return 1;
 }
 static int l_mpos(lua_State* L){
-    double* position = getRelativeCursorPosition();
+    EngineContext* ctx = get_ctx(L);
+    double* position = getRelativeCursorPosition(*(ctx->input_state));
     lua_pushnumber(L,position[0]);
     lua_pushnumber(L,position[1]);
     delete[] position;

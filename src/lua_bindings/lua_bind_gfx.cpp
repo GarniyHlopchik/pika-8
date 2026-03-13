@@ -197,7 +197,8 @@ static int l_text(lua_State* L){
 }
 
 static int l_close(lua_State* L){
-    glfwSetWindowShouldClose(GFX::get_window(), GLFW_TRUE);
+    EngineContext* ctx = get_ctx(L);
+    ctx->gfx->close();
     return 0;
 }
 

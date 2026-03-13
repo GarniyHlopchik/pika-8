@@ -23,6 +23,7 @@ class GFX;
 class Text;
 class SFX;
 class Config;
+struct InputState;
 struct EngineContext {
     LuaSystem* lua;
     SceneTree* scene_tree;
@@ -30,5 +31,6 @@ struct EngineContext {
     SFX* sfx;
     Text* text;
     Config* config;
+    InputState* input_state;
 };
 #endif
