@@ -1,5 +1,4 @@
-#include "lua_bindings.h"
-#include "engine_context.h"
+#include "../lua_bindings.h"
 #include "scene_tree/scene_tree.h"
 #include "scene_tree/node_factory.h"
 #include "sol/sol.hpp"

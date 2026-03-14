@@ -1,5 +1,4 @@
-#include "lua_bindings.h"
-#include "engine_context.h"
+#include "../lua_bindings.h"
 #include "user_input/user_input.h"
 
 static int l_btn(lua_State* L){

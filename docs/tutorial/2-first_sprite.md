@@ -24,18 +24,32 @@ With the texture loaded into memory, we can finally display it. To do this, we w
 Every frame, we need to clear the old screen and draw our sprite at its designated coordinates:
 
 ```lua
+function _init()
+    player = GFX.load("player_sprite.png")
+    sprite = GFX.spr(my_texture, 50, 50, 48, 48, {3, 11, 2, 5}, {255, 255, 255, 255})
+end
+
 function _update(delta)
     GFX.cls()
-    -- GFX.spr(texture, x, y, w, h, x1, x2, y1, y2)
-    GFX.spr(my_texture, 50, 50, 48, 48, {3, 11, 2, 5}, {255, 255, 255, 255})
+
+    sprite:draw()
 end
 
 ```
 
 Just like before, `GFX.cls()` wipes the screen clean.
-Then, we call a new function: `GFX.spr(texture, x, y, [width], [height], {x1, x2, y1, y2})`.
+Then, we call a new function: `GFX.spr(texture, x, y, [width], [height], {x1, x2, y1, y2}, {r, g, b, a})`. It returns a reference for our sprite that we can later use for display:
 
-This function is quite flexible. Let's break down its arguments:
+* `sprite:draw()` - draws the sprite
+* `sprite:pos(new_x: int, new_y: int)` - changes the position
+* `sprite:size(new_width: int, new_height: int)` - changes the size
+* `sprite:color( {r, g, b, a}: {int 0-255} )` - changes the color
+* `sprite:uv( { x1, y1, x1, y2}: {float} )` - changes the cutting
+* `sprite:texture( texture_path: String )` - changes the displayed texture
+
+
+
+GFX.spr function is quite flexible itself. Let's break down its arguments:
 
 * **texture (required):** The texture variable we loaded in `_init()`.
 * **x & y (required):** The screen coordinates where the sprite will be drawn.

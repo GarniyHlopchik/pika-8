@@ -1,5 +1,4 @@
-#include "lua_bindings.h"
-#include "engine_context.h"
+#include "../lua_bindings.h"
 #include "sfx/sfx.h"
 
 

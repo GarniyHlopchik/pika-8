@@ -7,6 +7,8 @@
 #include <string>
 #include "gfx_struct.h"
 #include "user_input/user_input.h"
+#include "file_resolve/file_system.h"
+#include <algorithm>
 
 class GFX {
 public:

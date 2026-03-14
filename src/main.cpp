@@ -80,16 +80,18 @@ int main(int argc, char** argv){
     };
     lua.set_context(&ctx);
     
+    SDL_GL_SetSwapInterval(1); // Enable VSync
 
     bind_gfx(lua.get_state());
+    bind_gfx_sprite(lua.get_state());
     bind_input(lua.get_state());
     bind_sfx(lua.get_state());
     bind_node(lua.get_state());
 
     lua.load_script(config.get_lua_script());
     lua.call("_init");
-
     
+
     //update loop
     auto last_time = std::chrono::high_resolution_clock::now();
     while(gfx.is_running()){

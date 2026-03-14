@@ -1,9 +1,7 @@
 #include "gfx.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
-#include "file_resolve/file_system.h"
-#include <algorithm>
-#include "user_input/user_input.h"
+
 std::vector<LoadedImages> loaded_images;
 SDL_Window* GFX::window = nullptr;
 SDL_GLContext GFX::gl_context = nullptr;

@@ -90,6 +90,7 @@ set(PIKA_SOURCES
     src/lua_system/lua_system.cpp
     src/gfx/gfx.cpp
     src/gfx/text/text.cpp
+    src/gfx/sprite/sprite.cpp
     src/json_reader/json_reader.cpp
     src/user_input/user_input.cpp
     src/sfx/sfx.cpp
@@ -99,10 +100,12 @@ set(PIKA_SOURCES
     dependencies/pugixml/pugixml.cpp
     dependencies/miniz/miniz.c
     src/lua_bindings/engine_context.cpp
-    src/lua_bindings/lua_bind_gfx.cpp
-    src/lua_bindings/lua_bind_input.cpp
-    src/lua_bindings/lua_bind_sfx.cpp
-    src/lua_bindings/lua_bind_node.cpp
+    src/lua_bindings/lua_bind/lua_bind_gfx.cpp
+    src/lua_bindings/lua_bind/lua_bind_gfx_sprite.cpp
+    src/lua_bindings/lua_bind/lua_bind_input.cpp
+    src/lua_bindings/lua_bind/lua_bind_sfx.cpp
+    src/lua_bindings/lua_bind/lua_bind_node.cpp
+    src/lua_bindings/table_getter/table_gatter.cpp
     src/file_resolve/file_system.cpp
     src/file_resolve/zip.cpp
 )

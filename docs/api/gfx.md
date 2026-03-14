@@ -51,7 +51,9 @@ x1 - start of the width cut (ex: 3)
 
 x2 - end   of the width cut (ex: b)
 
+
 y1 - start of the height cut (ex: 2)
+
 
 y2 - end   of the height cut (ex: 5)
 

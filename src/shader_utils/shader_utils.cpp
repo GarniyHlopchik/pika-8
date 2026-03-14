@@ -1,6 +1,3 @@
-#include <string>
-#include <vector>
-#include <iostream>
 #include "shader_utils.h"
 
 // Define shaders

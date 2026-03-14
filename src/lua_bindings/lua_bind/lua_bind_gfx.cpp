@@ -1,7 +1,8 @@
-#include "lua_bindings.h"
-#include "engine_context.h"
-#include "../gfx/gfx.h"
-#include "../gfx/text/text.h"
+#include "../lua_bindings.h"
+#include "../engine_context.h"
+#include "../../gfx/gfx.h"
+#include "../../gfx/text/text.h"
+#include "../../gfx/sprite/sprite.h"
 
 static int l_cls(lua_State* L){
     float r = luaL_optnumber(L,1,0.0f);
@@ -27,27 +28,29 @@ static int l_load(lua_State* L){
     lua_pushnumber(L,id);
     return 1;
 }
-struct SpriteCut{
-    float x1, x2, y1, y2;
-};
 
-static UVCoords calculate_uv(SpriteCut sprite, unsigned int texture) {
+
+static UVCoords calculate_uv(UVCoords sprite, unsigned int texture) {
     UVCoords uv;
-    if (sprite.x2 > sprite.x1 && sprite.y2 > sprite.y1) {
+    bool one = sprite.u2 > sprite.u1;
+    bool two = sprite.v2 > sprite.v1;
+    if (sprite.u2 > sprite.u1 && sprite.v2 > sprite.v1) {
         std::vector<int> dims = GFX::get_image_dimensions(texture);
         float tex_w = (float)dims[0];
         float tex_h = (float)dims[1];
 
+
         // Protect against division by zero
         if (tex_w > 0.0f && tex_h > 0.0f) {
             // UVs are normalized (0.0 to 1.0). Divide the pixel coordinate by the total dimension.
-            uv.u1 = sprite.x1 / tex_w;
-            uv.v1 = sprite.y1 / tex_h;
-            uv.u2 = sprite.x2 / tex_w;
-            uv.v2 = sprite.y2 / tex_h;
+            uv.u1 = sprite.u1 / tex_w;
+            uv.v1 = sprite.v1 / tex_h;
+            uv.u2 = sprite.u2 / tex_w;
+            uv.v2 = sprite.v2 / tex_h;
         } else {
             // Fallback if the texture fails to load properly
-            uv.u1 = 0.0f; uv.v1 = 0.0f; uv.u2 = 1.0f; uv.v2 = 1.0f;
+            uv.u1 = 0.0f; uv.v1 = 0.0f; 
+            uv.u2 = 1.0f; uv.v2 = 1.0f;
         }
     } else {
         // Default UV coordinates (draws the entire texture)
@@ -57,53 +60,9 @@ static UVCoords calculate_uv(SpriteCut sprite, unsigned int texture) {
     return uv;
 }
 
-static std::vector<float> get_table_floats(lua_State* L, int index, int count, float fallback = 1.0f) {
-    
-    // return a fallback value if NOT the table 
-    if (!lua_istable(L, index)) {
-        return std::vector<float>(count, fallback);
-    }
-    
-    std::vector<float> values;
-    values.reserve(count); // reserve space on RAM
-
-    for (int i = 1; i <= count; i++) {
-        // Pushes the value at table[i] to the top of the stack (-1)
-        lua_rawgeti(L, index, i);
-        // If the table is empty {}, optnumber will use the fallback
-        values.push_back((float)luaL_optnumber(L, -1, fallback));
-        // Pop the value immediately to keep the stack clean
-        lua_pop(L, 1);
-    }
-    
-    return values;
-}
-
-static Color get_color(lua_State* L, int index, float default_color = 255.0f) {
-    std::vector<float> color_values = get_table_floats(L, index, 4, default_color);
-    Color color = Color{
-        color_values[0],
-        color_values[1],
-        color_values[2],
-        color_values[3]
-    };
-    color.normalize(); // make colors between 0 and 1
-    return color;
-}
-
-static SpriteCut get_sprite_cut(lua_State* L, int index) {
-    std::vector<float> cut_values = get_table_floats(L, index, 4, 0.0f);
-    SpriteCut cut = SpriteCut{
-        cut_values[0],
-        cut_values[1],
-        cut_values[2],
-        cut_values[3]
-    };
-    return cut;
-}
 
 /*
-* Lua binding for drawing a sprite
+* Lua binding for creating a sprite
 * Arguments:
 * 1. texture (number) - the texture ID to draw
 * 2. x (number) - destination x position on screen
@@ -114,6 +73,7 @@ static SpriteCut get_sprite_cut(lua_State* L, int index) {
 * 7. sprite_x2 (number, optional) - ending X pixel on the sprite sheet (right)
 * 8. sprite_y1 (number, optional) - starting Y pixel on the sprite sheet (top)
 * 9. sprite_y2 (number, optional) - ending Y pixel on the sprite sheet (bottom)
+* Returns: the sprite userdata
 */
 static int l_spr(lua_State* L) {
     EngineContext* ctx = get_ctx(L);
@@ -127,19 +87,25 @@ static int l_spr(lua_State* L) {
     float height = luaL_optnumber(L, 5, 8.0f);
 
     // 3. (Optional) You can also expose the UV coordinates to Lua for sprite animations
-    SpriteCut sprite = get_sprite_cut(L, 6); // expects a table {x1, x2, y1, y2}    
-
+    UVCoords sprite_cut = get_sprite_cut(L, 6); // expects a table {x1, x2, y1, y2}    
+    
     Color color = get_color(L, 7); // expects a table {r, g, b, a}
 
-    UVCoords uv = calculate_uv(sprite, texture);
+    UVCoords uv = calculate_uv(sprite_cut, texture);
 
-    // std::cout << u1 << v1 << u2 << v2 << std::endl;
+    // Allocate Userdata
+    Sprite* s = (Sprite*)lua_newuserdata(L, sizeof(Sprite));
 
-    // Pass everything to your updated C++ draw function
-    ctx->gfx->draw(texture, x, y, width, height, uv, color);
-    
-    return 0;
+    // Construct the object in place
+    new (s) Sprite(texture, x, y, width, height, uv, color);
+
+    // Fetch and set the pre-registered metatable
+    luaL_getmetatable(L, "SpriteMeta");
+    lua_setmetatable(L, -2);
+
+    return 1;
 }
+
 
 static int l_getscr(lua_State* L){
     EngineContext* ctx = get_ctx(L);
