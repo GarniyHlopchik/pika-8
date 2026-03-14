@@ -2,7 +2,7 @@
 #include "../../gfx/sprite/sprite.h"
 
 static int l_update_position(lua_State* L){
-    Sprite* sprite = (Sprite*)lua_touserdata(L, 1);
+    Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
     float x = luaL_checknumber(L, 2);
     float y = luaL_checknumber(L, 3);
     sprite->update_position(x, y);
@@ -10,42 +10,72 @@ static int l_update_position(lua_State* L){
 }
 
 static int l_update_size(lua_State* L){
-    Sprite* sprite = (Sprite*)lua_touserdata(L, 1);
+    Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
     float width = luaL_checknumber(L, 2);
     float height = luaL_checknumber(L, 3);
     sprite->update_size(width, height);
     return 0;
 }
 
+static int l_scale(lua_State* L){
+    Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
+    float scale_x = (float)luaL_optnumber(L, 2, 1.0f);
+    float scale_y = (float)luaL_optnumber(L, 3, 1.0f);
+
+    float new_width = sprite->get_width() * scale_x;
+    float new_height = sprite->get_height() * scale_y;
+    sprite->update_size(new_width, new_height);
+    return 0;
+}
+
 static int l_update_color(lua_State* L){
-    Sprite* sprite = (Sprite*)lua_touserdata(L, 1);
+    Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
     Color color = get_color(L, 2);
     sprite->update_color(color);
     return 0;
 }
 
 static int l_update_uv(lua_State* L){
-    Sprite* sprite = (Sprite*)lua_touserdata(L, 1);
+    Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
     UVCoords uv = get_sprite_cut(L, 2);
     sprite->update_uv(uv);
     return 0;
 }
 
 static int l_update_texture(lua_State* L){
-    Sprite* sprite = (Sprite*)lua_touserdata(L, 1);
+    Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
     unsigned int texture = (unsigned int)luaL_checkinteger(L, 2);
     sprite->update_texture(texture);
     return 0;
 }
 
+static int l_update_visible(lua_State* L){
+    Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
+    bool visible = lua_toboolean(L, 2);
+    sprite->update_visibility(visible);
+    return 0;
+}
+
+static int l_mirror(lua_State* L){
+    Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
+    bool horizontal = lua_toboolean(L, 2);
+    bool vertical = lua_toboolean(L, 3);
+    sprite->mirror(horizontal, vertical);
+    return 0;
+}
+
 static int l_update(lua_State* L){
-    Sprite* sprite = (Sprite*)lua_touserdata(L, 1);
+    Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
+
     float x = luaL_checknumber(L, 2);
     float y = luaL_checknumber(L, 3);
+
     float width = luaL_checknumber(L, 4);
     float height = luaL_checknumber(L, 5);
+
     UVCoords uv = get_sprite_cut(L, 6);
     Color color = get_color(L, 7);
+    
     sprite->update(x, y, width, height, uv, color);
     return 0;
 }
@@ -58,7 +88,7 @@ static int l_draw(lua_State* L) {
 }
 
 static int sprite_gc(lua_State* L) {
-    Sprite* s = (Sprite*)lua_touserdata(L, 1);
+    Sprite* s = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
     s->~Sprite();
     return 0;
 }
@@ -68,9 +98,12 @@ void bind_gfx_sprite(lua_State* L)
     static const luaL_Reg gfx_sprite_lib[] = {
         {"pos", l_update_position},
         {"size", l_update_size},
+        {"scale", l_scale},
         {"color", l_update_color},
         {"uv", l_update_uv},
         {"texture", l_update_texture},
+        {"visible", l_update_visible},
+        {"mirror", l_mirror},
 
         {"update", l_update},
         {"draw", l_draw},
