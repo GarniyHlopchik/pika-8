@@ -13,6 +13,9 @@
 #include <filesystem>
 #include <algorithm> 
 #include <SDL3/SDL_main.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 bool has_embedded_zip(const std::string& exe_path)
 {
@@ -43,9 +46,73 @@ bool has_external_zip(const std::string& path)
 {
     return std::filesystem::exists(path);
 }
+auto last_time = std::chrono::high_resolution_clock::now();
+EngineContext ctx;
+void main_tick(void* arg) {
+    // Cast the generic pointer back to your struct
+    EngineContext* ctx = static_cast<EngineContext*>(arg);
 
+    // 1. Delta time logic
+    auto now = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> delta = now - last_time;
+    last_time = now;
+    float dt = delta.count();
+
+    // 2. Run the frame
+    ctx->lua->call_update(dt);
+    ctx->gfx->update();
+    
+    // 3. Handle quitting
+    #ifdef __EMSCRIPTEN__
+    if (!ctx->gfx->is_running()) {
+        ctx->lua->call("_exit");
+        emscripten_cancel_main_loop();
+    }
+    #endif
+}
+#ifdef __EMSCRIPTEN__
+void on_load_success(const char* file){
+    FileSystem::init(EngineReadState::ZIP,"game.pika");
+     //context setup------------------------
+    Config config;
+    InputState input_state;
+    GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str(),input_state);
+    Text text(gfx);
+    SFX sfx;
+    LuaSystem lua;
+    SceneTree scene_tree(&lua);
+    ctx = {
+        &lua,
+        &scene_tree,
+        &gfx,
+        &sfx,
+        &text,
+        &config,
+        &input_state
+    };
+    lua.set_context(&ctx);
+    
+
+    bind_gfx(lua.get_state());
+    bind_input(lua.get_state());
+    bind_sfx(lua.get_state());
+    bind_node(lua.get_state());
+
+    lua.load_script(config.get_lua_script());
+    lua.call("_init");
+
+    emscripten_set_main_loop_arg(main_tick, &ctx, 0, true);
+}
+void on_load_failure(const char* file){
+
+}
+#endif
 int main(int argc, char** argv){
     //data source setup
+    #ifdef __EMSCRIPTEN__
+    emscripten_async_wget("game.pika", "/game.pika", on_load_success, on_load_failure);
+    return 0;
+    #else
     #ifdef __ANDROID__
     FileSystem::init(EngineReadState::ZIP,"game.pika");
     #else
@@ -61,6 +128,7 @@ int main(int argc, char** argv){
         FileSystem::init(EngineReadState::DIRECTORY,"");
     }
     #endif
+    #endif
     //context setup------------------------
     Config config;
     InputState input_state;
@@ -69,7 +137,7 @@ int main(int argc, char** argv){
     SFX sfx;
     LuaSystem lua;
     SceneTree scene_tree(&lua);
-    EngineContext ctx = {
+    ctx = {
         &lua,
         &scene_tree,
         &gfx,
@@ -91,16 +159,11 @@ int main(int argc, char** argv){
 
     
     //update loop
-    auto last_time = std::chrono::high_resolution_clock::now();
     while(gfx.is_running()){
-        //count delta
-        auto now = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<float> delta = now - last_time;
-        last_time = now;
-        float dt = delta.count();
-        lua.call_update(dt);
-        gfx.update();
+        main_tick(&ctx);
     }
     lua.call("_exit");
+
+    
     return 0;
 }

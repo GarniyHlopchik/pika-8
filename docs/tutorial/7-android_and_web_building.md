@@ -33,3 +33,8 @@ if __name__ == "__main__":
 ```
 
 now run the script with `python android_build.py` and it will generate a final .apk file of your game.
+
+
+## Web building
+
+This is as easy as it gets - you just take the web template containing pika-8.html, pika-8.js, pika-8.wasm, you put the game.pika file into it and it's ready.

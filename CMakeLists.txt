@@ -175,3 +175,16 @@ else()
     endif()
 
 endif()
+
+# ----------- Emscripten ------------------
+if(EMSCRIPTEN)
+    set_target_properties(pika-8 PROPERTIES SUFFIX ".html")
+    target_compile_definitions(pika-8 PRIVATE PIKA_GLES)
+
+    target_link_options(pika-8 PRIVATE 
+        "-sMAX_WEBGL_VERSION=2" 
+        "-sMIN_WEBGL_VERSION=2"
+        "-sINITIAL_MEMORY=64MB"
+        "--shell-file" "${CMAKE_CURRENT_SOURCE_DIR}/shell.html"
+    )
+endif()
