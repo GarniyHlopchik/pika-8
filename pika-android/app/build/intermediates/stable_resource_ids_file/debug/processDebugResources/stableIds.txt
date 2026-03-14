@@ -1,6 +1,0 @@
-com.pika8.engine:style/AppTheme = 0x7f040000
-com.pika8.engine:mipmap/ic_launcher = 0x7f020000
-com.pika8.engine:string/app_name = 0x7f030000
-com.pika8.engine:color/colorPrimaryDark = 0x7f010002
-com.pika8.engine:color/colorPrimary = 0x7f010001
-com.pika8.engine:color/colorAccent = 0x7f010000

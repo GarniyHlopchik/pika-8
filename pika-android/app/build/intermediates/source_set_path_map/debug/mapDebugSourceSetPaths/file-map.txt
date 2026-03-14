@@ -1,7 +1,0 @@
-com.pika8.engine.app-pngs-0 D:\projects\c++\pika8\pika-android\app\build\generated\res\pngs\debug
-com.pika8.engine.app-resValues-1 D:\projects\c++\pika8\pika-android\app\build\generated\res\resValues\debug
-com.pika8.engine.app-packageDebugResources-2 D:\projects\c++\pika8\pika-android\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
-com.pika8.engine.app-packageDebugResources-3 D:\projects\c++\pika8\pika-android\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
-com.pika8.engine.app-debug-4 D:\projects\c++\pika8\pika-android\app\build\intermediates\merged_res\debug\mergeDebugResources
-com.pika8.engine.app-debug-5 D:\projects\c++\pika8\pika-android\app\src\debug\res
-com.pika8.engine.app-main-6 D:\projects\c++\pika8\pika-android\app\src\main\res

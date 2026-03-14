@@ -16,8 +16,21 @@ Makefile
 .vscode/*
 !.vscode/settings.json
 
-# Android Studio / Gradle build folders
-.externalNativeBuild/
-.cxx/
-app/build/
-.gradle/
+# --- Android Studio / IntelliJ Files ---
+pika-android/.idea/
+pika-android/*.iml
+pika-android/.gradle/
+pika-android/local.properties
+
+# --- Android Build Outputs ---
+pika-android/app/build/
+pika-android/build/
+pika-android/captures/
+
+# --- C++ / CMake specific to the Android Project ---
+pika-android/app/.cxx/
+pika-android/app/.externalNativeBuild/
+
+# --- Device / OS artifacts ---
+pika-android/.navigation/
+pika-android/assetPack/build/

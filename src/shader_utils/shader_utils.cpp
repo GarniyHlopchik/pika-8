@@ -1,8 +1,10 @@
+#include <string>
+#include <vector>
+#include <iostream>
 #include "shader_utils.h"
 
 // Define shaders
 const char* fragSource =
-    "#version 330 core\n"
     "in vec2 vUV;\n"
     "out vec4 screenColor;\n"
     "uniform sampler2D ourTexture;\n"
@@ -13,7 +15,6 @@ const char* fragSource =
     "}\n";
 
 const char* vertexSource =
-    "#version 330 core \n"
     "layout (location = 0) in vec2 vertexPos; \n"
     "layout (location = 1) in vec2 vertexUV; \n"
     "uniform vec2 uPos;\n"
@@ -54,7 +55,15 @@ unsigned int make_shader(){
 }
 
 unsigned int make_module(unsigned int module_type){
-    const char* ShaderSrc = (module_type == GL_VERTEX_SHADER) ? vertexSource : fragSource;
+    std::string header = "";
+    #ifdef PIKA_GLES
+        header = "#version 300 es\nprecision mediump float;\n";
+    #else
+        header = "#version 330 core\n";
+    #endif
+    std::string fullFrag = header+fragSource;
+    std::string fullVertex = header+vertexSource;
+    const char* ShaderSrc = (module_type == GL_VERTEX_SHADER) ? fullVertex.c_str() : fullFrag.c_str();
 
     unsigned int shaderModule = glCreateShader(module_type);
     glShaderSource(shaderModule,1,&ShaderSrc,NULL);
