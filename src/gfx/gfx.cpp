@@ -38,26 +38,45 @@ std::tuple<int,int> GFX::get_screen_size(){
     return std::make_tuple(width,height);
 }
 GFX::GFX(int w, int h, const char* title, InputState &p_state) : input_state(p_state){
-    if(SDL_Init(SDL_INIT_VIDEO) == 0){
-        std::cout << "SDL3 video couldn't start: " << SDL_GetError() << std::endl;
-    }
-    //use gl es 2.0 on android; else use open gl 3.3
-    #ifdef __ANDROID__
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-    #else
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    #ifdef __linux__
+    // 1. Set global hints BEFORE Init
+    SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11");
     #endif
-    window = SDL_CreateWindow(
-        title,
-        w,
-        h,
-        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
-    );
+    // 2. Init
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
+        SDL_Log("SDL_Init failed: %s", SDL_GetError());
+        return;
+    }
+
+    // 3. Set GL Attributes BEFORE Window Creation
+    #ifdef __ANDROID__
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    #else
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    #endif
+    
+    // Explicitly ask for a depth buffer (sometimes required for valid context)
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+    // 4. Create Window
+    window = SDL_CreateWindow(title, w, h, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    if (!window) {
+        SDL_Log("Window creation failed: %s", SDL_GetError());
+        return;
+    }
+
+    // 5. Create Context
     gl_context = SDL_GL_CreateContext(window);
+    if (!gl_context) {
+        // This is where "Invalid window" was happening
+        SDL_Log("Context creation failed: %s", SDL_GetError());
+        return;
+    }
     SDL_GL_MakeCurrent(window, gl_context);
     running = true;
 
