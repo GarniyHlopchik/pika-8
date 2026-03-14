@@ -34,3 +34,6 @@ pika-android/app/.externalNativeBuild/
 # --- Device / OS artifacts ---
 pika-android/.navigation/
 pika-android/assetPack/build/
+
+#jks
+pika8-release.jks
