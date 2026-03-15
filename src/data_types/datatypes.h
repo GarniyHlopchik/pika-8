@@ -2,10 +2,10 @@
 #include "config.h"
 
 
-class Sprite{
+class SpriteSize{
     public:
-    Sprite(int x1, int y1, int x2, int y2);
-    ~Sprite() = default;
+    SpriteSize(int x1, int y1, int x2, int y2);
+    ~SpriteSize() = default;
     void set_borders(int x1, int y1, int x2, int y2);
     std::tuple<int,int,int,int> get_borders();
 

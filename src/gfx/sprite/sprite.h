@@ -2,15 +2,9 @@
 #include "../gfx.h"
 
 struct Sprite {
-private:
-    float _x, _y, _width, _height, _rotation = 0.0f;
-    unsigned int _texture;
-    bool _dirty = true, _visible = true; // change has been made that requires redraw
-    UVCoords _uv;
-    Color _color;
-
 public:
     Sprite(unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color);
+    ~Sprite() = default;
 
     void update_position(float x, float y);
     void update_size(float width, float height);
@@ -33,4 +27,11 @@ public:
     bool is_visible() const { return _visible; }
     UVCoords get_uv() const { return _uv; }
     Color get_color() const { return _color; }
+
+private:
+    float _x, _y, _width, _height, _rotation = 0.0f;
+    unsigned int _texture;
+    bool _dirty = true, _visible = true; // change has been made that requires redraw
+    UVCoords _uv;
+    Color _color;
 };

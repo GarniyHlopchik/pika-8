@@ -87,6 +87,12 @@ static int l_draw(lua_State* L) {
     return 0;
 }
 
+static int l_destroy(lua_State* L){
+    Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
+    sprite->~Sprite();
+    return 0;
+}
+
 static int sprite_gc(lua_State* L) {
     Sprite* s = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
     s->~Sprite();
@@ -107,6 +113,8 @@ void bind_gfx_sprite(lua_State* L)
 
         {"update", l_update},
         {"draw", l_draw},
+
+        {"destroy", l_destroy}, // - work in progress
         {NULL, NULL}
     };
     luaL_newlib(L, gfx_sprite_lib);
