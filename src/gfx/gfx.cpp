@@ -1,7 +1,7 @@
 #include "gfx.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
-#include "../mobile_input/input_state.h"
+
 #include <algorithm>
 
 std::vector<LoadedImages> loaded_images;
@@ -37,7 +37,7 @@ std::tuple<int,int> GFX::get_screen_size(){
     SDL_GetWindowSizeInPixels(window, &width, &height);
     return std::make_tuple(width,height);
 }
-GFX::GFX(int w, int h, const char* title, InputState &p_state) : input_state(p_state), , mobile_input_state() {
+GFX::GFX(int w, int h, const char* title, InputState &p_state) : input_state(p_state) {
     #ifdef __linux__
     // 1. Set global hints BEFORE Init
     SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11");
@@ -99,6 +99,8 @@ GFX::GFX(int w, int h, const char* title, InputState &p_state) : input_state(p_s
     send_projection(w,h);
 
     spritemesh.init();
+
+    
 }
 
 GFX::~GFX(){
@@ -153,7 +155,8 @@ std::string GFX::get_texture_path(const unsigned int id){
 void GFX::add_new_image(const LoadedImages img){
     loaded_images.push_back(img);
 }
-
+void handleMouseEmulation(SDL_Event event){}
+void handleTouchEvent(SDL_Event event){}
 
 void GFX::update(){
 

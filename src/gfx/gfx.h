@@ -9,6 +9,7 @@
 #include "user_input/user_input.h"
 #include "file_resolve/file_system.h"
 #include <algorithm>
+#include "../mobile_input/input_state.h"
 
 class GFX {
 public:
@@ -41,4 +42,5 @@ private:
     SpriteMesh spritemesh;
     static unsigned int shader;
     InputState &input_state;
+    mobile_input::InputState mobile_input_state;
 };

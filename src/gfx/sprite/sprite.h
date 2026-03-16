@@ -12,7 +12,7 @@ public:
     void update_uv(UVCoords uv);
     void update_texture(unsigned int texture);
     void update_visibility(bool visible);
-    void Sprite::update_rotation(float degrees);
+    void update_rotation(float degrees);
     void mirror(bool horizontal, bool vertical);
 
     void update(float x, float y, float width, float height, UVCoords uv, Color color);
