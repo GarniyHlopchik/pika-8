@@ -1,6 +1,7 @@
 #include "lua_system.h"
 #include "file_resolve/file_system.h"
 #include <iostream>
+#include "gfx/sprite/sprite.h"
 int lua_zip_searcher(lua_State* L) {
     const char* module = luaL_checkstring(L, 1);
     
@@ -84,7 +85,10 @@ LuaSystem::LuaSystem(){
         lua_rawgeti(s, LUA_REGISTRYINDEX, self.script_ref);
         return sol::stack::pop<sol::object>(s);
     })
-);
+    );
+    lua.new_usertype<Sprite>("Sprite",
+        sol::base_classes, sol::bases<Node>()
+    );
 
     //allows lua to seek for require in zip instead of directory
     // 1. Get package.searchers onto the stack

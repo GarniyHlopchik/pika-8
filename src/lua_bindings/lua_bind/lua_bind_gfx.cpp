@@ -97,7 +97,7 @@ static int l_spr(lua_State* L) {
     Sprite* s = (Sprite*)lua_newuserdata(L, sizeof(Sprite));
 
     // Construct the object in place
-    new (s) Sprite(texture, x, y, width, height, uv, color);
+    new (s) Sprite(0,ctx->lua,ctx->scene_tree, texture, x, y, width, height, uv, color);
 
     // Fetch and set the pre-registered metatable
     luaL_getmetatable(L, "SpriteMeta");

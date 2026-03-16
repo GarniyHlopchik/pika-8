@@ -1,10 +1,10 @@
 #pragma once
 #include "../gfx.h"
+#include "scene_tree/node.h"
 
-struct Sprite {
+class Sprite : public Node{
 public:
-    Sprite(unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color);
-    ~Sprite() = default;
+    Sprite(int p_id, LuaSystem* p_L, SceneTree* p_tree, unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color);
 
     void update_position(float x, float y);
     void update_size(float width, float height);

@@ -4,12 +4,12 @@ class SceneTree;
 class LuaSystem;
 class Node{
     public:
-    Node(int p_id, LuaSystem* p_L, SceneTree* p_tree);
+    Node(int p_id, LuaSystem* p_L, SceneTree* p_tree) : id(p_id), lua(p_L), scene_tree(p_tree) {};
     virtual ~Node();
     void add_child(std::unique_ptr<Node> child);
     void remove_child(Node* child);
     virtual void _update(float dt);
-    void _init(int script_ref);
+    virtual void _init(int script_ref);
     int script_ref;
     int id;
 

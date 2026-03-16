@@ -1,11 +1,6 @@
 #include "node.h"
 
-Node::Node(int p_id, LuaSystem* p_L, SceneTree* p_tree){
-    id = p_id;
-    lua = p_L;
-    scene_tree = p_tree;
-    
-}
+
 void Node::_init(int p_script_ref){
     script_ref=p_script_ref;
     if (lua && script_ref) {

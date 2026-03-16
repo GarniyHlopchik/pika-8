@@ -1,7 +1,7 @@
 #include "sprite.h"
 
-Sprite::Sprite(unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color)
-    : _texture(texture), _x(x), _y(y), _width(width), _height(height), _uv(uv), _color(color) {}
+Sprite::Sprite(int p_id, LuaSystem* p_L, SceneTree* p_tree, unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color)
+    : Node(p_id, p_L, p_tree), _texture(texture), _x(x), _y(y), _width(width), _height(height), _uv(uv), _color(color) {}
 
 void Sprite::update_position(float x, float y) {
     if (x != _x || y != _y) {
