@@ -19,5 +19,5 @@ void bind_node(lua_State* L){
     {NULL, NULL}
     };
     luaL_newlib(L, node_lib);
-    lua_setglobal(L, "Node");
+    lua_setglobal(L, "NodeFactory");
 }
