@@ -108,6 +108,8 @@ set(PIKA_SOURCES
     src/lua_bindings/table_getter/table_gatter.cpp
     src/file_resolve/file_system.cpp
     src/file_resolve/zip.cpp
+    src/lua_bindings/sol_bind/sol_bind_node.cpp
+    src/lua_bindings/sol_bind/sol_bind_sprite.cpp
 )
 
 # ---------------- Target ----------------
