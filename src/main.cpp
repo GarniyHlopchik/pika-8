@@ -173,8 +173,8 @@ int main(int argc, char** argv){
     lua_pop(lua.get_state(), 1);
 
     std::cout << "Input module registered successfully!" << std::endl;
-
-    lua.load_script(config.get_lua_script());*/
+    */
+    lua.load_script(config.get_lua_script());
     lua.call("_init");
     
 
