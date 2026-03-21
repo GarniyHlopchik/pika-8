@@ -34,6 +34,7 @@ public:
     static std::string get_texture_path(const unsigned int id);
     static void add_new_image(const LoadedImages img);
     void close();
+    mobile_input::InputState* getMobileInputState() { return &mobile_input_state; }
 private:
     Config config;
     static SDL_Window* window;
@@ -43,4 +44,6 @@ private:
     static unsigned int shader;
     InputState &input_state;
     mobile_input::InputState mobile_input_state;
+    void handleTouch(const SDL_Event& event);
+    void handleMouse(const SDL_Event& event);
 };

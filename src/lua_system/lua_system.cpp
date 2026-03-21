@@ -3,6 +3,8 @@
 #include <iostream>
 #include "gfx/sprite/sprite.h"
 #include "lua_bindings/sol_bind/sol.h"
+
+extern "C" int luaopen_Input(lua_State* L);
 int lua_zip_searcher(lua_State* L) {
     const char* module = luaL_checkstring(L, 1);
     
@@ -39,6 +41,8 @@ LuaSystem::LuaSystem(){
     L = luaL_newstate();  // Lua vm
     luaL_openlibs(L);               // setup
 
+
+
     // Preload the "socket.core" module
     lua_getglobal(L, "package");
     lua_getfield(L, -1, "preload");
@@ -62,6 +66,35 @@ LuaSystem::LuaSystem(){
     }
     //sol setup
     bind_nodes(L);
+    lua_newtable(L);
+
+    // touch_count
+    lua_pushstring(L, "touch_count");
+    lua_pushcfunction(L, [](lua_State* L) -> int {
+        lua_pushinteger(L, 0);
+        return 1;
+        });
+    lua_settable(L, -3);
+
+    // get_position
+    lua_pushstring(L, "get_position");
+    lua_pushcfunction(L, [](lua_State* L) -> int {
+        lua_pushnumber(L, 0);
+        lua_pushnumber(L, 0);
+        lua_pushboolean(L, false);
+        return 3;
+        });
+    lua_settable(L, -3);
+
+    // get_touches
+    lua_pushstring(L, "get_touches");
+    lua_pushcfunction(L, [](lua_State* L) -> int {
+        lua_newtable(L);
+        return 1;
+        });
+    lua_settable(L, -3);
+
+    lua_setglobal(L, "Input");
 
     //allows lua to seek for require in zip instead of directory
     // 1. Get package.searchers onto the stack
@@ -100,6 +133,7 @@ void LuaSystem::set_context(EngineContext* ctx) {
     lua_pushlightuserdata(L, ctx);
     lua_setfield(L, LUA_REGISTRYINDEX, "engine_ctx");
 }
+
 void LuaSystem::load_script(const std::string& path){
     Resource res = FileSystem::get_resource(path);
 
@@ -162,6 +196,7 @@ int LuaSystem::load_script_table(const std::string& path){
 
     return ref;
 }
+    
 void LuaSystem::remove_table(int id){
     // Find the iterator pointing to the first occurrence of the value
     auto it = std::find(tables.begin(), tables.end(), id);

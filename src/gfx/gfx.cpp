@@ -37,7 +37,7 @@ std::tuple<int,int> GFX::get_screen_size(){
     SDL_GetWindowSizeInPixels(window, &width, &height);
     return std::make_tuple(width,height);
 }
-GFX::GFX(int w, int h, const char* title, InputState &p_state) : input_state(p_state) {
+GFX::GFX(int w, int h, const char* title, InputState &p_state) : input_state(p_state), mobile_input_state() {
     #ifdef __linux__
     // 1. Set global hints BEFORE Init
     SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11");
@@ -155,6 +155,95 @@ std::string GFX::get_texture_path(const unsigned int id){
 void GFX::add_new_image(const LoadedImages img){
     loaded_images.push_back(img);
 }
+void GFX::handleTouch(const SDL_Event& event) {
+    const auto& tf = event.tfinger;
+    int w, h;
+    SDL_GetWindowSizeInPixels(window, &w, &h);
+
+    if (event.type == SDL_EVENT_FINGER_DOWN) {
+        mobile_input::TouchPoint t;
+        t.id = tf.fingerID;
+        t.x = tf.x * w;
+        t.y = tf.y * h;
+        t.down = true;
+        t.just_pressed = true;
+        mobile_input_state.touches.push_back(t);
+        mobile_input_state.num_touches++;
+    }
+    else if (event.type == SDL_EVENT_FINGER_UP) {
+        for (auto& t : mobile_input_state.touches) {
+            if (t.id == tf.fingerID) {
+                t.down = false;
+                t.just_released = true;
+                break;
+            }
+        }
+        auto it = std::remove_if(mobile_input_state.touches.begin(),
+            mobile_input_state.touches.end(),
+            [](const mobile_input::TouchPoint& p) { return !p.down; });
+        mobile_input_state.touches.erase(it, mobile_input_state.touches.end());
+        mobile_input_state.num_touches = mobile_input_state.touches.size();
+    }
+    else if (event.type == SDL_EVENT_FINGER_MOTION) {
+        for (auto& t : mobile_input_state.touches) {
+            if (t.id == tf.fingerID) {
+                float nx = tf.x * w;
+                float ny = tf.y * h;
+                t.dx = nx - t.x;
+                t.dy = ny - t.y;
+                t.x = nx;
+                t.y = ny;
+                break;
+            }
+        }
+    }
+}
+
+void GFX::handleMouse(const SDL_Event& event) {
+    static bool mouse_down = false;
+    static float last_x = 0, last_y = 0;
+
+    if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN && event.button.button == SDL_BUTTON_LEFT) {
+        mouse_down = true;
+        last_x = event.button.x;
+        last_y = event.button.y;
+
+        mobile_input::TouchPoint t;
+        t.id = 999;
+        t.x = last_x;
+        t.y = last_y;
+        t.down = true;
+        t.just_pressed = true;
+        mobile_input_state.touches.push_back(t);
+        mobile_input_state.num_touches++;
+    }
+    else if (event.type == SDL_EVENT_MOUSE_BUTTON_UP && event.button.button == SDL_BUTTON_LEFT) {
+        mouse_down = false;
+        for (auto& t : mobile_input_state.touches) {
+            if (t.id == 999) {
+                t.down = false;
+                t.just_released = true;
+                break;
+            }
+        }
+        auto it = std::remove_if(mobile_input_state.touches.begin(),
+            mobile_input_state.touches.end(),
+            [](const mobile_input::TouchPoint& p) { return !p.down; });
+        mobile_input_state.touches.erase(it, mobile_input_state.touches.end());
+        mobile_input_state.num_touches = mobile_input_state.touches.size();
+    }
+    else if (event.type == SDL_EVENT_MOUSE_MOTION && mouse_down) {
+        for (auto& t : mobile_input_state.touches) {
+            if (t.id == 999) {
+                t.dx = event.motion.x - t.x;
+                t.dy = event.motion.y - t.y;
+                t.x = event.motion.x;
+                t.y = event.motion.y;
+                break;
+            }
+        }
+    }
+}
 void handleMouseEmulation(SDL_Event event){}
 void handleTouchEvent(SDL_Event event){}
 
@@ -180,17 +269,17 @@ void GFX::update(){
             case SDL_EVENT_MOUSE_MOTION:
                 input_state.mouseX = event.motion.x;
                 input_state.mouseY = event.motion.y;
-                handleMouseEmulation(event);
+                handleMouse(event);
                 break;
-            case SDL_EVENT_MOUSE_BUTTON_DOWN:  
-            case SDL_EVENT_MOUSE_BUTTON_UP:    
-                handleMouseEmulation(event);   
+            case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            case SDL_EVENT_MOUSE_BUTTON_UP:
+                handleMouse(event);
                 break;
 
             case SDL_EVENT_FINGER_DOWN:
             case SDL_EVENT_FINGER_UP:
             case SDL_EVENT_FINGER_MOTION:
-                handleTouchEvent(event);
+                handleTouch(event);
                 break;
 
             case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
@@ -202,6 +291,7 @@ void GFX::update(){
     //set previous input to this for next frame
     std::copy(std::begin(input_state.keys), std::end(input_state.keys), std::begin(input_state.previous_keys));
 }
+
 
 
 unsigned int GFX::load_texture(const std::string& path){

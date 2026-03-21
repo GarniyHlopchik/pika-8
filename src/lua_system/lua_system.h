@@ -3,6 +3,7 @@
 #include "scene_tree/node.h"
 struct EngineContext;
 class Node;
+class GFX;
 class LuaSystem{
     public:
     LuaSystem();

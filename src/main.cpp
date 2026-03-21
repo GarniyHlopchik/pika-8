@@ -8,14 +8,17 @@
 #include "lua_bindings/engine_context.h"
 #include "file_resolve/file_system.h"
 #include "user_input/user_input.h"
-#include "globals.h"
+#include "globals.h"   
 #include <fstream>
 #include <filesystem>
 #include <algorithm> 
 #include <SDL3/SDL_main.h>
+extern "C" int luaopen_Input(lua_State* L);
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+
 #endif
+
 
 bool has_embedded_zip(const std::string& exe_path)
 {
@@ -98,6 +101,12 @@ void on_load_success(const char* file){
     bind_sfx(lua.get_state());
     bind_node(lua.get_state());
 
+   /* lua_pushlightuserdata(lua.get_state(), &gfx);
+    lua_setglobal(lua.get_state(), "gfx");
+    luaL_requiref(lua.get_state(), "Input", luaopen_Input, 1);
+    lua_pop(lua.get_state(), 1);*/
+
+
     lua.load_script(config.get_lua_script());
     lua.call("_init");
 
@@ -156,7 +165,16 @@ int main(int argc, char** argv){
     bind_sfx(lua.get_state());
     bind_node(lua.get_state());
 
-    lua.load_script(config.get_lua_script());
+    /*lua_pushlightuserdata(lua.get_state(), &gfx);
+    lua_setglobal(lua.get_state(), "gfx");
+
+
+    luaL_requiref(lua.get_state(), "Input", luaopen_Input, 1);
+    lua_pop(lua.get_state(), 1);
+
+    std::cout << "Input module registered successfully!" << std::endl;
+
+    lua.load_script(config.get_lua_script());*/
     lua.call("_init");
     
 

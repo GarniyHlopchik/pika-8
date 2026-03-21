@@ -110,6 +110,7 @@ set(PIKA_SOURCES
     src/file_resolve/zip.cpp
     src/lua_bindings/sol_bind/sol_bind_node.cpp
     src/lua_bindings/sol_bind/sol_bind_sprite.cpp
+    src/mobile_input/input_state.h 
 )
 
 # ---------------- Target ----------------
@@ -117,13 +118,15 @@ set(PIKA_SOURCES
 if(ANDROID)
     add_library(pika-8 SHARED ${PIKA_SOURCES})
 else()
-    add_executable(pika-8 ${PIKA_SOURCES})
+    add_executable(pika-8 ${PIKA_SOURCES}
+src/lua_bindings/lua_bind/lua_bind_input.cpp)
 endif()
 
 # ---------------- Includes ----------------
 
 target_include_directories(pika-8 PRIVATE
     src
+    src/mobile_input 
     dependencies
     dependencies/lua
     dependencies/sol
