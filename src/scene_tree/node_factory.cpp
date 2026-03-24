@@ -15,6 +15,10 @@ std::unique_ptr<Node> NodeFactory::create(const std::string& type, LuaSystem* lu
 
         return node;
     }
+    else if(type=="sprite"){
+        int id = NodeFactory::get_id();
+        
+    }
     
     std::cout << "No such node name found: " << type << std::endl;
     return nullptr;
