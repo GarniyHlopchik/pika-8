@@ -2,6 +2,7 @@
 #include "../lua_bindings.h"
 #include "gfx/sprite/sprite.h"
 void sol_bind_sprite(lua_State* L){
+    
     sol::state_view lua(L);
     lua.new_usertype<Sprite>("Sprite",
         sol::base_classes, sol::bases<Node>(),
@@ -15,7 +16,7 @@ void sol_bind_sprite(lua_State* L){
             float new_width = self.get_width() * scale_x;
             float new_height = self.get_height() * scale_y;
             self.update_size(new_width, new_height);
-        }
+        },
         "update_color", [](Sprite& self, sol::table color_table){
             Color color;
             color.r = color_table[1];
@@ -36,7 +37,7 @@ void sol_bind_sprite(lua_State* L){
             self.update_texture(texture);
         },
         "update_visible",[](Sprite& self, bool visible){
-            self.update_visibilty(visible);
+            self.update_visibility(visible);
         },
         "mirror", [](Sprite& self, bool horizontal, bool vertical){
             self.mirror(horizontal, vertical);
@@ -54,8 +55,10 @@ void sol_bind_sprite(lua_State* L){
             color.a = color_table[4];
             self.update(x,y,width,height,uv,color);
         },
-        "draw",[](Sprite& self){
-            self.draw();
+        "draw",[](Sprite& self,sol::this_state ts){
+            lua_State* L = ts;
+            EngineContext* ctx = get_ctx(L);
+            self.draw(ctx->gfx);
         },
         "destroy",[](Sprite& self){
             self.~Sprite();
