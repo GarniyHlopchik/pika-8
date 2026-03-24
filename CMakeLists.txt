@@ -36,18 +36,25 @@ FetchContent_MakeAvailable(simdjson)
 
 # ---------------- Lua ----------------
 
-file(GLOB LUA_SOURCES
-    dependencies/lua/*.c
-)
+set(LUA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua)
 
-list(REMOVE_ITEM LUA_SOURCES
-    ${CMAKE_SOURCE_DIR}/dependencies/lua/lua.c
-    ${CMAKE_SOURCE_DIR}/dependencies/lua/luac.c
-    ${CMAKE_SOURCE_DIR}/dependencies/lua/onelua.c
-)
+if(PIKA_USE_ONELUA)
+    set(LUA_SOURCES ${LUA_DIR}/onelua.c)
+else()
+    file(GLOB LUA_SOURCES
+        ${LUA_DIR}/*.c
+    )
+
+    list(REMOVE_ITEM LUA_SOURCES
+        ${LUA_DIR}/lua.c
+        ${LUA_DIR}/luac.c
+        ${LUA_DIR}/onelua.c
+    )
+endif()
 
 add_library(lua STATIC ${LUA_SOURCES})
-target_include_directories(lua PUBLIC dependencies/lua)
+target_include_directories(lua PUBLIC ${LUA_DIR})
+target_compile_definitions(lua PRIVATE MAKE_LIB)
 
 # ---------------- LuaSocket ----------------
 
