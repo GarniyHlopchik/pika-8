@@ -1,4 +1,5 @@
 #include "config.h"
+#include <functional>
 void sol_bind_node(lua_State* L){
     sol::state_view lua(L);
     lua.new_usertype<Node>("Node",
@@ -13,10 +14,16 @@ void sol_bind_node(lua_State* L){
         self.add_child(std::move(child_ptr));
     },
     // Fix: Use lambdas for member variables to satisfy Android Clang
-    "id", [](Node& n) { return n.id; },
-    "parent", [](Node& n) { return n.parent; },
+    "id", sol::property([](Node& n) { return n.id; }),
+        
+    "parent", sol::property([](Node& n) { return n.parent; }),
+        
+    "children", sol::property([](Node& n) { 
+            // Returning as a reference so Lua can iterate over the actual vector
+        return std::ref(n.children); 
+    }),
     "remove_child", &Node::remove_child,
-    "children", [](Node& n) { return std::ref(n.children); }, 
+    
     "script", sol::property([](Node& self, sol::this_state s) -> sol::object {
         if (self.script_ref == LUA_REFNIL) {
             return sol::make_object(s, sol::lua_nil);

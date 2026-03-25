@@ -1,5 +1,6 @@
 #pragma once
 #include "config.h"
+#include "sol/sol.hpp"
 class SceneTree;
 class LuaSystem;
 class Node{
@@ -19,4 +20,8 @@ class Node{
     
     LuaSystem* lua; 
     SceneTree* scene_tree;
+
+    virtual void push_to_lua(lua_State* L) {
+        sol::stack::push(L, std::ref(*this));
+    }
 };

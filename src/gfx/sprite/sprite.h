@@ -28,6 +28,11 @@ public:
     UVCoords get_uv() const { return _uv; }
     Color get_color() const { return _color; }
 
+    void push_to_lua(lua_State* L) override {
+        // This tells sol2: "I am specifically a Sprite"
+        sol::stack::push(L, std::ref(*this));
+    }
+
 private:
     float _x, _y, _width, _height, _rotation = 0.0f;
     unsigned int _texture;

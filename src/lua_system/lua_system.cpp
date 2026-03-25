@@ -228,7 +228,7 @@ void LuaSystem::call_init(int table_ref, Node& node_ref) {
 
     // 4. Push the Node reference using sol2
     // This uses the bindings you already defined for the Node class
-    sol::stack::push(L, std::ref(node_ref)); 
+    node_ref.push_to_lua(L);
 
     // Stack is now: [table] [function] [self] [node_userdata]
     
