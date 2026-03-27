@@ -13,6 +13,19 @@ std::unique_ptr<Node> NodeFactory::create_node(LuaSystem* lua,SceneTree* tree, s
         return node;
     
 }
+std::unique_ptr<YSort> NodeFactory::create_ysort(LuaSystem* lua,SceneTree* tree, std::string& script_name, float x, float y){
+
+        int id = NodeFactory::get_id();
+        std::unique_ptr<YSort> node = std::make_unique<YSort>(id,lua,tree,x,y);
+        
+        if(script_name!=""){
+            int script_ref = lua->load_script_table(script_name);
+            node->_init(script_ref);
+        }
+
+        return node;
+    
+}
 std::unique_ptr<Sprite> NodeFactory::create_sprite(LuaSystem* lua,SceneTree* tree,std::string& script_name, 
     unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color){
         int id = NodeFactory::get_id();

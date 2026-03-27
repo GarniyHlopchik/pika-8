@@ -4,6 +4,7 @@
 #include "sol/sol.hpp"
 #include "gfx/sprite/sprite.h"
 #include "scene_tree/node2d.h"
+#include "scene_tree/y_sort.h"
 
 
 static int l_create(lua_State* L){
@@ -49,6 +50,12 @@ static int l_create(lua_State* L){
         float x = luaL_checknumber(L,3);
         float y = luaL_checknumber(L,4);
         std::unique_ptr<Node2D> node = NodeFactory::create_node2d(ctx->lua,ctx->scene_tree,script_path,x,y);
+        sol::stack::push(L, std::move(node));
+    }
+    else if(type=="ysort"){
+        float x = luaL_checknumber(L,3);
+        float y = luaL_checknumber(L,4);
+        std::unique_ptr<YSort> node = NodeFactory::create_ysort(ctx->lua,ctx->scene_tree,script_path,x,y);
         sol::stack::push(L, std::move(node));
     }
         

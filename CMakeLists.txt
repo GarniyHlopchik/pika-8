@@ -120,6 +120,9 @@ set(PIKA_SOURCES
     src/mobile_input/input_state.h
     src/scene_tree/node2d.cpp
     src/lua_bindings/sol_bind/sol_bind_node2d.cpp
+    src/lua_bindings/lua_bind/lua_bind_input.cpp
+    src/scene_tree/y_sort.cpp
+    src/lua_bindings/sol_bind/sol_bind_ysort.cpp
 )
 
 # ---------------- Target ----------------
@@ -128,7 +131,7 @@ if(ANDROID)
     add_library(pika-8 SHARED ${PIKA_SOURCES})
 else()
     add_executable(pika-8 ${PIKA_SOURCES}
-src/lua_bindings/lua_bind/lua_bind_input.cpp)
+)
 endif()
 
 # ---------------- Includes ----------------
