@@ -117,7 +117,9 @@ set(PIKA_SOURCES
     src/file_resolve/zip.cpp
     src/lua_bindings/sol_bind/sol_bind_node.cpp
     src/lua_bindings/sol_bind/sol_bind_sprite.cpp
-    src/mobile_input/input_state.h 
+    src/mobile_input/input_state.h
+    src/scene_tree/node2d.cpp
+    src/lua_bindings/sol_bind/sol_bind_node2d.cpp
 )
 
 # ---------------- Target ----------------

@@ -25,6 +25,17 @@ std::unique_ptr<Sprite> NodeFactory::create_sprite(LuaSystem* lua,SceneTree* tre
 
         return node;
     }
+std::unique_ptr<Node2D> NodeFactory::create_node2d(LuaSystem* lua,SceneTree* tree,std::string& script_name,float x, float y){
+    int id = NodeFactory::get_id();
+    std::unique_ptr<Node2D> node = std::make_unique<Node2D>(id,lua,tree,x,y);
+        
+    if(script_name!=""){
+        int script_ref = lua->load_script_table(script_name);
+        node->_init(script_ref);
+    }
+
+    return node;
+}
 int NodeFactory::get_id(){
     static int id = 1;
     return ++id;

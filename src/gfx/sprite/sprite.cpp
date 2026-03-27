@@ -1,12 +1,12 @@
 #include "sprite.h"
 
 Sprite::Sprite(int p_id, LuaSystem* p_L, SceneTree* p_tree, unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color)
-    : Node(p_id, p_L, p_tree), _texture(texture), _x(x), _y(y), _width(width), _height(height), _uv(uv), _color(color) {}
+    : Node2D(p_id, p_L, p_tree, x, y), _texture(texture), _width(width), _height(height), _uv(uv), _color(color) {}
 
 void Sprite::update_position(float x, float y) {
-    if (x != _x || y != _y) {
-        _x = x;
-        _y = y;
+    if (x != position.x || y != position.y) {
+        position.x = x;
+        position.y = y;
         _dirty = true;
     }
 }
@@ -76,7 +76,7 @@ void Sprite::update(float x, float y, float width, float height, UVCoords uv, Co
 void Sprite::draw(GFX* gfx) {
     if(_visible){
     // if (_dirty) { // Optional optimization: only redraw if something changed /// removed for causing flickering due to redrawing the window every frame
-        gfx->draw(_texture, _x, _y, _width, _height, _uv, _color);
+        gfx->draw(_texture, position.x, position.y, _width, _height, _uv, _color);
         _dirty = false; // Reset dirty flag after drawing
     // }
     }

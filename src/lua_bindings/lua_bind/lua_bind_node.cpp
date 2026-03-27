@@ -3,6 +3,7 @@
 #include "scene_tree/node_factory.h"
 #include "sol/sol.hpp"
 #include "gfx/sprite/sprite.h"
+#include "scene_tree/node2d.h"
 
 
 static int l_create(lua_State* L){
@@ -43,6 +44,12 @@ static int l_create(lua_State* L){
             }
             std::unique_ptr<Sprite> node = NodeFactory::create_sprite(ctx->lua,ctx->scene_tree,script_path,texture,x,y,width,height,uv,color);
             sol::stack::push(L, std::move(node));
+    }
+    else if(type=="node2d"){
+        float x = luaL_checknumber(L,3);
+        float y = luaL_checknumber(L,4);
+        std::unique_ptr<Node2D> node = NodeFactory::create_node2d(ctx->lua,ctx->scene_tree,script_path,x,y);
+        sol::stack::push(L, std::move(node));
     }
         
     
