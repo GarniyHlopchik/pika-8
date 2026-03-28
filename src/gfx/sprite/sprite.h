@@ -1,8 +1,8 @@
 #pragma once
 #include "../gfx.h"
-#include "scene_tree/node.h"
+#include "scene_tree/node2d.h"
 
-class Sprite : public Node{
+class Sprite : public Node2D{
 public:
     Sprite(int p_id, LuaSystem* p_L, SceneTree* p_tree, unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color);
 
@@ -21,8 +21,8 @@ public:
 
     float get_width() const { return _width; }
     float get_height() const { return _height; }
-    float get_x() const { return _x; }
-    float get_y() const { return _y; }
+    float get_x() const { return position.x; }
+    float get_y() const { return position.y; }
     unsigned int get_texture() const { return _texture; }
     bool is_visible() const { return _visible; }
     UVCoords get_uv() const { return _uv; }
@@ -34,7 +34,7 @@ public:
     }
 
 private:
-    float _x, _y, _width, _height, _rotation = 0.0f;
+    float _width, _height, _rotation = 0.0f;
     unsigned int _texture;
     bool _dirty = true, _visible = true; // change has been made that requires redraw
     UVCoords _uv;

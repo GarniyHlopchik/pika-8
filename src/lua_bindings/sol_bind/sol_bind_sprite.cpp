@@ -5,7 +5,7 @@ void sol_bind_sprite(lua_State* L){
     
     sol::state_view lua(L);
     lua.new_usertype<Sprite>("Sprite",
-        sol::base_classes, sol::bases<Node>(),
+        sol::base_classes, sol::bases<Node2D>(),
         "update_position", [](Sprite& self, float x, float y){
             self.update_position(x,y);
         },
