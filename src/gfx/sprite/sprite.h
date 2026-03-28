@@ -2,7 +2,15 @@
 #include "../gfx.h"
 #include "scene_tree/node2d.h"
 
-class Sprite : public Node2D{
+/// TODO: More sprite functions
+///         animate(bool)       - is the sprite animated, 
+///         repeat(bool)        - repeat the animation continuously
+///         frame(int)          - skips to the frame
+///         rotate(int[0-360]/  - rotate degrees
+///                float[0-1])          /percent
+///         origin(int, int)    - set an origin point
+
+class Sprite : public Node2D {
 public:
     Sprite(int p_id, LuaSystem* p_L, SceneTree* p_tree, unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color);
 
@@ -12,31 +20,36 @@ public:
     void update_uv(UVCoords uv);
     void update_texture(unsigned int texture);
     void update_visibility(bool visible);
-    void update_rotation(float degrees);
+    void update_pivot(int x, int y);
+    
+    void update_rotation(int degrees);
     void mirror(bool horizontal, bool vertical);
+
 
     void update(float x, float y, float width, float height, UVCoords uv, Color color);
     void draw(GFX* gfx);
 
-
     float get_width() const { return _width; }
     float get_height() const { return _height; }
-    float get_x() const { return position.x; }
-    float get_y() const { return position.y; }
+    float get_x() const { return _x; }
+    float get_y() const { return _y; }
     unsigned int get_texture() const { return _texture; }
     bool is_visible() const { return _visible; }
     UVCoords get_uv() const { return _uv; }
     Color get_color() const { return _color; }
-
-    void push_to_lua(lua_State* L) override {
-        // This tells sol2: "I am specifically a Sprite"
-        sol::stack::push(L, std::ref(*this));
-    }
+    PivotPoint get_pivot() const { return _pivot; }
 
 private:
-    float _width, _height, _rotation = 0.0f;
     unsigned int _texture;
-    bool _dirty = true, _visible = true; // change has been made that requires redraw
+    float _x, _y;
+    float _width, _height;
+
+    int _rotation = 0;
+
+    bool _dirty = true; // change has been made that requires redraw
+    bool _visible = true; 
+    
+    PivotPoint _pivot = { 0, 0 };
     UVCoords _uv;
     Color _color;
 };

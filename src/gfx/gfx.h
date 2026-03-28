@@ -17,8 +17,16 @@ public:
     ~GFX();
 
     unsigned int load_texture(const std::string& path);
-    void draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv);    
+    
+    // No color nor rotation specification
+    void draw(const unsigned int texture, float x, float y, float width, float height, PivotPoint pv, UVCoords uv);
+    // Color specification, but not rotation
+    void draw(const unsigned int texture, float x, float y, float width, float height, PivotPoint pv, UVCoords uv, Color color);
+    // Color and rotation
+    void draw(const unsigned int texture, float x, float y, float width, float height, PivotPoint pv, UVCoords uv, Color color, float rotation);
+    // No pivot point, but color
     void draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color);
+
 
     FontData get_font_data(const std::string& name);
 

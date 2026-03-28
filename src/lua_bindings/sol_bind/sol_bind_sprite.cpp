@@ -17,6 +17,9 @@ void sol_bind_sprite(lua_State* L){
             float new_height = self.get_height() * scale_y;
             self.update_size(new_width, new_height);
         },
+        "pivot", [](Sprite& self, int x, int y){
+            self.update_pivot(x, y);
+        },
         "update_color", [](Sprite& self, sol::table color_table){
             Color color;
             color.r = color_table[1];
@@ -41,6 +44,9 @@ void sol_bind_sprite(lua_State* L){
         },
         "mirror", [](Sprite& self, bool horizontal, bool vertical){
             self.mirror(horizontal, vertical);
+        },
+        "update_rotation", [](Sprite& self, int degrees){
+            self.update_rotation(degrees);
         },
         "update_all", [](Sprite& self, int x,int y,int width,int height,sol::table uv_table,sol::table color_table){
             UVCoords uv;

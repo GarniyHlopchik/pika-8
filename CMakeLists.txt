@@ -76,6 +76,8 @@ set(LUASOCKET_SOURCES
 
 if (WIN32)
     list(APPEND LUASOCKET_SOURCES dependencies/luasocket/wsocket.c)
+    set(SDL_STATIC ON CACHE BOOL "" FORCE)
+    set(SDL_SHARED OFF CACHE BOOL "" FORCE)
 else()
     list(APPEND LUASOCKET_SOURCES dependencies/luasocket/usocket.c)
 endif()

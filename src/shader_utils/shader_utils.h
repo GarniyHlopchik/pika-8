@@ -1,5 +1,6 @@
 #pragma once
 #include "config.h"
+#include "gfx/gfx_struct.h"
 
 unsigned int make_module(unsigned int module_type);
 unsigned int make_shader();

@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+#include "../json_reader/get_config.h"
 #include "sprite_mesh/mesh_struct.h"
 
 struct LoadedFont {
@@ -13,3 +15,4 @@ struct LoadedImages
     std::string path;
     unsigned int id;
 };
+

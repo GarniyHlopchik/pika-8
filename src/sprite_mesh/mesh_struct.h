@@ -1,5 +1,9 @@
 #pragma once
 
+struct PivotPoint {
+    int x, y;
+};
+
 struct UVCoords {
     float u1, v1, u2, v2;
 };

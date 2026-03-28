@@ -91,6 +91,8 @@ static int l_spr(lua_State* L) {
     
     Color color = get_color(L, 7); // expects a table {r, g, b, a}
 
+    // int rotation = luaL_optnumber(L, 8, 0); // TODO: if needed, input of the rotation during the rotation of the sprite can be added
+
     UVCoords uv = calculate_uv(sprite_cut, texture);
 
     // Allocate Userdata

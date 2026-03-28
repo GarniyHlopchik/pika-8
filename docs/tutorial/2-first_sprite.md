@@ -49,6 +49,8 @@ Then, we call a new function: `GFX.spr(texture, x, y, [width], [height], {x1, x2
 * `sprite:texture( texture_path: String )` - changes the displayed texture
 * `sprite:visible(bool)` - should it be displayed
 * `sprite:mirror(bool, bool)` - flips horizontaly and verticaly
+* `strite:rotation(degree: int)` - sets a rotation 
+* `sprite:pivot(x: int, y: int)` - sets a pivot(origin). Default { 0, 0 }
 
 
 

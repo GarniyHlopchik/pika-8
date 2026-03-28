@@ -28,6 +28,15 @@ static int l_scale(lua_State* L){
     return 0;
 }
 
+static int l_update_pivot(lua_State* L){
+    Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
+    int x = luaL_checkinteger(L, 2);
+    int y = luaL_checkinteger(L, 3);
+
+    sprite->update_pivot(x, y);
+    return 0;
+}
+
 static int l_update_color(lua_State* L){
     Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
     Color color = get_color(L, 2);
@@ -61,6 +70,13 @@ static int l_mirror(lua_State* L){
     bool horizontal = lua_toboolean(L, 2);
     bool vertical = lua_toboolean(L, 3);
     sprite->mirror(horizontal, vertical);
+    return 0;
+}
+
+static int l_rotation(lua_State* L){
+    Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
+    int degrees = luaL_checknumber(L, 2);
+    sprite->update_rotation(degrees);
     return 0;
 }
 
@@ -105,11 +121,13 @@ void bind_gfx_sprite(lua_State* L)
         {"pos", l_update_position},
         {"size", l_update_size},
         {"scale", l_scale},
+        {"pivot", l_update_pivot},
         {"color", l_update_color},
         {"uv", l_update_uv},
         {"texture", l_update_texture},
         {"visible", l_update_visible},
         {"mirror", l_mirror},
+        {"rotation", l_rotation},
 
         {"update", l_update},
         {"draw", l_draw},

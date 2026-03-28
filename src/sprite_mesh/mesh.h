@@ -6,7 +6,9 @@ class SpriteMesh {
     public:
     void init();
     SpriteMesh();
-    void draw(unsigned int shader, unsigned int texture, float posX, float posY, float width, float height, UVCoords uv, Color color);
+    void prepare_shader(unsigned int shader, unsigned int texture, float posX, float posY, float width, float height, PivotPoint pv, UVCoords uv, Color color, float rotation);
+    void draw(unsigned int shader, unsigned int texture, float posX, float posY, float width, float height, PivotPoint pv, UVCoords uv, Color color);
+    void draw(unsigned int shader, unsigned int texture, float posX, float posY, float width, float height, PivotPoint pv, UVCoords uv, Color color, float rotation);
     ~SpriteMesh();
 
     private:

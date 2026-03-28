@@ -303,15 +303,15 @@ unsigned int GFX::load_texture(const std::string& path){
         return 0;
     }
 
-    unsigned char *data = stbi_load_from_memory(res.data.get(),res.size, &width, &height, &nrChannels, 0);
-    if(!data){
+    unsigned char *texture_data = stbi_load_from_memory(res.data.get(),res.size, &width, &height, &nrChannels, 0);
+    if(!texture_data){
         return 0;
     }
     unsigned int texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
     GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, texture_data);
     // set nearest-neighbor filtering
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -320,7 +320,7 @@ unsigned int GFX::load_texture(const std::string& path){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(data);
+    stbi_image_free(texture_data);
 
     return texture;
 }
@@ -335,16 +335,38 @@ FontData GFX::get_font_data(const std::string& name) {
     throw std::runtime_error("Font not found: " + name);
 }
 
-void GFX::draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv) {
-    Color color = {1.0f, 1.0f, 1.0f, 1.0f};
-    spritemesh.draw(shader, texture, x, y, width, height, uv, color);
+void default_color_helper(Color* color){
+    Color white = {1.0f, 1.0f, 1.0f, 1.0f};
+    Color black = {0.0f, 0.0f, 0.0f, 1.0f};
+
+    if (*color > white) *color = white;
+    if (*color < black) *color = black;
 }
 
-void GFX::draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color) {
-    Color white = {1.0f, 1.0f, 1.0f, 1.0f};
-    if (color > white) color = white; // clamp to white if any component is above 1.0f
-    Color black = {0.0f, 0.0f, 0.0f, 1.0f};
-    if (color < black) color = black; // clamp to black if any component is below 0.0f
+// nothing
+void GFX::draw(const unsigned int texture, float x, float y, float width, float height, PivotPoint pv, UVCoords uv) {
+    Color color = {1.0f, 1.0f, 1.0f, 1.0f};
+    spritemesh.draw(shader, texture, x, y, width, height, pv, uv, color);
+}
 
-    spritemesh.draw(shader, texture, x, y, width, height, uv, color);
+// COLOR
+void GFX::draw(const unsigned int texture, float x, float y, float width, float height, PivotPoint pv, UVCoords uv, Color color) {
+    default_color_helper(&color);
+
+    spritemesh.draw(shader, texture, x, y, width, height, pv, uv, color);
+}
+
+// COLOR and ROTATION
+void GFX::draw(const unsigned int texture, float x, float y, float width, float height, PivotPoint pv, UVCoords uv, Color color, float rotation) {
+    default_color_helper(&color);
+    spritemesh.draw(shader, texture, x, y, width, height, pv, uv, color, rotation);
+}
+
+// COLOR, NO PIVOT
+void GFX::draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color) {
+    default_color_helper(&color);
+
+    PivotPoint pv = { 0, 0};
+
+    spritemesh.draw(shader, texture, x, y, width, height, pv, uv, color);
 }

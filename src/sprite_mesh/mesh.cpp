@@ -29,33 +29,51 @@ void SpriteMesh::init(){
     glEnableVertexAttribArray(1);
 }
 
-void SpriteMesh::draw(unsigned int shader, unsigned int texture, float posX, float posY, float width, float height, UVCoords uv, Color color) {
+
+
+void SpriteMesh::prepare_shader(unsigned int shader, unsigned int texture, float posX, float posY, float width, float height, PivotPoint pv, UVCoords uv, Color color, float rotation) {
     glUseProgram(shader);
-    
-    GLint posLoc = glGetUniformLocation(shader, "uPos");
-    glUniform2f(posLoc, posX, posY);
-    
-    // Pass the actual character width/height we want to the shader!
-    GLint sizeLoc = glGetUniformLocation(shader, "uSize");
-    glUniform2f(sizeLoc, width, height);
 
-    GLint uU1Loc = glGetUniformLocation(shader, "uU1");
-    glUniform1f(uU1Loc, uv.u1);
-    GLint uV1Loc = glGetUniformLocation(shader, "uV1");
-    glUniform1f(uV1Loc, uv.v1);
-    GLint uU2Loc = glGetUniformLocation(shader, "uU2");
-    glUniform1f(uU2Loc, uv.u2);
-    GLint uV2Loc = glGetUniformLocation(shader, "uV2");
-    glUniform1f(uV2Loc, uv.v2);
+    // Position and Size
+    glUniform2f(glGetUniformLocation(shader, "uPos"), posX, posY);
+    glUniform2f(glGetUniformLocation(shader, "uSize"), width, height);
     
-    glActiveTexture(GL_TEXTURE0);  
+    // Rotation (Defaults to 0.0f in the non-rotating overload)
+    glUniform1f(glGetUniformLocation(shader, "uRotation"), rotation);
+
+    // UV Coordinates
+    glUniform1f(glGetUniformLocation(shader, "uU1"), uv.u1);
+    glUniform1f(glGetUniformLocation(shader, "uV1"), uv.v1);
+    glUniform1f(glGetUniformLocation(shader, "uU2"), uv.u2);
+    glUniform1f(glGetUniformLocation(shader, "uV2"), uv.v2);
+
+    // Texture Binding
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
+    glUniform1i(glGetUniformLocation(shader, "ourTexture"), 0);
 
-    unsigned int location = glGetUniformLocation(shader, "ourTexture");
-    glUniform1i(location, 0); 
+    // Color
+    glUniform4f(glGetUniformLocation(shader, "uColor"), color.r, color.g, color.b, color.a);
 
-    GLint colorLoc = glGetUniformLocation(shader, "uColor");
-    glUniform4f(colorLoc, color.r, color.g, color.b, color.a);
+    // Pivot
+    glUniform2f(glGetUniformLocation(shader, "uPivot"), pv.x, pv.y);
+    // std::cout << "pivot is: { " << pv.x << ", " << pv.y << " }" << std::endl;
+
+}
+
+// Draw without rotation
+void SpriteMesh::draw(unsigned int shader, unsigned int texture, float posX, float posY, float width, float height, PivotPoint pv, UVCoords uv, Color color) {
+    prepare_shader(shader, texture, posX, posY, width, height, pv, uv, color, 0.0f);
+    
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, vertex_count);
+}
+
+// Draw with rotation
+void SpriteMesh::draw(unsigned int shader, unsigned int texture, float posX, float posY, float width, float height, PivotPoint pv, UVCoords uv, Color color, float rotation) {
+    // std::cout << texture << "'s rotation: " << rotation << std::endl;
+    
+    prepare_shader(shader, texture, posX, posY, width, height, pv, uv, color, rotation);
 
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, vertex_count);

@@ -47,9 +47,19 @@ void Sprite::update_visibility(bool visible) {
     }
 }
 
-void Sprite::update_rotation(float degrees) {
-    if (degrees != _rotation) {
-        _rotation = degrees;
+void Sprite::update_rotation(int degrees) {
+    int normalized = (degrees % 360 + 360) % 360;
+
+    if (normalized != _rotation) {
+        _rotation = normalized;
+        _dirty = true;
+    }
+}
+
+void Sprite::update_pivot(int x, int y){
+    if (x != _pivot.x || y != _pivot.y) { 
+        _pivot.x = x;
+        _pivot.y = y;
         _dirty = true;
     }
 }
@@ -75,9 +85,8 @@ void Sprite::update(float x, float y, float width, float height, UVCoords uv, Co
 
 void Sprite::draw(GFX* gfx) {
     if(_visible){
-    // if (_dirty) { // Optional optimization: only redraw if something changed /// removed for causing flickering due to redrawing the window every frame
-        gfx->draw(_texture, position.x, position.y, _width, _height, _uv, _color);
+        // std::cout << _texture << "'s rotation: " << _rotation << std::endl;
+        gfx->draw(_texture, position.x, position.y, _width, _height, _pivot, _uv, _color, static_cast<float>(_rotation));
         _dirty = false; // Reset dirty flag after drawing
-    // }
     }
 }
