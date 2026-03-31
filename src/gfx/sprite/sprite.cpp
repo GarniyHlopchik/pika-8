@@ -1,5 +1,5 @@
 #include "sprite.h"
-
+#include "lua_bindings/engine_context.h"
 Sprite::Sprite(int p_id, LuaSystem* p_L, SceneTree* p_tree, unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color)
     : Node2D(p_id, p_L, p_tree, x, y), _texture(texture), _width(width), _height(height), _uv(uv), _color(color) {}
 
@@ -91,4 +91,8 @@ void Sprite::draw(GFX* gfx) {
         gfx->draw(_texture, position.x, position.y, _width, _height, _pivot, _uv, _color, static_cast<float>(_rotation));
         _dirty = false; // Reset dirty flag after drawing
     }
+}
+void Sprite::_update(float delta){
+    Node::_update(delta);
+    draw(get_ctx(lua->get_state())->gfx);
 }
