@@ -6,9 +6,7 @@
 ///         animate(bool)       - is the sprite animated, 
 ///         repeat(bool)        - repeat the animation continuously
 ///         frame(int)          - skips to the frame
-///         rotate(int[0-360]/  - rotate degrees
-///                float[0-1])          /percent
-///         origin(int, int)    - set an origin point
+
 
 class Sprite : public Node2D {
 public:
@@ -20,8 +18,8 @@ public:
     void update_uv(UVCoords uv);
     void update_texture(unsigned int texture);
     void update_visibility(bool visible);
-    void update_pivot(int x, int y);
     
+    void update_pivot(int x, int y);
     void update_rotation(int degrees);
     void mirror(bool horizontal, bool vertical);
 

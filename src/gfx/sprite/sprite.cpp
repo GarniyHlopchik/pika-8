@@ -47,6 +47,8 @@ void Sprite::update_visibility(bool visible) {
     }
 }
 
+
+
 void Sprite::update_rotation(int degrees) {
     int normalized = (degrees % 360 + 360) % 360;
 
@@ -64,8 +66,6 @@ void Sprite::update_pivot(int x, int y){
     }
 }
 
-
-
 void Sprite::mirror(bool horizontal, bool vertical) {
     if (horizontal) {
         std::swap(_uv.u1, _uv.u2);
@@ -75,6 +75,8 @@ void Sprite::mirror(bool horizontal, bool vertical) {
     }
     _dirty = true;
 }
+
+
 
 void Sprite::update(float x, float y, float width, float height, UVCoords uv, Color color) {
     update_position(x, y);

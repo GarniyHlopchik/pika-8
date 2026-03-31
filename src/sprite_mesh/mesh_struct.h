@@ -18,7 +18,11 @@ struct Color
         a = a/255;
     }
     void print(const char* prefix = "") const {
-        std::cout << prefix << ": Color: {" << r << ", " << g << ", " << b << ", " << a << "}" << std::endl;
+        if (prefix != ""){
+            std::cout << prefix << ": Color: {" << r << ", " << g << ", " << b << ", " << a << "}" << std::endl;
+            return;
+        }
+        std::cout << "Color: {" << r << ", " << g << ", " << b << ", " << a << "}" << std::endl;
     }
 };
 
@@ -42,3 +46,9 @@ inline bool operator!=(const Color& c1, const Color& c2) {
             c1.b != c2.b && 
             c1.a != c2.a;
 }
+
+
+struct ShaderLocations {
+    unsigned int position, size, rotation, pivot, u1, v1, u2, v2, texture, color;
+};
+

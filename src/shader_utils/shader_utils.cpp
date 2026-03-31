@@ -27,6 +27,7 @@ const char* vertexSource =
     "   float rad = radians(uRotation);\n"
     "   float cosR = cos(rad);\n"
     "   float sinR = sin(rad);\n"
+    // "   vec2 localPos = vertexPos * (uSize * 0.5);\n"
     "   vec2 localPos = vertexPos * (uSize * 0.5);\n"
     "   vec2 centeredPos = localPos - uPivot;\n"
     "   vec2 rotatedPos = vec2( centeredPos.x * cosR - centeredPos.y * sinR, centeredPos.x * sinR + centeredPos.y * cosR);\n"
