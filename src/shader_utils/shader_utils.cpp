@@ -1,40 +1,36 @@
 #include "shader_utils.h"
 
 // Define shaders
-const char* fragSource =
-    "in vec2 vUV;\n"
-    "out vec4 screenColor;\n"
-    "uniform sampler2D ourTexture;\n"
-    "uniform vec4 uColor;\n"
-    "void main()\n"
-    "{\n"
-    "        screenColor = texture(ourTexture, vUV) * uColor;\n"
-    "}\n";
+const char* vertexSource = R"(
+layout (location = 0) in vec2 vertexPos; 
+layout (location = 1) in vec2 vertexUV; 
+layout (location = 2) in vec4 aColor;
 
-const char* vertexSource =
-    "layout (location = 0) in vec2 vertexPos; \n"
-    "layout (location = 1) in vec2 vertexUV; \n"
-    "uniform vec2 uPivot;\n"
-    "uniform vec2 uPos;\n"
-    "uniform vec2 uSize;\n"
-    "uniform mat4 uProjection;\n"
-    "uniform float uRotation;\n"
-    "uniform float uU1, uV1, uU2, uV2;\n"
-    "out vec2 vUV;\n"
-    "void main() \n"
-    "{\n"
-    // vertexPos ranges from -1..1 so multiply by half-size to get correct pixel extents
-    "   float rad = radians(uRotation);\n"
-    "   float cosR = cos(rad);\n"
-    "   float sinR = sin(rad);\n"
-    // "   vec2 localPos = vertexPos * (uSize * 0.5);\n"
-    "   vec2 localPos = vertexPos * (uSize * 0.5);\n"
-    "   vec2 centeredPos = localPos - uPivot;\n"
-    "   vec2 rotatedPos = vec2( centeredPos.x * cosR - centeredPos.y * sinR, centeredPos.x * sinR + centeredPos.y * cosR);\n"
-    "   vec2 worldPos = uPos + rotatedPos + uPivot;  \n"
-    "   gl_Position = uProjection * vec4(worldPos, 0.0, 1.0);  \n"
-    "   vUV = vec2(mix(uU1, uU2, vertexUV.x), mix(uV1, uV2, vertexUV.y));  \n"
-    "}\n";
+uniform mat4 uProjection;
+
+out vec2 vUV;
+out vec4 vColor;
+
+void main()
+{
+    gl_Position = uProjection * vec4(vertexPos, 0.0, 1.0);  
+    vUV = vertexUV;
+    vColor = aColor;
+}
+)";
+
+const char* fragSource = R"(
+in vec2 vUV;
+in vec4 vColor;
+out vec4 screenColor;
+
+uniform sampler2D ourTexture;
+
+void main() {
+    screenColor = texture(ourTexture, vUV) * vColor;
+}
+)";
+
 
 unsigned int make_shader(){
     std::vector<unsigned> modules;
@@ -72,7 +68,7 @@ unsigned int make_module(unsigned int module_type){
     const char* ShaderSrc = (module_type == GL_VERTEX_SHADER) ? fullVertex.c_str() : fullFrag.c_str();
 
     unsigned int shaderModule = glCreateShader(module_type);
-    glShaderSource(shaderModule,1,&ShaderSrc,NULL);
+    glShaderSource(shaderModule, 1, &ShaderSrc, nullptr);
     glCompileShader(shaderModule);
 
     int success;

@@ -287,6 +287,7 @@ void GFX::update(){
                 break;
         }
     }
+    spritemesh.flush(shader);
     SDL_GL_SwapWindow(window);
     //set previous input to this for next frame
     std::copy(std::begin(input_state.keys), std::end(input_state.keys), std::begin(input_state.previous_keys));

@@ -6,13 +6,30 @@ class SpriteMesh {
 public:
     void init();
     SpriteMesh();
-    void prepare_shader(unsigned int shader, unsigned int texture, float posX, float posY, float width, float height, PivotPoint pv, UVCoords uv, Color color, float rotation);
-    void draw(unsigned int shader, unsigned int texture, float posX, float posY, float width, float height, PivotPoint pv, UVCoords uv, Color color);
-    void draw(unsigned int shader, unsigned int texture, float posX, float posY, float width, float height, PivotPoint pv, UVCoords uv, Color color, float rotation);
+    void draw(
+        unsigned int shader, unsigned int texture, float posX, float posY, 
+        float width, float height, PivotPoint pv, UVCoords uv, Color color);
+
+    void draw(
+        unsigned int shader, unsigned int texture, float posX, float posY, 
+        float width, float height, PivotPoint pv, UVCoords uv, Color color, 
+        float rotation);
+
+    void flush(unsigned int shader);
     
     ~SpriteMesh();
 
 private:
-    // static ShaderLocations shadesLoc;
-    unsigned int VBO, VAO, vertex_count;
+    static const unsigned int MAX_BATCH_SPRITES = 4096;
+    unsigned int VBO, VAO, EBO;
+    unsigned int batchTexture = 0;
+    bool batchTextureActive = false;
+    std::vector<SpriteVertexShader> batchVertices;
+    std::vector<SpriteDrawCommand> textureSortedVertexShader;
+
+    void SpriteMesh::add_sprite_to_batch(
+        unsigned int shader, unsigned int texture, 
+        float posX, float posY, float width, float height, const PivotPoint& pv, 
+        const UVCoords& uv, const Color& color, float rotation);
+
 };

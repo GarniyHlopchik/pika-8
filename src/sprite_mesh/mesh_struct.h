@@ -52,3 +52,13 @@ struct ShaderLocations {
     unsigned int position, size, rotation, pivot, u1, v1, u2, v2, texture, color;
 };
 
+struct SpriteVertexShader {
+    float x, y;       // Final screen position
+    float u, v;       // Texture coordinates
+    float r, g, b, a; // Color
+};
+
+struct SpriteDrawCommand {
+    std::array<SpriteVertexShader, 4> vertices;
+    unsigned int texture;
+};
