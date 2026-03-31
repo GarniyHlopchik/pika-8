@@ -27,6 +27,8 @@ public:
     void update(float x, float y, float width, float height, UVCoords uv, Color color);
     void draw(GFX* gfx);
 
+    void _update(float delta) override; //override of Node's _update, calls draw() 
+
     float get_width() const { return _width; }
     float get_height() const { return _height; }
     float get_x() const { return _x; }

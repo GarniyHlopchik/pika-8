@@ -1,11 +1,13 @@
 #include "config.h"
 #include "../lua_bindings.h"
 #include "gfx/sprite/sprite.h"
+#include "scene_tree/node2d.h"
+#include "scene_tree/node.h"
 void sol_bind_sprite(lua_State* L){
     
     sol::state_view lua(L);
     lua.new_usertype<Sprite>("Sprite",
-        sol::base_classes, sol::bases<Node2D>(),
+        sol::base_classes, sol::bases<Node2D, Node>(),
         "update_position", [](Sprite& self, float x, float y){
             self.update_position(x,y);
         },
