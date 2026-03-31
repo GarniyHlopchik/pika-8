@@ -27,7 +27,7 @@ private:
     std::vector<SpriteVertexShader> batchVertices;
     std::vector<SpriteDrawCommand> textureSortedVertexShader;
 
-    void SpriteMesh::add_sprite_to_batch(
+    void add_sprite_to_batch(
         unsigned int shader, unsigned int texture, 
         float posX, float posY, float width, float height, const PivotPoint& pv, 
         const UVCoords& uv, const Color& color, float rotation);
