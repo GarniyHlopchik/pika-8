@@ -73,6 +73,7 @@ GFX.spr(texture, x, y, [width], [height], {x1, x2, y1, y2}, {r, g, b, a})
 | `{x1, y1, x2, y2}`| `{ float }`   | `- [ ]`   |
 | `{r, g, b, a}`    | `{ float }`   | `- [ ]`   |
 
-* Note: even though many parametrs exept `float` values, it's *heighly* recomended to use integer insted
+> [!IMPORTANT]
+> Even though many parametrs exept `float` values, it's *highly* recomended to use integer insted.
 
 Run the engine, and you should now see your player sprite sitting perfectly on the screen!
