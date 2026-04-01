@@ -40,15 +40,13 @@ void Sprite::update_uv(UVCoords uv) {
         _uv = uv;
 
         // Pivot dynamic update when uv is updated
-        // float new_width = (_uv.u2 - _uv.u1) * 0.5;
-        // float new_height = (_uv.v2 - _uv.v1) * 0.5;
-        
-        // float normalized_pivot_x = new_width / (_width * 0.5);
-        // float normalized_pivot_y = new_height / (_height * 0.5);
+        float new_width = (_uv.u2 - _uv.u1) * 0.5;
+        float new_height = (_uv.v2 - _uv.v1) * 0.5;
 
-        // std::cout << "pivot: {" << normalized_pivot_x << ", " << normalized_pivot_y << "}";
+        std::cout << "pivot: {" << new_width << ", " << new_width << "}";
 
-        // update_pivot(normalized_pivot_x, normalized_pivot_y);
+        update_pivot(new_width, new_height);
+
         _dirty = true;
     }
 }
