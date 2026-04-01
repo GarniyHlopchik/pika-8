@@ -1,6 +1,7 @@
 ## Overview
 
 Node2D is a class that inherits Node. It adds 2D position coordinates and a way to get the most global position in the node's tree.
+
 ## Creation
 
 ```lua

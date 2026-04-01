@@ -1,7 +1,7 @@
 ## Preparing the Asset
-Now that we have created a window and successfully displayed text, it's time to get something more visual on the screen—like a sprite representing your player character. 
+Now that we have created a window and successfully displayed text, it's time to get something more visual on the screen - like a sprite representing your player character. 
 
-First, you'll need an image file. You can draw a simple character or grab a placeholder, just make sure to name it `player_sprite.png` and place it in your project folder right next to your `game.lua` file. 
+First, you'll need an image file. You can draw a simple character or grab a placeholder and place it in your project folder right next to your `game.lua` file. 
 
 ## Initialization
 Before we can draw the sprite, the engine needs to load the texture into memory. Loading files every single frame is bad for performance, so we want to do this only once when the game boots up. 
@@ -40,28 +40,39 @@ end
 Just like before, `GFX.cls()` wipes the screen clean.
 Then, we call a new function: `GFX.spr(texture, x, y, [width], [height], {x1, x2, y1, y2}, {r, g, b, a})`. It returns a reference for our sprite that we can later use for display:
 
-* `sprite:draw()` - draws the sprite
-* `sprite:pos(new_x: int, new_y: int)` - changes the position
-* `sprite:size(new_width: int, new_height: int)` - changes the size
-* `sprite:scaleXY(w: float, l: float)` - changes the size based on the size
-* `sprite:scale(s: float)` - changes the size based on the size
-* `sprite:color( {r, g, b, a}: {int 0-255} )` - changes the color
-* `sprite:uv( { x1, y1, x2, y2}: {float} )` - changes the cutting
-* `sprite:texture( texture_path: String )` - changes the displayed texture
-* `sprite:visible(bool)` - should it be displayed
-* `sprite:mirror(bool, bool)` - flips horizontaly and verticaly
-* `strite:rotation(degree: int)` - sets a rotation 
-* `sprite:pivot(x: int, y: int)` - sets a pivot(origin). Default { 0, 0 }
+| *Function*            | *Parametr*                            | *Description*                         |
+| :-------------------- | :-----------------------------------: | :------------------------------------ |
+| `sprite:draw`         | ---                                   | draws the sprite                      |
+| `sprite:pos`          | `(new_x: int, new_y: int)`            | changes the position                  |
+| `sprite:size`         | `(new_width: int, new_height: int)`   | changes the size                      |
+| `sprite:scaleXY`      | `(w: float, l: float)`                | changes the size based on the size    |
+| `sprite:scale`        | `(s: float)`                          | changes the size based on the size    |
+| `sprite:color`        | `( {r, g, b, a}: {int [0-255]} )`     | changes the color                     |
+| `sprite:uv`           | `( { x1, y1, x2, y2}: {float} )`      | changes the cutting                   |
+| `sprite:texture`      | `( texture_path: String )`            | changes the displayed texture         |
+| `sprite:visible`      | `(bool)`                              | should it be displayed                |
+| `sprite:mirror`       | `(bool, bool)`                        | flips horizontaly and verticaly       |
+| `strite:rotation`     | `(degree: int)`                       | sets a rotation                       |
+| `sprite:pivot`        | `(x: int, y: int)`                    | sets a pivot(origin).                 |
 
 
 
 GFX.spr function is quite flexible itself. Let's break down its arguments:
 
-* **texture (required):** The texture variable we loaded in `_init()`.
-* **x & y (required):** The screen coordinates where the sprite will be drawn.
-* **width & height (optional):** The dimensions to render the sprite. If left blank, Pika-8 defaults to an 8x8 size.
-* **{x1, y1, x2, y2}(optional):** The coordinates. These are used if your image is a sprite sheet and you only want to draw a specific section of it. By default, it draws the entire image. Can be specified as `{}` to default to the full image
-* **{r, g, b, a}(optional):** Color and alpha of the sprite rendering. If not specified or specified as `{}` defaults to `{255, 255, 255, 255}`.
+```lua
+GFX.spr(texture, x, y, [width], [height], {x1, x2, y1, y2}, {r, g, b, a})
+```
 
+| Parametr          | Accepted type(s) | Required |
+| :---              | :---:         | :---      |
+| `texture`         | `int`         | `- [x]`   | 
+| `x`               | `float`       | `- [x]`   |
+| `y`               | `float`       | `- [ ]`   |
+| `width`           | `float`       | `- [ ]`   |
+| `height`          | `float`       | `- [ ]`   |
+| `{x1, y1, x2, y2}`| `{ float }`   | `- [ ]`   |
+| `{r, g, b, a}`    | `{ float }`   | `- [ ]`   |
+
+* Note: even though many parametrs exept `float` values, it's *heighly* recomended to use integer insted
 
 Run the engine, and you should now see your player sprite sitting perfectly on the screen!
