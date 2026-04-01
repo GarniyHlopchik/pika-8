@@ -60,5 +60,5 @@ struct SpriteVertexShader {
 
 struct SpriteDrawCommand {
     std::array<SpriteVertexShader, 4> vertices;
-    unsigned int texture;
+    unsigned int texture, index;
 };

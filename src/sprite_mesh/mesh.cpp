@@ -1,4 +1,6 @@
 #include "mesh.h"
+#include "../gfx/sprite/sprite.h"
+#include <climits>
 
 SpriteMesh::~SpriteMesh() {
     glDeleteVertexArrays(1, &VAO);
@@ -67,7 +69,8 @@ float degreesToRadians(float degrees) {
 void SpriteMesh::add_sprite_to_batch(
     unsigned int shader, unsigned int texture, 
     float posX, float posY, float width, float height, const PivotPoint& pv, 
-    const UVCoords& uv, const Color& color, float rotation
+    const UVCoords& uv, const Color& color, float rotation,
+    unsigned int sortIndex
 ) {
     // Precalculate everything needed befor flushing
     // calculate trigonometry for rotation
@@ -87,6 +90,7 @@ void SpriteMesh::add_sprite_to_batch(
 
     SpriteDrawCommand spriteDrawCommand;
     spriteDrawCommand.texture = texture;
+    spriteDrawCommand.index = (sortIndex == UINT_MAX) ? batchSequenceIndex++ : sortIndex;
     
     // Apply rotation and translation to all 4 corners
     for (int i = 0; i < 4; ++i) {
@@ -102,17 +106,40 @@ void SpriteMesh::add_sprite_to_batch(
 
 }
 
+void SpriteMesh::draw(unsigned int shader, const Sprite& sprite) {
+    add_sprite_to_batch(shader, sprite);
+}
+
+void SpriteMesh::add_sprite_to_batch(unsigned int shader, const Sprite& sprite) {
+    add_sprite_to_batch(
+        shader,
+        sprite.get_texture(),
+        sprite.get_x(),
+        sprite.get_y(),
+        sprite.get_width(),
+        sprite.get_height(),
+        sprite.get_pivot(),
+        sprite.get_uv(),
+        sprite.get_color(),
+        static_cast<float>(sprite.get_rotation()),
+        sprite.get_sort_index()
+    );
+}
+
 void SpriteMesh::flush(unsigned int shader) {
+    batchSequenceIndex = 0;
     if (textureSortedVertexShader.empty()) {
         return;
     }
 
     std::sort(textureSortedVertexShader.begin(), textureSortedVertexShader.end(), 
-        [](const SpriteDrawCommand& a, const SpriteDrawCommand& b){
-            return a.texture > b.texture; 
-            // TODO: mayby a Z-index sorting in the future
+        [](const SpriteDrawCommand& a, const SpriteDrawCommand& b) {
+            if (a.index != b.index) {
+                return a.index < b.index; 
+            }
+            return a.texture < b.texture; 
         }
-    );
+    ); 
 
     
     glUseProgram(shader);

@@ -2,7 +2,7 @@
 
 #include "gfx/gfx.h"
 #include "gfx/gfx_struct.h"
-
+class Sprite;
 #include <string>
 #include <unordered_map>
 

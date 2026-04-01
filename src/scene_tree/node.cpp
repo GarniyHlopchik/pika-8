@@ -8,7 +8,9 @@ void Node::_init(int p_script_ref){
     }
 }
 Node::~Node(){
-    lua->remove_table(script_ref);
+    if (lua) {
+        lua->remove_table(script_ref);
+    }
 }
 void Node::add_child(std::unique_ptr<Node> child) {
     child->parent = this;

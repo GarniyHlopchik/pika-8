@@ -2,6 +2,7 @@
 #include "config.h"
 #include "shader_utils/shader_utils.h"
 #include "sprite_mesh/mesh.h"
+#include "sprite/sprite.h"
 #include "json_reader/get_config.h"
 #include <unordered_map>
 #include <string>
@@ -17,16 +18,8 @@ public:
     ~GFX();
 
     unsigned int load_texture(const std::string& path);
-    
-    // No color nor rotation specification
-    void draw(const unsigned int texture, float x, float y, float width, float height, PivotPoint pv, UVCoords uv);
-    // Color specification, but not rotation
-    void draw(const unsigned int texture, float x, float y, float width, float height, PivotPoint pv, UVCoords uv, Color color);
-    // Color and rotation
-    void draw(const unsigned int texture, float x, float y, float width, float height, PivotPoint pv, UVCoords uv, Color color, float rotation);
-    // No pivot point, but color
-    void draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color);
 
+    void draw(const Sprite& sprite);
 
     FontData get_font_data(const std::string& name);
 

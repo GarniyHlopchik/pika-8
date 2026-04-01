@@ -1,10 +1,12 @@
 #include "sprite.h"
 #include "lua_bindings/engine_context.h"
 Sprite::Sprite(int p_id, LuaSystem* p_L, SceneTree* p_tree, unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color)
-    : Node2D(p_id, p_L, p_tree, x, y), _texture(texture), _width(width), _height(height), _uv(uv), _color(color) {}
+    : Node2D(p_id, p_L, p_tree, x, y), _texture(texture), _x(x), _y(y), _width(width), _height(height), _uv(uv), _color(color) {}
 
 void Sprite::update_position(float x, float y) {
-    if (x != position.x || y != position.y) {
+    if (x != _x || y != _y) {
+        _x = x;
+        _y = y;
         position.x = x;
         position.y = y;
         _dirty = true;
@@ -20,8 +22,15 @@ void Sprite::update_size(float width, float height) {
 }
 
 void Sprite::update_color(Color color) {
+    static const Color white = {1.0f, 1.0f, 1.0f, 1.0f};
+    static const Color black = {0.0f, 0.0f, 0.0f, 1.0f};
+
     if (color != _color) {
         _color = color;
+        
+        if (color > white) color = white;
+        if (color < black) color = black;
+
         _dirty = true;
     }
 }
@@ -88,7 +97,8 @@ void Sprite::update(float x, float y, float width, float height, UVCoords uv, Co
 void Sprite::draw(GFX* gfx) {
     if(_visible){
         // std::cout << _texture << "'s rotation: " << _rotation << std::endl;
-        gfx->draw(_texture, position.x, position.y, _width, _height, _pivot, _uv, _color, static_cast<float>(_rotation));
+        gfx->draw(*this);
+        std::cout << this->get_x() << " " << this->get_y() << '\n';
         _dirty = false; // Reset dirty flag after drawing
     }
 }

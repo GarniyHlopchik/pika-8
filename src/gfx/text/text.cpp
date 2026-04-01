@@ -1,4 +1,5 @@
 #include "text.h"
+#include "../sprite/sprite.h"
 
 #include <vector>
 
@@ -80,23 +81,23 @@ void Text::draw_text(const std::string& text, float x, float y, const std::strin
     float draw_width = font.data.char_width * scale; 
     float draw_height = font.data.char_height * scale; 
 
-    float cursor_x = x; 
+    float cursor_x = x;
 
-    // Drawing text by charecter
+    // Drawing text by character
     for (char c : text) {
         if (c == ' ') {
-            cursor_x += (draw_width * space_multiplier); 
+            cursor_x += (draw_width * space_multiplier);
             continue;
         }
 
         size_t index = get_char_index(c, font.data.charset);
         if (index == std::string::npos) continue;
-        
+
         UVCoords uv = calculate_uv_coords(index, font);
+        Sprite sprite(font.texture_id, nullptr, nullptr, font.texture_id, cursor_x, y, draw_width, draw_height, uv, color);
 
-        // Use the cached texture ID
-        gfx.draw(font.texture_id, cursor_x, y, draw_width, draw_height, uv, color);
+        gfx.draw(sprite);
 
-        cursor_x += draw_width; 
+        cursor_x += draw_width;
     }
 }

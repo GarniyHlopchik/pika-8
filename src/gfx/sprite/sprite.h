@@ -33,6 +33,7 @@ public:
     float get_height() const { return _height; }
     float get_x() const { return _x; }
     float get_y() const { return _y; }
+    float get_rotation() const { return _rotation; }
     unsigned int get_texture() const { return _texture; }
     bool is_visible() const { return _visible; }
     UVCoords get_uv() const { return _uv; }

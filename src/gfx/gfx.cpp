@@ -344,30 +344,6 @@ void default_color_helper(Color* color){
     if (*color < black) *color = black;
 }
 
-// nothing
-void GFX::draw(const unsigned int texture, float x, float y, float width, float height, PivotPoint pv, UVCoords uv) {
-    Color color = {1.0f, 1.0f, 1.0f, 1.0f};
-    spritemesh.draw(shader, texture, x, y, width, height, pv, uv, color);
-}
-
-// COLOR
-void GFX::draw(const unsigned int texture, float x, float y, float width, float height, PivotPoint pv, UVCoords uv, Color color) {
-    default_color_helper(&color);
-
-    spritemesh.draw(shader, texture, x, y, width, height, pv, uv, color);
-}
-
-// COLOR and ROTATION
-void GFX::draw(const unsigned int texture, float x, float y, float width, float height, PivotPoint pv, UVCoords uv, Color color, float rotation) {
-    default_color_helper(&color);
-    spritemesh.draw(shader, texture, x, y, width, height, pv, uv, color, rotation);
-}
-
-// COLOR, NO PIVOT
-void GFX::draw(const unsigned int texture, float x, float y, float width, float height, UVCoords uv, Color color) {
-    default_color_helper(&color);
-
-    PivotPoint pv = { 0, 0};
-
-    spritemesh.draw(shader, texture, x, y, width, height, pv, uv, color);
+void GFX::draw(const Sprite& sprite) {
+    spritemesh.draw(shader, sprite);
 }

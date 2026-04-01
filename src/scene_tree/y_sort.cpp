@@ -25,6 +25,11 @@ void YSort::_update(float delta) {
         }
     );
 
+    unsigned int order = 0;
+    for (auto& child : children) {
+        child->set_sort_index(order++);
+    }
+
     // Continue the update chain
     Node2D::_update(delta);
 }
