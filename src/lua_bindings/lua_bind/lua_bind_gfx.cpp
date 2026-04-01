@@ -1,5 +1,6 @@
 #include "../lua_bindings.h"
 #include "../engine_context.h"
+#include "../uv_utils.h"
 #include "../../gfx/gfx.h"
 #include "../../gfx/text/text.h"
 #include "../../gfx/sprite/sprite.h"
@@ -31,33 +32,7 @@ static int l_load(lua_State* L){
 
 
 static UVCoords calculate_uv(UVCoords sprite, unsigned int texture) {
-    UVCoords uv;
-    bool one = sprite.u2 > sprite.u1;
-    bool two = sprite.v2 > sprite.v1;
-    if (sprite.u2 > sprite.u1 && sprite.v2 > sprite.v1) {
-        std::vector<int> dims = GFX::get_image_dimensions(texture);
-        float tex_w = (float)dims[0];
-        float tex_h = (float)dims[1];
-
-
-        // Protect against division by zero
-        if (tex_w > 0.0f && tex_h > 0.0f) {
-            // UVs are normalized (0.0 to 1.0). Divide the pixel coordinate by the total dimension.
-            uv.u1 = sprite.u1 / tex_w;
-            uv.v1 = sprite.v1 / tex_h;
-            uv.u2 = sprite.u2 / tex_w;
-            uv.v2 = sprite.v2 / tex_h;
-        } else {
-            // Fallback if the texture fails to load properly
-            uv.u1 = 0.0f; uv.v1 = 0.0f; 
-            uv.u2 = 1.0f; uv.v2 = 1.0f;
-        }
-    } else {
-        // Default UV coordinates (draws the entire texture)
-        uv.u1 = 0.0f; uv.v1 = 0.0f; 
-        uv.u2 = 1.0f; uv.v2 = 1.0f;
-    }
-    return uv;
+    return normalize_sprite_uv(sprite, texture);
 }
 
 

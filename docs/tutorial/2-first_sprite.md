@@ -43,9 +43,10 @@ Then, we call a new function: `GFX.spr(texture, x, y, [width], [height], {x1, x2
 * `sprite:draw()` - draws the sprite
 * `sprite:pos(new_x: int, new_y: int)` - changes the position
 * `sprite:size(new_width: int, new_height: int)` - changes the size
-* `sprite:scale(w: float, l: float)` - changes the size based on the size
+* `sprite:scaleXY(w: float, l: float)` - changes the size based on the size
+* `sprite:scale(s: float)` - changes the size based on the size
 * `sprite:color( {r, g, b, a}: {int 0-255} )` - changes the color
-* `sprite:uv( { x1, y1, x1, y2}: {float} )` - changes the cutting
+* `sprite:uv( { x1, y1, x2, y2}: {float} )` - changes the cutting
 * `sprite:texture( texture_path: String )` - changes the displayed texture
 * `sprite:visible(bool)` - should it be displayed
 * `sprite:mirror(bool, bool)` - flips horizontaly and verticaly

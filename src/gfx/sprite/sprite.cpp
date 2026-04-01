@@ -38,6 +38,17 @@ void Sprite::update_color(Color color) {
 void Sprite::update_uv(UVCoords uv) {
     if (uv.u1 != _uv.u1 || uv.v1 != _uv.v1 || uv.u2 != _uv.u2 || uv.v2 != _uv.v2) {
         _uv = uv;
+
+        // Pivot dynamic update when uv is updated
+        // float new_width = (_uv.u2 - _uv.u1) * 0.5;
+        // float new_height = (_uv.v2 - _uv.v1) * 0.5;
+        
+        // float normalized_pivot_x = new_width / (_width * 0.5);
+        // float normalized_pivot_y = new_height / (_height * 0.5);
+
+        // std::cout << "pivot: {" << normalized_pivot_x << ", " << normalized_pivot_y << "}";
+
+        // update_pivot(normalized_pivot_x, normalized_pivot_y);
         _dirty = true;
     }
 }
@@ -67,7 +78,7 @@ void Sprite::update_rotation(int degrees) {
     }
 }
 
-void Sprite::update_pivot(int x, int y){
+void Sprite::update_pivot(float x, float y){
     if (x != _pivot.x || y != _pivot.y) { 
         _pivot.x = x;
         _pivot.y = y;
@@ -98,7 +109,7 @@ void Sprite::draw(GFX* gfx) {
     if(_visible){
         // std::cout << _texture << "'s rotation: " << _rotation << std::endl;
         gfx->draw(*this);
-        std::cout << this->get_x() << " " << this->get_y() << '\n';
+        // std::cout << this->get_x() << " " << this->get_y() << '\n';
         _dirty = false; // Reset dirty flag after drawing
     }
 }
