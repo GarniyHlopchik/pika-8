@@ -40,6 +40,9 @@ public:
     Color get_color() const { return _color; }
     PivotPoint get_pivot() const { return _pivot; }
 
+    void push_to_lua(lua_State* L) override {
+        sol::stack::push(L, std::ref(*this));
+    }
 private:
     unsigned int _texture;
     float _x, _y;

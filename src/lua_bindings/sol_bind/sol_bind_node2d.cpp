@@ -13,6 +13,9 @@ void sol_bind_node2d(lua_State* L){
             output[1]=pos.x;
             output[2]=pos.y;
             return output;
+        },
+        "update_position", [](Node2D& self, float x, float y){
+            self.update_position(x,y);
         }
     );
 }

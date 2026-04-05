@@ -11,3 +11,8 @@ Vector2 Node2D::get_global_position(){
         return position;
     }
 }
+
+void Node2D::update_position(float x, float y) {
+    position.x = x;
+    position.y = y;
+}
