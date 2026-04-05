@@ -1,4 +1,5 @@
 #include "../lua_bindings.h"
+#include "../uv_utils.h"
 #include "../../gfx/sprite/sprite.h"
 
 static int l_update_position(lua_State* L){
@@ -17,7 +18,7 @@ static int l_update_size(lua_State* L){
     return 0;
 }
 
-static int l_scale(lua_State* L){
+static int l_scaleXY(lua_State* L){
     Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
     float scale_x = (float)luaL_optnumber(L, 2, 1.0f);
     float scale_y = (float)luaL_optnumber(L, 3, 1.0f);
@@ -28,10 +29,20 @@ static int l_scale(lua_State* L){
     return 0;
 }
 
+static int l_scale(lua_State* L){
+    Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
+    float scale = (float)luaL_optnumber(L, 2, 1.0f);
+
+    float new_width = sprite->get_width() * scale;
+    float new_height = sprite->get_height() * scale;
+    sprite->update_size(new_width, new_height);
+    return 0;
+}
+
 static int l_update_pivot(lua_State* L){
     Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
-    int x = luaL_checkinteger(L, 2);
-    int y = luaL_checkinteger(L, 3);
+    int x = (float)luaL_optnumber(L, 2, 0.0f);
+    int y = (float)luaL_optnumber(L, 3, 0.0f);
 
     sprite->update_pivot(x, y);
     return 0;
@@ -47,7 +58,7 @@ static int l_update_color(lua_State* L){
 static int l_update_uv(lua_State* L){
     Sprite* sprite = (Sprite*)luaL_checkudata(L, 1, "SpriteMeta");
     UVCoords uv = get_sprite_cut(L, 2);
-    sprite->update_uv(uv);
+    sprite->update_uv(normalize_sprite_uv(uv, sprite->get_texture()));
     return 0;
 }
 
@@ -90,6 +101,7 @@ static int l_update(lua_State* L){
     float height = luaL_checknumber(L, 5);
 
     UVCoords uv = get_sprite_cut(L, 6);
+    uv = normalize_sprite_uv(uv, sprite->get_texture());
     Color color = get_color(L, 7);
     
     sprite->update(x, y, width, height, uv, color);
@@ -120,6 +132,7 @@ void bind_gfx_sprite(lua_State* L)
     static const luaL_Reg gfx_sprite_lib[] = {
         {"pos", l_update_position},
         {"size", l_update_size},
+        {"scaleXY", l_scaleXY},
         {"scale", l_scale},
         {"pivot", l_update_pivot},
         {"color", l_update_color},

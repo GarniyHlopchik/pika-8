@@ -121,7 +121,7 @@ void SpriteMesh::add_sprite_to_batch(unsigned int shader, const Sprite& sprite) 
         sprite.get_pivot(),
         sprite.get_uv(),
         sprite.get_color(),
-        static_cast<float>(sprite.get_rotation()),
+        sprite.get_rotation(),
         sprite.get_sort_index()
     );
 }

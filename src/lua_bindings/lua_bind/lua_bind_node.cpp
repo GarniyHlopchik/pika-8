@@ -1,4 +1,5 @@
 #include "../lua_bindings.h"
+#include "../uv_utils.h"
 #include "scene_tree/scene_tree.h"
 #include "scene_tree/node_factory.h"
 #include "sol/sol.hpp"
@@ -31,7 +32,7 @@ static int l_create(lua_State* L){
                 uv.v2 = 1.0;
             }
             else{
-                uv = get_sprite_cut(L,8);
+                uv = normalize_sprite_uv(get_sprite_cut(L,8), texture);
             }
             Color color;
             if (lua_isnoneornil(L, 9)) {

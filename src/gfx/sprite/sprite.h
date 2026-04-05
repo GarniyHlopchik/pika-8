@@ -19,7 +19,7 @@ public:
     void update_texture(unsigned int texture);
     void update_visibility(bool visible);
     
-    void update_pivot(int x, int y);
+    void update_pivot(float x, float y);
     void update_rotation(int degrees);
     void mirror(bool horizontal, bool vertical);
 
@@ -53,7 +53,7 @@ private:
     bool _dirty = true; // change has been made that requires redraw
     bool _visible = true; 
     
-    PivotPoint _pivot = { 0, 0 };
+    PivotPoint _pivot = { 0.0f, 0.0f };
     UVCoords _uv;
     Color _color;
 };

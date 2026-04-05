@@ -1,7 +1,7 @@
 #pragma once
 
 struct PivotPoint {
-    int x, y;
+    float x, y;
 };
 
 struct UVCoords {

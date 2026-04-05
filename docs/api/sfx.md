@@ -8,7 +8,7 @@ Takes in path to a sound file, loads it and returns an integer that represents i
 ## SFX.play(sound_id: int, volume: float, pitch: float, loop: Boolean, pan: float)
 
 Takes in sound id obtained from load and plays said sound.
-All parametrs, apart from sound_id, are optional. `voulume` represents how loud the sound will be.
+`voulume` represents how loud the sound will be.
 To play same sound multiple times at the same moment you *must* create saperate objects with different IDs
 
 ## SFX.stop(sound_id: int)
