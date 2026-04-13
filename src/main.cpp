@@ -169,7 +169,7 @@ int main(int argc, char** argv){
     Debug::init(ctx.debugShader);
     lua.set_context(&ctx);
     
-    SDL_GL_SetSwapInterval(1); // Enable VSync
+    SDL_GL_SetSwapInterval(config.get_vsync()); // Enable VSync
 
     bind_gfx(lua.get_state());
     bind_gfx_sprite(lua.get_state());

@@ -22,6 +22,7 @@ public:
     int64_t get_window_height() const { return window_height; }
     std::string get_window_title() const { return window_title; }
     std::string get_lua_script() const { return lua_script; }
+    int64_t get_vsync() const { return VSync; }
     const std::vector<FontData>& get_fonts() const { return fonts; }
 
     Config() {
@@ -43,6 +44,9 @@ public:
             return; 
         }
 
+
+
+
         // 3. Safely extract values (if they are missing or wrong type, it just skips and keeps the default)
         auto title_res = doc["window_title"].get_string();
         if (!title_res.error()) window_title = title_res.value();
@@ -55,6 +59,10 @@ public:
 
         auto h_res = doc["window_height"].get_int64();
         if (!h_res.error()) window_height = h_res.value();
+
+        auto vsync_res = doc["VSync"].get_int64();
+        if (!vsync_res.error()) VSync = vsync_res.value();
+
 
         // 4. Safely extract the fonts array
         auto fonts_res = doc["fonts"].get_array();
@@ -94,5 +102,6 @@ private:
     std::string lua_script = "main.lua"; 
     int64_t window_width = 512; 
     int64_t window_height = 512; 
+    int64_t VSync = 1;
     std::vector<FontData> fonts; 
 };
