@@ -111,7 +111,11 @@ void Sprite::draw(GFX* gfx) {
         _dirty = false; // Reset dirty flag after drawing
     }
 }
+
 void Sprite::_update(float delta){
+    Debug::draw_rect((_x), (_y), _width, _height, {0.0f, 1.0f, 0.0f, 1.0f});
+    // Debug::draw_circle((_x), (_y), (_width + _height) * 0.5, {0.0f, 1.0f, 0.0f, 1.0f});
+
     Node::_update(delta);
     draw(get_ctx(lua->get_state())->gfx);
 }

@@ -1,6 +1,8 @@
 #pragma once
-#include "../gfx.h"
+#include "globals.h"
+#include "gfx/gfx.h"
 #include "scene_tree/node2d.h"
+#include "debug/debug.h"
 
 /// TODO: More sprite functions
 ///         animate(bool)       - is the sprite animated, 

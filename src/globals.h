@@ -31,6 +31,7 @@ struct EngineContext {
     SFX* sfx;
     Text* text;
     Config* config;
+    unsigned int debugShader;
     InputState* input_state;
 };
 #endif

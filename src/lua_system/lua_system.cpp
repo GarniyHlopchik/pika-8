@@ -243,7 +243,6 @@ void LuaSystem::call_init(int table_ref, Node& node_ref) {
 }
 void LuaSystem::call_script_update(int table_ref, float dt)
 {
-   
         // Push table onto stack (self)
         lua_rawgeti(L, LUA_REGISTRYINDEX, table_ref);
 

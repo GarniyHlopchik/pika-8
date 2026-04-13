@@ -8,12 +8,14 @@ std::vector<LoadedImages> loaded_images;
 SDL_Window* GFX::window = nullptr;
 SDL_GLContext GFX::gl_context = nullptr;
 unsigned int GFX::shader = 0;
+unsigned int GFX::debugShader = 0;
 bool GFX::running = false;
 void send_projection(int width, int height);
 void GFX::resize(int width, int height)
 {
     glViewport(0, 0, width, height);
     send_projection(width,height);
+    Debug::set_projection(width, height);
 }
 void send_projection(int width, int height){
     unsigned int shader = GFX::get_shader();
@@ -31,6 +33,12 @@ void send_projection(int width, int height){
 }
 unsigned int GFX::get_shader(){
     return GFX::shader;
+}
+unsigned int GFX::get_debug_shader(){
+    return GFX::debugShader;
+}
+void GFX::set_debug_shader(unsigned int shader){
+    GFX::debugShader = shader;
 }
 std::tuple<int,int> GFX::get_screen_size(){
     int width, height;
@@ -287,6 +295,10 @@ void GFX::update(){
                 break;
         }
     }
+
+    // Flush debug after scene update but before main render
+    Debug::flush(GFX::debugShader);
+
     spritemesh.flush(shader);
     SDL_GL_SwapWindow(window);
     //set previous input to this for next frame

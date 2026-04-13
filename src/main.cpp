@@ -8,7 +8,9 @@
 #include "lua_bindings/engine_context.h"
 #include "file_resolve/file_system.h"
 #include "user_input/user_input.h"
-#include "globals.h"   
+#include "globals.h"
+#include "debug/debug.h"
+#include "shader_utils/shader_utils.h"
 #include <fstream>
 #include <filesystem>
 #include <algorithm> 
@@ -62,6 +64,7 @@ void main_tick(void* arg) {
     float dt = delta.count();
 
     // 2. Run the frame
+    Debug::begin_frame();
     ctx->lua->call_update(dt);
     ctx->gfx->update();
     
@@ -91,8 +94,12 @@ void on_load_success(const char* file){
         &sfx,
         &text,
         &config,
+        0,
         &input_state
     };
+    ctx.debugShader = make_debug_shader();
+    GFX::set_debug_shader(ctx.debugShader);
+    Debug::init(ctx.debugShader);
     lua.set_context(&ctx);
     
 
@@ -153,8 +160,13 @@ int main(int argc, char** argv){
         &sfx,
         &text,
         &config,
+        0,
         &input_state
     };
+    // Debug shader setup
+    ctx.debugShader = make_debug_shader();
+    GFX::set_debug_shader(ctx.debugShader);
+    Debug::init(ctx.debugShader);
     lua.set_context(&ctx);
     
     SDL_GL_SetSwapInterval(1); // Enable VSync

@@ -24,8 +24,10 @@ public:
     FontData get_font_data(const std::string& name);
 
     static SDL_Window* get_window();
-    std::tuple<int,int> get_screen_size();
+    static std::tuple<int,int> get_screen_size();
     static unsigned int get_shader();
+    static unsigned int get_debug_shader();
+    static void set_debug_shader(unsigned int shader);
     bool is_running();
     void update();
     void resize(int width, int height);
@@ -43,6 +45,7 @@ private:
     static bool running;
     SpriteMesh spritemesh;
     static unsigned int shader;
+    static unsigned int debugShader;
     InputState &input_state;
     mobile_input::InputState mobile_input_state;
     void handleTouch(const SDL_Event& event);
