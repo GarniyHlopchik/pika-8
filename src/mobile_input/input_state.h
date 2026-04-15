@@ -16,6 +16,7 @@ namespace mobile_input {
     struct InputState {
         std::vector<TouchPoint> touches;
         int num_touches = 0;
+        bool is_emulating = false; 
 
         void resetFrame() {
             for (auto& t : touches) {
@@ -24,6 +25,7 @@ namespace mobile_input {
                 t.dx = 0;
                 t.dy = 0;
             }
+            is_emulating = false; 
         }
     };
 

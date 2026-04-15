@@ -208,25 +208,27 @@ void GFX::handleTouch(const SDL_Event& event) {
 }
 
 void GFX::handleMouse(const SDL_Event& event) {
-    static bool mouse_down = false;
-    static float last_x = 0, last_y = 0;
+    static bool mouse_left_down = false;
+    static bool mouse_right_down = false;
 
+   
     if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN && event.button.button == SDL_BUTTON_LEFT) {
-        mouse_down = true;
-        last_x = event.button.x;
-        last_y = event.button.y;
+        mouse_left_down = true;
 
         mobile_input::TouchPoint t;
-        t.id = 999;
-        t.x = last_x;
-        t.y = last_y;
+        t.id = 999;  
+        t.x = event.button.x;
+        t.y = event.button.y;
         t.down = true;
         t.just_pressed = true;
         mobile_input_state.touches.push_back(t);
         mobile_input_state.num_touches++;
+        mobile_input_state.is_emulating = true;
+
+        printf("Left button DOWN at (%.0f, %.0f)\n", t.x, t.y);
     }
     else if (event.type == SDL_EVENT_MOUSE_BUTTON_UP && event.button.button == SDL_BUTTON_LEFT) {
-        mouse_down = false;
+        mouse_left_down = false;
         for (auto& t : mobile_input_state.touches) {
             if (t.id == 999) {
                 t.down = false;
@@ -234,27 +236,77 @@ void GFX::handleMouse(const SDL_Event& event) {
                 break;
             }
         }
+      
         auto it = std::remove_if(mobile_input_state.touches.begin(),
             mobile_input_state.touches.end(),
             [](const mobile_input::TouchPoint& p) { return !p.down; });
         mobile_input_state.touches.erase(it, mobile_input_state.touches.end());
         mobile_input_state.num_touches = mobile_input_state.touches.size();
+
+        printf("Left button UP\n");
     }
-    else if (event.type == SDL_EVENT_MOUSE_MOTION && mouse_down) {
+
+  
+    if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN && event.button.button == SDL_BUTTON_RIGHT) {
+        mouse_right_down = true;
+
+        mobile_input::TouchPoint t;
+        t.id = 998;  
+        t.x = event.button.x;
+        t.y = event.button.y;
+        t.down = true;
+        t.just_pressed = true;
+        mobile_input_state.touches.push_back(t);
+        mobile_input_state.num_touches++;
+        mobile_input_state.is_emulating = true;
+
+        printf("Right button DOWN at (%.0f, %.0f)\n", t.x, t.y);
+    }
+    else if (event.type == SDL_EVENT_MOUSE_BUTTON_UP && event.button.button == SDL_BUTTON_RIGHT) {
+        mouse_right_down = false;
         for (auto& t : mobile_input_state.touches) {
-            if (t.id == 999) {
-                t.dx = event.motion.x - t.x;
-                t.dy = event.motion.y - t.y;
-                t.x = event.motion.x;
-                t.y = event.motion.y;
+            if (t.id == 998) {
+                t.down = false;
+                t.just_released = true;
                 break;
+            }
+        }
+       
+        auto it = std::remove_if(mobile_input_state.touches.begin(),
+            mobile_input_state.touches.end(),
+            [](const mobile_input::TouchPoint& p) { return !p.down; });
+        mobile_input_state.touches.erase(it, mobile_input_state.touches.end());
+        mobile_input_state.num_touches = mobile_input_state.touches.size();
+
+        printf("Right button UP\n");
+    }
+
+  
+    else if (event.type == SDL_EVENT_MOUSE_MOTION) {
+        if (mouse_left_down) {
+            for (auto& t : mobile_input_state.touches) {
+                if (t.id == 999) {
+                    t.dx = event.motion.x - t.x;
+                    t.dy = event.motion.y - t.y;
+                    t.x = event.motion.x;
+                    t.y = event.motion.y;
+                    break;
+                }
+            }
+        }
+        if (mouse_right_down) {
+            for (auto& t : mobile_input_state.touches) {
+                if (t.id == 998) {
+                    t.dx = event.motion.x - t.x;
+                    t.dy = event.motion.y - t.y;
+                    t.x = event.motion.x;
+                    t.y = event.motion.y;
+                    break;
+                }
             }
         }
     }
 }
-void handleMouseEmulation(SDL_Event event){}
-void handleTouchEvent(SDL_Event event){}
-
 void GFX::update(){
 
     mobile_input_state.resetFrame();

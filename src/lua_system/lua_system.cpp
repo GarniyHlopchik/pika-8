@@ -3,6 +3,7 @@
 #include <iostream>
 #include "gfx/sprite/sprite.h"
 #include "lua_bindings/sol_bind/sol.h"
+#include "lua_bindings/lua_bindings.h"
 
 extern "C" int luaopen_Input(lua_State* L);
 int lua_zip_searcher(lua_State* L) {
@@ -118,6 +119,7 @@ LuaSystem::LuaSystem(){
 
     // 5. Clean up the stack (pop 'table', 'searchers', and 'package')
     lua_pop(L, 3);
+    bind_input(L);
 }
 LuaSystem::~LuaSystem(){
     lua_close(L);
