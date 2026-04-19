@@ -28,14 +28,17 @@ static int l_touch_count(lua_State* L) {
     if (!ctx || !ctx->gfx) {
         lua_pushinteger(L, 0);
         return 1;
+
     }
     mobile_input::InputState* state = ctx->gfx->getMobileInputState();
     lua_pushinteger(L, state ? state->num_touches : 0);
+
     return 1;
 }
 
 static int l_get_touches(lua_State* L) {
     EngineContext* ctx = get_ctx(L);
+
     if (!ctx || !ctx->gfx) {
         lua_newtable(L);
         return 1;
@@ -50,7 +53,7 @@ static int l_get_touches(lua_State* L) {
     lua_createtable(L, state->touches.size(), 0);
     for (size_t i = 0; i < state->touches.size(); i++) {
         auto& t = state->touches[i];
-        lua_createtable(L, 0, 7);  
+        lua_createtable(L, 0, 8);  
 
         lua_pushstring(L, "x"); lua_pushnumber(L, t.x); lua_settable(L, -3);
         lua_pushstring(L, "y"); lua_pushnumber(L, t.y); lua_settable(L, -3);
@@ -61,7 +64,7 @@ static int l_get_touches(lua_State* L) {
         
         lua_pushstring(L, "just_pressed"); lua_pushboolean(L, t.just_pressed); lua_settable(L, -3);
         lua_pushstring(L, "just_released"); lua_pushboolean(L, t.just_released); lua_settable(L, -3);
-
+        lua_pushstring(L, "button"); lua_pushinteger(L, t.button); lua_settable(L, -3);
         lua_rawseti(L, -2, i + 1);
     }
     return 1;

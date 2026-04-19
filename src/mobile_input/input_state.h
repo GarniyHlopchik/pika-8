@@ -11,6 +11,7 @@ namespace mobile_input {
         bool just_pressed;
         bool just_released;
         unsigned int timestamp;
+        int button;
     };
 
     struct InputState {
