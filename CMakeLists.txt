@@ -7,6 +7,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(FetchContent)
 
 # ---------------- SDL3 ----------------
+if (WIN32)
+    set(SDL_STATIC ON CACHE BOOL "Link SDL3 statically" FORCE)
+    set(SDL_SHARED OFF CACHE BOOL "Link SDL3 shared" FORCE)
+endif()
+
+
+
+set(SDL_TEST OFF CACHE BOOL "" FORCE)
+set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     SDL3
@@ -14,8 +23,6 @@ FetchContent_Declare(
     GIT_TAG release-3.4.2
 )
 
-set(SDL_TEST OFF CACHE BOOL "" FORCE)
-set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 if(ANDROID)
     set(SDL_STATIC ON CACHE BOOL "" FORCE)
