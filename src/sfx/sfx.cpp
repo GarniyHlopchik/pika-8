@@ -105,3 +105,43 @@ unsigned int SFX::get_id(){
     static unsigned int id = 0;
     return id++;
 }
+void SFX::worker_loop(){
+    while(worker_should_run){
+        SFXLoadRequest task;
+        {
+            std::unique_lock<std::mutex> lock(to_worker_mutex);
+            
+            // Wait until there's a task OR the engine is shutting down
+            cv.wait(lock, [this]{ 
+                return to_worker_queue.peek(QueueProtocol::OLDEST).priority || !worker_should_run; 
+            });
+
+            // If we woke up because we're shutting down, exit the loop
+            if (!worker_should_run && !to_worker_queue.peek(QueueProtocol::OLDEST).priority) break;
+
+            task = to_worker_queue.dequeue(QueueProtocol::OLDEST).data;
+        }
+
+        // Process the task
+        unsigned int sound_handle = load(task.path.c_str());
+        //enqueue to main with lock
+        {
+            std::lock_guard<std::mutex> lock(to_main_mutex);
+            SFXLoadResult data = {task.registry_ref, sound_handle};
+            to_main_queue.enqueue(data, 1);
+        }
+        
+    }
+}
+void SFX::poll_loaded_sounds(){
+    std::lock_guard<std::mutex> lock(to_main_mutex);
+    while(to_main_queue.peek(QueueProtocol::OLDEST).priority){
+        SFXLoadResult finished_task = to_main_queue.dequeue(QueueProtocol::OLDEST).data;
+        //TODO: set ready and value of respective table reference
+    }
+}
+void SFX::schedule_load(const std::string& path, int registry_ref){
+    std::lock_guard<std::mutex> lock(to_worker_mutex);
+    SFXLoadRequest request = {registry_ref, path};
+    to_worker_queue.enqueue(request,1);
+}
