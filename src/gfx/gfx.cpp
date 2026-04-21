@@ -267,11 +267,12 @@ void GFX::handleMouse(const SDL_Event& event) {
         }
     }
 }
-void GFX::handleTouch(const SDL_Event& event) {
-    const auto& tf = event.tfinger;
-    int w, h;
-    SDL_GetWindowSizeInPixels(window, &w, &h);
+// void GFX::handleTouch(const SDL_Event& event) {
+//     const auto& tf = event.tfinger;
+//     int w, h;
+//     SDL_GetWindowSizeInPixels(window, &w, &h);
 
+<<<<<<< HEAD
     if (event.type == SDL_EVENT_FINGER_DOWN) {
         mobile_input::TouchPoint t;
         t.id = tf.fingerID;           
@@ -314,6 +315,50 @@ void GFX::handleTouch(const SDL_Event& event) {
         }
     }
 }
+=======
+//     if (event.type == SDL_EVENT_FINGER_DOWN) {
+//         mobile_input::TouchPoint t;
+//         t.id = tf.fingerID;           
+//         t.x = tf.x * w;                
+//         t.y = tf.y * h;
+//         t.down = true;
+//         t.just_pressed = true;
+//         t.button = 0;
+//         mobile_input_state.touches.push_back(t);
+//         mobile_input_state.num_touches++;
+//         printf("Finger DOWN: id=%d at (%.0f, %.0f)\n", t.id, t.x, t.y);
+//     }
+//     else if (event.type == SDL_EVENT_FINGER_UP) {
+//         for (auto& t : mobile_input_state.touches) {
+//             if (t.id == tf.fingerID) {
+//                 t.down = false;
+//                 t.just_released = true;
+//                 break;
+//             }
+//         }
+       
+//         auto it = std::remove_if(mobile_input_state.touches.begin(),
+//             mobile_input_state.touches.end(),
+//             [](const mobile_input::TouchPoint& p) { return !p.down; });
+//         mobile_input_state.touches.erase(it, mobile_input_state.touches.end());
+//         mobile_input_state.num_touches = mobile_input_state.touches.size();
+//         printf("Finger UP: id=%d\n", tf.fingerID);
+//     }
+//     else if (event.type == SDL_EVENT_FINGER_MOTION) {
+//         for (auto& t : mobile_input_state.touches) {
+//             if (t.id == tf.fingerID) {
+//                 float nx = tf.x * w;
+//                 float ny = tf.y * h;
+//                 t.dx = nx - t.x;
+//                 t.dy = ny - t.y;
+//                 t.x = nx;
+//                 t.y = ny;
+//                 break;
+//             }
+//         }
+//     }
+// }
+>>>>>>> dede4b9f8408e860a190933d8f1b3fa019aa2ebd
 void GFX::update(){
 
     mobile_input_state.resetFrame();
