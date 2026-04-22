@@ -144,7 +144,7 @@ class PriorityQueue{
         void bubble_up(int index){
             if (index==0) return;
             size_t parent_index = (index - 1) / 2;
-            int level = static_cast<int>(31 - __builtin_clz(index + 1));
+            int level = static_cast<int>(std::log2(index + 1));
             if(level%2==0){
                 if(tree[index].priority > tree[parent_index].priority){
                     std::swap(tree[index],tree[parent_index]);
@@ -193,7 +193,7 @@ class PriorityQueue{
             tree[index] = tree.back();
             tree.pop_back();
 
-            int level = static_cast<int>(31 - __builtin_clz(index + 1));
+            int level = static_cast<int>(std::log2(index + 1));
             if (level % 2 == 0) push_down_min(index);
             else push_down_max(index);
             bubble_up(index); 
