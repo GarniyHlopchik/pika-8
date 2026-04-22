@@ -163,6 +163,7 @@ std::string GFX::get_texture_path(const unsigned int id){
 void GFX::add_new_image(const LoadedImages img){
     loaded_images.push_back(img);
 }
+
 void GFX::handleTouch(const SDL_Event& event) {
     const auto& tf = event.tfinger;
     int w, h;
@@ -309,11 +310,11 @@ void GFX::handleMouse(const SDL_Event& event) {
         }
     }
 }
+
 // void GFX::handleTouch(const SDL_Event& event) {
 //     const auto& tf = event.tfinger;
 //     int w, h;
 //     SDL_GetWindowSizeInPixels(window, &w, &h);
-
 //     if (event.type == SDL_EVENT_FINGER_DOWN) {
 //         mobile_input::TouchPoint t;
 //         t.id = tf.fingerID;           
@@ -334,7 +335,6 @@ void GFX::handleMouse(const SDL_Event& event) {
 //                 break;
 //             }
 //         }
-       
 //         auto it = std::remove_if(mobile_input_state.touches.begin(),
 //             mobile_input_state.touches.end(),
 //             [](const mobile_input::TouchPoint& p) { return !p.down; });
@@ -356,6 +356,7 @@ void GFX::handleMouse(const SDL_Event& event) {
 //         }
 //     }
 // }
+
 void GFX::update(){
 
     mobile_input_state.resetFrame();

@@ -11,6 +11,7 @@
 #include "globals.h"
 #include "debug/debug.h"
 #include "shader_utils/shader_utils.h"
+#include "async_loader.h"
 #include <fstream>
 #include <filesystem>
 #include <algorithm> 
@@ -67,6 +68,7 @@ void main_tick(void* arg) {
     Debug::begin_frame();
     ctx->lua->call_update(dt);
     ctx->gfx->update();
+    AsyncLoader::process_main_thread_tasks();
     
     // 3. Handle quitting
     #ifdef __EMSCRIPTEN__
@@ -80,7 +82,8 @@ void main_tick(void* arg) {
 void on_load_success(const char* file){
     FileSystem::init(EngineReadState::ZIP,"game.pika");
      //context setup------------------------
-    Config config;
+    auto config_future = Config::load_async();
+    Config config = config_future.get();
     InputState input_state;
     GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str(),input_state);
     Text text(gfx);
@@ -146,7 +149,9 @@ int main(int argc, char** argv){
     #endif
     #endif
     //context setup------------------------
-    Config config;
+    auto config_future = Config::load_async();
+    Config config = config_future.get();
+    
     InputState input_state;
     GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str(),input_state);
     Text text(gfx);
