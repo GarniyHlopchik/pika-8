@@ -65,7 +65,11 @@ void main_tick(void* arg) {
     float dt = delta.count();
 
     // 2. Run the frame
+
+    // Poll input and update input state for async 
     ctx->sfx->poll_loaded_sounds();
+    ctx->gfx->poll_loaded_textures();
+
     Debug::begin_frame();
     ctx->lua->call_update(dt);
     ctx->gfx->update();
@@ -106,6 +110,7 @@ void on_load_success(const char* file){
     GFX::set_debug_shader(ctx.debugShader);
     Debug::init(ctx.debugShader);
     lua.set_context(&ctx);
+    gfx.set_lua_system(&lua);
     
 
     bind_gfx(lua.get_state());
@@ -176,6 +181,7 @@ int main(int argc, char** argv){
     GFX::set_debug_shader(ctx.debugShader);
     Debug::init(ctx.debugShader);
     lua.set_context(&ctx);
+    gfx.set_lua_system(&lua);
     
     SDL_GL_SetSwapInterval(config.get_vsync()); // Enable VSync
 

@@ -11,6 +11,11 @@
 #include "file_resolve/file_system.h"
 #include <algorithm>
 #include "../mobile_input/input_state.h"
+#include <atomic>
+#include <mutex>
+#include <thread>
+#include "data_types/priority_queue.h"
+#include "lua_system/lua_system.h"
 
 class GFX {
 public:
@@ -18,6 +23,11 @@ public:
     ~GFX();
 
     unsigned int load_texture(const std::string& path);
+    
+    void set_lua_system(LuaSystem* l_lua);
+    void schedule_load(const std::string& path, int registry_ref);
+    void poll_loaded_textures();
+    void worker_loop();
 
     void draw(const Sprite& sprite);
 
@@ -48,6 +58,17 @@ private:
     static unsigned int debugShader;
     InputState &input_state;
     mobile_input::InputState mobile_input_state;
-    void handleTouch(const SDL_Event& event);
     void handleMouse(const SDL_Event& event);
+    void handleTouch(const SDL_Event& event);
+
+    // async texture loading threads
+    LuaSystem* lua;
+    unsigned int get_texture_id();
+    std::atomic<bool> worker_should_run;
+    PriorityQueue<TextureLoadRequest> to_worker_queue;
+    PriorityQueue<TextureLoadResult> to_main_queue;
+    std::mutex to_worker_mutex;
+    std::mutex to_main_mutex;
+    std::condition_variable cv;
+    std::jthread worker_thread;
 };

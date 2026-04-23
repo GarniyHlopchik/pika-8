@@ -17,16 +17,17 @@ static int l_cls(lua_State* L){
 static int l_load(lua_State* L){
     EngineContext* ctx = get_ctx(L);
     const char* path = luaL_checkstring(L, 1);
-    std::cout << "Loading " << path << std::endl;
-    const unsigned int id = ctx->gfx->load_texture(path);
-    
-    LoadedImages img;
-    img.id = id;
-    img.path = path;
-    GFX::add_new_image(img);
 
-    std::cout << "Loaded id " << id << std::endl;
-    lua_pushnumber(L,id);
+    // 1. Create a "Proxy" table: { ready = false }
+    lua_newtable(L);
+    lua_pushboolean(L, 0);
+    lua_setfield(L, -2, "ready");
+    
+    // create a reference so we can find this table
+    lua_pushvalue(L, -1); // duplicate the table on stack
+    int registry_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+
+    ctx->gfx->schedule_load(path, registry_ref);
     return 1;
 }
 

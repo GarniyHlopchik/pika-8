@@ -15,3 +15,23 @@ struct LoadedImages
     unsigned int id;
 };
 
+
+// async staff for texture loading/ threading communication between main thread and worker thread
+struct TextureLoadRequest{
+    int registry_ref;
+    std::string path;
+};
+
+struct ImageData {
+    unsigned char* pixel_data;
+    int width;
+    int height;
+    int channels;
+};
+
+struct TextureLoadResult{
+    int registry_ref;
+    unsigned int texture_id;
+    ImageData image;
+    std::string path;
+};
