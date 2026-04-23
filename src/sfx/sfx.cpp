@@ -69,74 +69,197 @@ unsigned int SFX::load(const std::string& path){
 
 
 void SFX::play(unsigned int sound_id, float volume, float pitch, bool loop, float pan) {
-    
-    for(SoundRes& s : sounds){
-        if(s.is_playing == true && s.id == sound_id){
-            // stop(sound_id);
-            // std::cout << "Sound was already playing: "<< sound_id << std::endl;
-            return;
-        } else if(s.is_playing == false && s.id == sound_id){
-            // std::cout << "Playing sound id: "<< sound_id << std::endl;
-            ma_sound_set_volume(&s.sound, volume);
-            ma_sound_set_pitch(&s.sound, pitch);
-            ma_sound_set_pan(&s.sound, pan);
-            ma_sound_set_looping(&s.sound, loop ? MA_TRUE : MA_FALSE);
-            ma_sound_start(&s.sound);
-            s.is_playing = true;
-            // std::cout << "Sound started: "<< sound_id << std::endl;
-            return;
-        }
-    }
-    std::cout << "Could not find a sound file with that id!" << std::endl;
+    AudioCommand cmd;
+    cmd.type = AudioCommandType::PLAY;
+    cmd.sound_id = sound_id;
+    cmd.volume = volume;
+    cmd.pitch = pitch;
+    cmd.loop = loop;
+    cmd.pan = pan;
+    schedule_command(cmd);
 }
 
 void SFX::stop(unsigned int sound_id) {
-    for(SoundRes& s : sounds){
-        if(s.id == sound_id && s.is_playing == true){
-            ma_sound_stop(&s.sound);
-            s.is_playing = false;
-            // std::cout << "Sound stopped: "<< sound_id << std::endl;
-            return;
-        }
-    }
-    // std::cout << "Could not find a sound file with that id!" << std::endl;
+    AudioCommand cmd;
+    cmd.type = AudioCommandType::STOP;
+    cmd.sound_id = sound_id;
+    schedule_command(cmd);
 }
 
-unsigned int SFX::get_id(){
-    static unsigned int id = 0;
-    return id++;
+void SFX::set_volume(unsigned int sound_id, float volume) {
+    AudioCommand cmd;
+    cmd.type = AudioCommandType::SET_VOLUME;
+    cmd.sound_id = sound_id;
+    cmd.volume = volume;
+    schedule_command(cmd);
 }
-void SFX::worker_loop(){
-    while(worker_should_run){
+
+void SFX::set_pitch(unsigned int sound_id, float pitch) {
+    AudioCommand cmd;
+    cmd.type = AudioCommandType::SET_PITCH;
+    cmd.sound_id = sound_id;
+    cmd.pitch = pitch;
+    schedule_command(cmd);
+}
+
+void SFX::set_pan(unsigned int sound_id, float pan) {
+    AudioCommand cmd;
+    cmd.type = AudioCommandType::SET_PAN;
+    cmd.sound_id = sound_id;
+    cmd.pan = pan;
+    schedule_command(cmd);
+}
+
+void SFX::set_looping(unsigned int sound_id, bool loop) {
+    AudioCommand cmd;
+    cmd.type = AudioCommandType::SET_LOOPING;
+    cmd.sound_id = sound_id;
+    cmd.loop = loop;
+    schedule_command(cmd);
+}
+
+void SFX::schedule_command(const AudioCommand& cmd) {
+    std::lock_guard<std::mutex> lock(command_mutex);
+    command_queue.enqueue(cmd, 1); 
+    cv.notify_one();
+}
+
+SoundRes* SFX::find_sound(unsigned int sound_id) {
+    for (SoundRes& s : sounds) {
+        if (s.id == sound_id) {
+            return &s;
+        }
+    }
+    return nullptr;
+}
+
+void SFX::internal_play(unsigned int sound_id, float volume, float pitch, bool loop, float pan) {
+    SoundRes* s = find_sound(sound_id);
+    if (!s) {
+        std::cout << "Sound not found: " << sound_id << std::endl;
+        return;
+    }
+
+    if (s->is_playing) {
+        return;
+    }
+
+    ma_sound_set_volume(&s->sound, volume);
+    ma_sound_set_pitch(&s->sound, pitch);
+    ma_sound_set_pan(&s->sound, pan);
+    ma_sound_set_looping(&s->sound, loop ? MA_TRUE : MA_FALSE);
+    ma_sound_start(&s->sound);
+    s->is_playing = true;
+
+    std::cout << "Sound started: " << sound_id << std::endl;
+}
+
+void SFX::internal_stop(unsigned int sound_id) {
+    SoundRes* s = find_sound(sound_id);
+    if (!s || !s->is_playing) return;
+
+    ma_sound_stop(&s->sound);
+    s->is_playing = false;
+    std::cout << "Sound stopped: " << sound_id << std::endl;
+}
+
+void SFX::internal_set_volume(unsigned int sound_id, float volume) {
+    SoundRes* s = find_sound(sound_id);
+    if (s) {
+        ma_sound_set_volume(&s->sound, volume);
+    }
+}
+
+void SFX::internal_set_pitch(unsigned int sound_id, float pitch) {
+    SoundRes* s = find_sound(sound_id);
+    if (s) {
+        ma_sound_set_pitch(&s->sound, pitch);
+    }
+}
+
+void SFX::internal_set_pan(unsigned int sound_id, float pan) {
+    SoundRes* s = find_sound(sound_id);
+    if (s) {
+        ma_sound_set_pan(&s->sound, pan);
+    }
+}
+
+void SFX::internal_set_looping(unsigned int sound_id, bool loop) {
+    SoundRes* s = find_sound(sound_id);
+    if (s) {
+        ma_sound_set_looping(&s->sound, loop ? MA_TRUE : MA_FALSE);
+    }
+}
+
+void SFX::process_command(const AudioCommand& cmd) {
+    switch (cmd.type) {
+    case AudioCommandType::PLAY:
+        internal_play(cmd.sound_id, cmd.volume, cmd.pitch, cmd.loop, cmd.pan);
+        break;
+    case AudioCommandType::STOP:
+        internal_stop(cmd.sound_id);
+        break;
+    case AudioCommandType::SET_VOLUME:
+        internal_set_volume(cmd.sound_id, cmd.volume);
+        break;
+    case AudioCommandType::SET_PITCH:
+        internal_set_pitch(cmd.sound_id, cmd.pitch);
+        break;
+    case AudioCommandType::SET_PAN:
+        internal_set_pan(cmd.sound_id, cmd.pan);
+        break;
+    case AudioCommandType::SET_LOOPING:
+        internal_set_looping(cmd.sound_id, cmd.loop);
+        break;
+    default:
+        break;
+    }
+}
+
+void SFX::worker_loop() {
+    while (worker_should_run) {
+
+        {
+            std::unique_lock<std::mutex> lock(command_mutex);
+            if (!command_queue.empty()) {
+                AudioCommand cmd = command_queue.dequeue(QueueProtocol::OLDEST).data;
+                lock.unlock();
+                process_command(cmd);
+                lock.lock();
+                continue;
+            }
+        }
+
         SFXLoadRequest task;
+        bool has_task = false;
         {
             std::unique_lock<std::mutex> lock(to_worker_mutex);
-            
-            // Wait until there's a task OR the engine is shutting down
-            cv.wait(lock, [this]{ 
-                return to_worker_queue.peek(QueueProtocol::OLDEST).priority || !worker_should_run; 
+            if (!to_worker_queue.empty()) {
+                task = to_worker_queue.dequeue(QueueProtocol::OLDEST).data;
+                has_task = true;
+            }
+        }
+
+        if (has_task) {
+            unsigned int sound_handle = load(task.path.c_str());
+            {
+                std::lock_guard<std::mutex> lock(to_main_mutex);
+                SFXLoadResult data = { task.registry_ref, sound_handle };
+                to_main_queue.enqueue(data, 1);
+            }
+            continue;
+        }
+
+        std::unique_lock<std::mutex> lock(command_mutex);
+        cv.wait_for(lock, std::chrono::milliseconds(10), [this] {
+            return !command_queue.empty() || !to_worker_queue.empty() || !worker_should_run;
             });
-
-            // If we woke up because we're shutting down, exit the loop
-            if (!worker_should_run && !to_worker_queue.peek(QueueProtocol::OLDEST).priority) break;
-
-            task = to_worker_queue.dequeue(QueueProtocol::OLDEST).data;
-        }
-
-        // Process the task if it exists
-        if(!task.path.empty()) 
-        {
-        unsigned int sound_handle = load(task.path.c_str());
-        //enqueue to main with lock
-        {
-            std::lock_guard<std::mutex> lock(to_main_mutex);
-            SFXLoadResult data = {task.registry_ref, sound_handle};
-            to_main_queue.enqueue(data, 1);
-        }
-
-        }
-        
     }
+}
+
+unsigned int SFX::get_id() {
+    static unsigned int id = 0;
+    return id++;
 }
 void SFX::poll_loaded_sounds(){
     std::lock_guard<std::mutex> lock(to_main_mutex);
