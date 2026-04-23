@@ -7,8 +7,17 @@
 static int l_sfx_load(lua_State* L){
     EngineContext* ctx = get_ctx(L);
     const char* path = luaL_checkstring(L,1);
-    unsigned int id = ctx->sfx->load(path);
-    lua_pushnumber(L,id);
+
+    // 1. Create a "Proxy" table: { ready = false }
+    lua_newtable(L);
+    lua_pushboolean(L, 0);
+    lua_setfield(L, -2, "ready");
+    
+    // Create a "strong reference" so we can find this table later
+    lua_pushvalue(L, -1); // Duplicate the table on stack
+    int registry_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+
+    ctx->sfx->schedule_load(path,registry_ref);
     return 1;
 }
 /*

@@ -64,6 +64,7 @@ void main_tick(void* arg) {
     float dt = delta.count();
 
     // 2. Run the frame
+    ctx->sfx->poll_loaded_sounds();
     Debug::begin_frame();
     ctx->lua->call_update(dt);
     ctx->gfx->update();
@@ -84,8 +85,9 @@ void on_load_success(const char* file){
     InputState input_state;
     GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str(),input_state);
     Text text(gfx);
-    SFX sfx;
     LuaSystem lua;
+    SFX sfx(&lua);
+    
     SceneTree scene_tree(&lua);
     ctx = {
         &lua,
@@ -150,8 +152,9 @@ int main(int argc, char** argv){
     InputState input_state;
     GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str(),input_state);
     Text text(gfx);
-    SFX sfx;
     LuaSystem lua;
+    SFX sfx(&lua);
+    
     SceneTree scene_tree(&lua);
     ctx = {
         &lua,

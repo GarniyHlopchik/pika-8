@@ -314,3 +314,25 @@ void LuaSystem::bind_lib(const luaL_Reg* lib, const std::string& name) {
     luaL_setfuncs(L, lib, 0);     
     lua_setglobal(L, name.c_str());
 }
+void LuaSystem::resolve_promise(int handle, int table) {
+    // Check if the reference is valid
+    if (table == LUA_NOREF || table == LUA_REFNIL) return;
+
+    lua_rawgeti(L, LUA_REGISTRYINDEX, table);
+    
+    // Safety Check: Is it actually a table?
+    if (!lua_istable(L, -1)) {
+        std::cerr << "Lua Error: Registry ref " << table << " is a " 
+                  << lua_typename(L, lua_type(L, -1)) << ", not a table!" << std::endl;
+        lua_pop(L, 1); // Clean up the stack
+        return;
+    }
+    lua_pushnumber(L, handle);
+    lua_setfield(L, -2, "id");
+            
+    lua_pushboolean(L, 1);
+    lua_setfield(L, -2, "ready");
+            
+    luaL_unref(L, LUA_REGISTRYINDEX, table);
+    lua_pop(L, 1);
+}

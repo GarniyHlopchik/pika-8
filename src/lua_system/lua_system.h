@@ -18,6 +18,7 @@ class LuaSystem{
     void call(const char* name);
     void bind_lib(const luaL_Reg* lib, const std::string& name);
     void remove_table(int id);
+    void resolve_promise(int handle, int table);
     private:
     lua_State* L;
     std::vector<int> tables;

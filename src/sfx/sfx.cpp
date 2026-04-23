@@ -5,7 +5,7 @@
 #include "file_resolve/file_system.h"
 
 
-SFX::SFX(){
+SFX::SFX(LuaSystem* l_lua): worker_should_run(true), worker_thread(&SFX::worker_loop, this), lua(l_lua){
     ma_result result = ma_engine_init(NULL, &engine);
     if (result != MA_SUCCESS) {
         std::cout << "Sound engine couldn't start" << std::endl;
@@ -18,6 +18,7 @@ SFX::~SFX(){
         ma_decoder_uninit(&s.decoder);
     }
     ma_engine_uninit(&engine);
+    worker_should_run = false;
 }
 unsigned int SFX::load(const std::string& path){
     sounds.emplace_back();
@@ -122,7 +123,9 @@ void SFX::worker_loop(){
             task = to_worker_queue.dequeue(QueueProtocol::OLDEST).data;
         }
 
-        // Process the task
+        // Process the task if it exists
+        if(!task.path.empty()) 
+        {
         unsigned int sound_handle = load(task.path.c_str());
         //enqueue to main with lock
         {
@@ -130,14 +133,16 @@ void SFX::worker_loop(){
             SFXLoadResult data = {task.registry_ref, sound_handle};
             to_main_queue.enqueue(data, 1);
         }
+
+        }
         
     }
 }
 void SFX::poll_loaded_sounds(){
     std::lock_guard<std::mutex> lock(to_main_mutex);
-    while(to_main_queue.peek(QueueProtocol::OLDEST).priority){
+    while(!to_main_queue.empty()){
         SFXLoadResult finished_task = to_main_queue.dequeue(QueueProtocol::OLDEST).data;
-        //TODO: set ready and value of respective table reference
+        lua->resolve_promise(finished_task.value, finished_task.registry_ref);
     }
 }
 void SFX::schedule_load(const std::string& path, int registry_ref){

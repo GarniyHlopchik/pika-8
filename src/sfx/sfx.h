@@ -5,6 +5,8 @@
 #include "data_types/priority_queue.h"
 #include <atomic>
 #include <mutex>
+#include <thread>
+#include "lua_system/lua_system.h"
 struct SoundRes{
     unsigned int id;
     bool is_playing = false;
@@ -24,7 +26,7 @@ struct SFXLoadResult{
 
 class SFX{
 public:
-    SFX();
+    SFX(LuaSystem* lua);
     ~SFX();
 
     unsigned int load(const std::string& path);
@@ -34,6 +36,7 @@ public:
     void schedule_load(const std::string& path, int registry_ref);
     void worker_loop();
 private:
+    LuaSystem* lua;
     unsigned int get_id();
     ma_engine engine;
     std::list<SoundRes> sounds;
@@ -43,4 +46,5 @@ private:
     std::mutex to_worker_mutex;
     std::mutex to_main_mutex;
     std::condition_variable cv;
+    std::jthread worker_thread;
 };

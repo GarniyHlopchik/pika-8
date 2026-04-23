@@ -16,6 +16,13 @@ struct QueueNode{
 template <typename TypeOfData>
 class PriorityQueue{
     public:
+        bool empty() const {
+    return tree.empty();
+}
+
+size_t size() const {
+    return tree.size();
+}
         PriorityQueue() = default;
         ~PriorityQueue() = default;
         void enqueue(TypeOfData data, int priority){
