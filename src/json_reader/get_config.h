@@ -25,6 +25,7 @@ public:
     std::string get_window_title() const { return window_title; }
     std::string get_lua_script() const { return lua_script; }
     int64_t get_vsync() const { return VSync; }
+    int64_t get_show_console() const { return show_console; }
     const std::vector<FontData>& get_fonts() const { return fonts; }
 
     // Default constructor with defaults
@@ -68,6 +69,9 @@ public:
             auto vsync_res = doc["VSync"].get_int64();
             if (!vsync_res.error()) config.VSync = vsync_res.value();
 
+            auto show_console_res = doc["show_console"].get_int64();
+            if (!show_console_res.error()) config.show_console = show_console_res.value();
+
             // Extract fonts array
             auto fonts_res = doc["fonts"].get_array();
             if (!fonts_res.error()) {
@@ -109,5 +113,6 @@ private:
     int64_t window_width = 512; 
     int64_t window_height = 512; 
     int64_t VSync = 1;
+    int64_t show_console = 1; // 1 to show console, 0 to hide
     std::vector<FontData> fonts; 
 };

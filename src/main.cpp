@@ -19,9 +19,12 @@
 extern "C" int luaopen_Input(lua_State* L);
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
-
 #endif
 
+#ifdef _WIN32
+    #include <windows.h>
+    #include <iostream>
+#endif
 
 bool has_embedded_zip(const std::string& exe_path)
 {
@@ -203,6 +206,15 @@ int main(int argc, char** argv){
     lua.load_script(config.get_lua_script());
     lua.call("_init");
     
+    #ifdef _WIN32
+    if (config.get_show_console()) {
+        AllocConsole();
+        freopen("CONOUT$", "w", stdout);
+        freopen("CONOUT$", "w", stderr);
+    } else {
+        FreeConsole();
+    }
+    #endif
 
     //update loop
     while(gfx.is_running()){
