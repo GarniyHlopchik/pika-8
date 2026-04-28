@@ -193,6 +193,7 @@ int main(int argc, char** argv){
     bind_input(lua.get_state());
     bind_sfx(lua.get_state());
     bind_node(lua.get_state());
+    bind_debug(lua.get_state());
 
     /*lua_pushlightuserdata(lua.get_state(), &gfx);
     lua_setglobal(lua.get_state(), "gfx");

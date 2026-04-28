@@ -122,6 +122,7 @@ set(PIKA_SOURCES
     src/lua_bindings/lua_bind/lua_bind_input.cpp
     src/lua_bindings/lua_bind/lua_bind_sfx.cpp
     src/lua_bindings/lua_bind/lua_bind_node.cpp
+    src/lua_bindings/lua_bind/lua_bind_debug.cpp
     src/lua_bindings/table_getter/table_gatter.cpp
     src/file_resolve/file_system.cpp
     src/file_resolve/zip.cpp
