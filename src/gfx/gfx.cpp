@@ -402,7 +402,6 @@ unsigned int GFX::load_texture(const std::string& path) {
     return texture;
 }
 
-
 FontData GFX::get_font_data(const std::string& name) {
     for (const auto& font : config.get_fonts()) {
         if (font.name == name) {
@@ -420,6 +419,8 @@ void default_color_helper(Color* color) {
     if (*color < black) *color = black;
 }
 
+
+// async texture loading
 void GFX::set_lua_system(LuaSystem* l_lua) {
     lua = l_lua;
     worker_should_run = true;
@@ -469,10 +470,10 @@ void GFX::poll_loaded_textures(){
     while(!to_main_queue.empty()){
         TextureLoadResult finished_task = to_main_queue.dequeue(QueueProtocol::OLDEST).data;
         
-        // Create texture on main thread (GL context required)
+        // create texture on main thread
         unsigned int texture_id = create_texture_from_image_data(finished_task.image);
         
-        // Add to loaded images tracking
+        // add to loaded images tracking
         LoadedImages img;
         img.id = texture_id;
         img.path = finished_task.path;
@@ -490,26 +491,27 @@ void GFX::poll_loaded_textures(){
 void GFX::worker_loop(){
     while(worker_should_run){
         TextureLoadRequest task;
+        
         {
             std::unique_lock<std::mutex> lock(to_worker_mutex);
             
-            // Wait until there's a task OR the engine is shutting down
+            // wait until there is a task or the engine is shutting down
             cv.wait(lock, [this]{ 
                 return to_worker_queue.peek(QueueProtocol::OLDEST).priority || !worker_should_run; 
             });
 
-            // If we woke up because we're shutting down, exit the loop
+            // if we woke up because we're sinking, break the loop
             if (!worker_should_run && !to_worker_queue.peek(QueueProtocol::OLDEST).priority) break;
 
             task = to_worker_queue.dequeue(QueueProtocol::OLDEST).data;
         }
 
-        // Process the task if it exists
+        // work on this if it is. is it working because it is or does it is to work?
         if(!task.path.empty()) 
         {
             ImageData image = load_image_data(task.path);
             
-            //enqueue to main with lock
+            // enqueue to main with lock
             {
                 std::lock_guard<std::mutex> lock(to_main_mutex);
                 TextureLoadResult data = {task.registry_ref, 0, image, task.path};

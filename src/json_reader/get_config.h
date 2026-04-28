@@ -6,6 +6,7 @@
 #include <future>
 #include "file_resolve/file_system.h"
 #include "async_loader.h"
+#include "stb_truetype/stb_truetype.h"
 #define CONFIG_FILE_PATH "config.json"
 
 struct FontData {
@@ -15,6 +16,9 @@ struct FontData {
     int char_height;
     std::string charset;
 };
+
+
+
 
 class Config {
 public:

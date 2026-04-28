@@ -4,9 +4,10 @@
 
 struct LoadedFont {
     unsigned int texture_id;
-    unsigned int width;
-    unsigned int height;
-    FontData data;
+    int tex_width;
+    int tex_height;
+
+    stbtt_bakedchar cdata[96]; 
 };
 
 struct LoadedImages

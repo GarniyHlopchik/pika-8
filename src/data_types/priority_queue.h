@@ -13,16 +13,17 @@ struct QueueNode{
         return (order == other.order);
     }
 };
+
 template <typename TypeOfData>
 class PriorityQueue{
-    public:
-        bool empty() const {
-    return tree.empty();
-}
+public:
+    bool empty() const {
+        return tree.empty();
+    }
 
-size_t size() const {
-    return tree.size();
-}
+    size_t size() const {
+        return tree.size();
+    }
         PriorityQueue() = default;
         ~PriorityQueue() = default;
         void enqueue(TypeOfData data, int priority){
@@ -35,7 +36,8 @@ size_t size() const {
             size_t index = tree.size()-1;
             bubble_up(index);
         };
-        QueueNode<TypeOfData> dequeue(QueueProtocol protocol){
+        
+    QueueNode<TypeOfData> dequeue(QueueProtocol protocol){
             QueueNode<TypeOfData> node;
             if(protocol==QueueProtocol::HIGHEST_PRIORITY){
                 
@@ -93,6 +95,7 @@ size_t size() const {
             }
             return node;
         };
+        
         QueueNode<TypeOfData> peek(QueueProtocol protocol){
             QueueNode<TypeOfData> node;
             if(protocol==QueueProtocol::HIGHEST_PRIORITY){
@@ -261,4 +264,5 @@ size_t size() const {
                 std::swap(tree[biggest_descendant], tree[index]);
             }
         };
+
 };
