@@ -28,6 +28,11 @@ namespace mobile_input {
             }
             is_emulating = false; 
         }
+        void clear() {
+            touches.clear();
+            num_touches = 0;
+            is_emulating = false;
+        }
     };
 
 }

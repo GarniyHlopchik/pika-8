@@ -10,7 +10,6 @@
 #include "user_input/user_input.h"
 #include "file_resolve/file_system.h"
 #include <algorithm>
-#include "../mobile_input/input_state.h"
 #include <atomic>
 #include <mutex>
 #include <thread>
@@ -47,7 +46,6 @@ public:
     static std::string get_texture_path(const unsigned int id);
     static void add_new_image(const LoadedImages img);
     void close();
-    mobile_input::InputState* getMobileInputState() { return &mobile_input_state; }
 private:
     Config config;
     static SDL_Window* window;
@@ -57,10 +55,6 @@ private:
     static unsigned int shader;
     static unsigned int debugShader;
     InputState &input_state;
-    mobile_input::InputState mobile_input_state;
-    void handleMouse(const SDL_Event& event);
-    void handleTouch(const SDL_Event& event);
-
     // async texture loading threads
     LuaSystem* lua;
     unsigned int get_texture_id();

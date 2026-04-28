@@ -45,7 +45,7 @@ std::tuple<int, int> GFX::get_screen_size() {
     SDL_GetWindowSizeInPixels(window, &width, &height);
     return std::make_tuple(width, height);
 }
-GFX::GFX(int w, int h, const char* title, InputState& p_state) : input_state(p_state), mobile_input_state(), lua(nullptr), worker_should_run(false) {
+GFX::GFX(int w, int h, const char* title, InputState& p_state) : input_state(p_state), lua(nullptr), worker_should_run(false) {
 #ifdef __linux__
     // 1. Set global hints BEFORE Init
     SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11");
@@ -183,160 +183,8 @@ void GFX::add_new_image(const LoadedImages img) {
 }
 
 
-void GFX::handleMouse(const SDL_Event& event) {
-    static bool mouse_left_down = false;
-    static bool mouse_right_down = false;
-
-
-    if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN && event.button.button == SDL_BUTTON_LEFT) {
-        mouse_left_down = true;
-
-        mobile_input::TouchPoint t;
-        t.id = 999;
-        t.x = event.button.x;
-        t.y = event.button.y;
-        t.down = true;
-        t.just_pressed = true;
-        t.button = event.button.button;
-        mobile_input_state.touches.push_back(t);
-        mobile_input_state.num_touches++;
-        mobile_input_state.is_emulating = true;
-
-        printf("Left button DOWN at (%.0f, %.0f)\n", t.x, t.y);
-    }
-    else if (event.type == SDL_EVENT_MOUSE_BUTTON_UP && event.button.button == SDL_BUTTON_LEFT) {
-        mouse_left_down = false;
-        for (auto& t : mobile_input_state.touches) {
-            if (t.id == 999) {
-                t.down = false;
-                t.just_released = true;
-                break;
-            }
-        }
-
-        auto it = std::remove_if(mobile_input_state.touches.begin(),
-            mobile_input_state.touches.end(),
-            [](const mobile_input::TouchPoint& p) { return !p.down; });
-        mobile_input_state.touches.erase(it, mobile_input_state.touches.end());
-        mobile_input_state.num_touches = mobile_input_state.touches.size();
-
-        printf("Left button UP\n");
-    }
-
-
-    if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN && event.button.button == SDL_BUTTON_RIGHT) {
-        mouse_right_down = true;
-
-        mobile_input::TouchPoint t;
-        t.id = 998;
-        t.x = event.button.x;
-        t.y = event.button.y;
-        t.down = true;
-        t.just_pressed = true;
-        t.button = event.button.button;
-        mobile_input_state.touches.push_back(t);
-        mobile_input_state.num_touches++;
-        mobile_input_state.is_emulating = true;
-
-        printf("Right button DOWN at (%.0f, %.0f)\n", t.x, t.y);
-    }
-    else if (event.type == SDL_EVENT_MOUSE_BUTTON_UP && event.button.button == SDL_BUTTON_RIGHT) {
-        mouse_right_down = false;
-        for (auto& t : mobile_input_state.touches) {
-            if (t.id == 998) {
-                t.down = false;
-                t.just_released = true;
-                break;
-            }
-        }
-
-        auto it = std::remove_if(mobile_input_state.touches.begin(),
-            mobile_input_state.touches.end(),
-            [](const mobile_input::TouchPoint& p) { return !p.down; });
-        mobile_input_state.touches.erase(it, mobile_input_state.touches.end());
-        mobile_input_state.num_touches = mobile_input_state.touches.size();
-
-        printf("Right button UP\n");
-    }
-
-
-    else if (event.type == SDL_EVENT_MOUSE_MOTION) {
-        if (mouse_left_down) {
-            for (auto& t : mobile_input_state.touches) {
-                if (t.id == 999) {
-                    t.dx = event.motion.x - t.x;
-                    t.dy = event.motion.y - t.y;
-                    t.x = event.motion.x;
-                    t.y = event.motion.y;
-                    break;
-                }
-            }
-        }
-        if (mouse_right_down) {
-            for (auto& t : mobile_input_state.touches) {
-                if (t.id == 998) {
-                    t.dx = event.motion.x - t.x;
-                    t.dy = event.motion.y - t.y;
-                    t.x = event.motion.x;
-                    t.y = event.motion.y;
-                    break;
-                }
-            }
-        }
-    }
-}
-
-void GFX::handleTouch(const SDL_Event& event) {
-    const auto& tf = event.tfinger;
-    int w, h;
-    SDL_GetWindowSizeInPixels(window, &w, &h);
-
-    if (event.type == SDL_EVENT_FINGER_DOWN) {
-        mobile_input::TouchPoint t;
-        t.id = tf.fingerID;
-        t.x = tf.x * w;
-        t.y = tf.y * h;
-        t.down = true;
-        t.just_pressed = true;
-        t.button = 0;
-        mobile_input_state.touches.push_back(t);
-        mobile_input_state.num_touches++;
-        printf("Finger DOWN: id=%lld at (%.0f, %.0f)\n", (long long)t.id, t.x, t.y);
-    }
-    else if (event.type == SDL_EVENT_FINGER_UP) {
-        for (auto& t : mobile_input_state.touches) {
-            if (t.id == tf.fingerID) {
-                t.down = false;
-                t.just_released = true;
-                break;
-            }
-        }
-
-        auto it = std::remove_if(mobile_input_state.touches.begin(),
-            mobile_input_state.touches.end(),
-            [](const mobile_input::TouchPoint& p) { return !p.down; });
-        mobile_input_state.touches.erase(it, mobile_input_state.touches.end());
-        mobile_input_state.num_touches = mobile_input_state.touches.size();
-        printf("Finger UP: id=%lld\n", (long long)tf.fingerID);
-    }
-    else if (event.type == SDL_EVENT_FINGER_MOTION) {
-        for (auto& t : mobile_input_state.touches) {
-            if (t.id == tf.fingerID) {
-                float nx = tf.x * w;
-                float ny = tf.y * h;
-                t.dx = nx - t.x;
-                t.dy = ny - t.y;
-                t.x = nx;
-                t.y = ny;
-                break;
-            }
-        }
-    }
-}
 
 void GFX::update() {
-
-    mobile_input_state.resetFrame();
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -351,23 +199,6 @@ void GFX::update() {
 
         case SDL_EVENT_KEY_UP:
             input_state.keys[event.key.scancode] = false;
-            break;
-
-        case SDL_EVENT_MOUSE_BUTTON_DOWN:
-        case SDL_EVENT_MOUSE_BUTTON_UP:
-            handleMouse(event);
-            break;
-
-        case SDL_EVENT_MOUSE_MOTION:
-            input_state.mouseX = event.motion.x;
-            input_state.mouseY = event.motion.y;
-            handleMouse(event);
-            break;
-
-        case SDL_EVENT_FINGER_DOWN:
-        case SDL_EVENT_FINGER_UP:
-        case SDL_EVENT_FINGER_MOTION:
-            handleTouch(event);
             break;
 
         case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:

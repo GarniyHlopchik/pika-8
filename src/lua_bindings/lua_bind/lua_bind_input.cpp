@@ -1,5 +1,6 @@
 #include "../lua_bindings.h"
 #include "user_input/user_input.h"
+#include "../../mobile_input/input_state.h"
 
 static int l_btn(lua_State* L){
     EngineContext* ctx = get_ctx(L);
@@ -30,7 +31,7 @@ static int l_touch_count(lua_State* L) {
         return 1;
 
     }
-    mobile_input::InputState* state = ctx->gfx->getMobileInputState();
+     mobile_input::InputState* state = getTouchState();
     lua_pushinteger(L, state ? state->num_touches : 0);
 
     return 1;
@@ -44,7 +45,7 @@ static int l_get_touches(lua_State* L) {
         return 1;
     }
 
-    mobile_input::InputState* state = ctx->gfx->getMobileInputState();
+    mobile_input::InputState* state = getTouchState();
     if (!state) {
         lua_newtable(L);
         return 1;
@@ -79,7 +80,7 @@ static int l_get_position(lua_State* L) {
         return 3;
     }
 
-    mobile_input::InputState* state = ctx->gfx->getMobileInputState();
+    mobile_input::InputState* state = getTouchState();
     if (state && !state->touches.empty()) {
         auto& t = state->touches[0];
         lua_pushnumber(L, t.x);
@@ -101,7 +102,7 @@ static int l_is_down(lua_State* L) {
         return 1;
     }
 
-    mobile_input::InputState* state = ctx->gfx->getMobileInputState();
+    mobile_input::InputState* state = getTouchState();
     lua_pushboolean(L, state ? state->num_touches > 0 : false);
     return 1;
 }
@@ -114,7 +115,7 @@ static int l_get_swipe(lua_State* L) {
         return 2;
     }
 
-    mobile_input::InputState* state = ctx->gfx->getMobileInputState();
+    mobile_input::InputState* state = getTouchState();
     if (state && !state->touches.empty()) {
         auto& t = state->touches[0];
         lua_pushnumber(L, t.dx);
@@ -134,7 +135,7 @@ static int l_is_emulating(lua_State* L) {
         return 1;
     }
 
-    mobile_input::InputState* state = ctx->gfx->getMobileInputState();
+    mobile_input::InputState* state = getTouchState();
     lua_pushboolean(L, state ? state->is_emulating : false);
     return 1;
 }
