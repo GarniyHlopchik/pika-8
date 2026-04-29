@@ -90,8 +90,9 @@ void main_tick(void* arg) {
 void on_load_success(const char* file){
     FileSystem::init(EngineReadState::ZIP,"game.pika");
      //context setup------------------------
-    auto config_future = Config::load_async();
-    Config config = config_future.get();
+    Config config;
+    // auto config_future = Config::load_async();
+    // Config config = config_future.get();
     InputState input_state;
     GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str(),input_state);
     Text text(gfx);
@@ -162,9 +163,9 @@ int main(int argc, char** argv){
     #endif
     #endif
     //context setup------------------------
-    auto config_future = Config::load_async();
-    Config config = config_future.get();
-    
+    // auto config_future = Config::load_async();
+    // Config config = config_future.get();
+    Config config;
     InputState input_state;
     GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str(),input_state);
     Text text(gfx);
