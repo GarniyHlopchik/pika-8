@@ -115,6 +115,9 @@ void on_load_success(const char* file){
     lua.set_context(&ctx);
     gfx.set_lua_system(&lua);
     
+    initTouchInput();
+    auto [w, h] = gfx.get_screen_size();
+    setTouchWindowSize(w, h);
 
     bind_gfx(lua.get_state());
     bind_input(lua.get_state());
@@ -188,6 +191,10 @@ int main(int argc, char** argv){
     
     SDL_GL_SetSwapInterval(config.get_vsync()); // Enable VSync
 
+    initTouchInput();
+    auto [w, h] = gfx.get_screen_size();
+    setTouchWindowSize(w, h);
+
     bind_gfx(lua.get_state());
     bind_gfx_sprite(lua.get_state());
     bind_input(lua.get_state());
@@ -219,6 +226,42 @@ int main(int argc, char** argv){
 
     //update loop
     while(gfx.is_running()){
+        resetTouchFrame();
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+            case SDL_EVENT_QUIT:
+                gfx.close();
+                break;
+
+            case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            case SDL_EVENT_MOUSE_BUTTON_UP:
+                handleMouseEvent(event);
+                break;
+
+            case SDL_EVENT_MOUSE_MOTION:
+                input_state.mouseX = event.motion.x;
+                input_state.mouseY = event.motion.y;
+                handleMouseEvent(event);
+                break;
+
+            case SDL_EVENT_FINGER_DOWN:
+            case SDL_EVENT_FINGER_UP:
+            case SDL_EVENT_FINGER_MOTION:
+                handleTouchEvent(event);
+                break;
+
+            case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+                setTouchWindowSize(event.window.data1, event.window.data2);
+                gfx.resize(event.window.data1, event.window.data2);
+                break;
+
+            default:
+                break;
+            }
+
+
+        }
         main_tick(&ctx);
     }
     lua.call("_exit");
