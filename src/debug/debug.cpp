@@ -110,6 +110,7 @@ void Debug::draw_polygon(const std::vector<std::pair<float, float>>& vertices, C
     for (const auto& vertex : vertices) {
         debugVertices.push_back({vertex.first, vertex.second, 0.0f, color});
     }
+    std::cout << "Drawing polygon with " << debugVertices.size() << " vertices." << std::endl;
     draw_debug_shape(debugVertices, DebugPrimitiveType::LineLoop);
 }
 

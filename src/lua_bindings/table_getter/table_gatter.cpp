@@ -1,5 +1,11 @@
 #include "table_gatter.h"
 
+/// @brief Gets a vector of floats from a Lua table
+/// @param L Lua state
+/// @param index index of the table on the Lua stack
+/// @param count number of floats to retrieve from the table
+/// @param fallback fallback value if the table is not found or empty
+/// @return 
 std::vector<float> get_table_floats(lua_State* L, int index, int count, float fallback) {
     // return a fallback value if NOT the table 
     if (!lua_istable(L, index)) {
@@ -64,4 +70,9 @@ UVCoords get_sprite_cut(lua_State* L, int index) {
         cut_values[3]
     };
     return cut;
+}
+
+std::pair<float, float> get_vec2(lua_State* L, int index) {
+    std::vector<float> vec_values = get_table_floats(L, index, 2, 0.0f);
+    return std::make_pair(vec_values[0], vec_values[1]);
 }

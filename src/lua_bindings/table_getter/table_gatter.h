@@ -14,3 +14,5 @@ std::vector<int> get_table_ints(lua_State* L, int index, int count, int fallback
 Color get_color(lua_State* L, int index, float default_color = 255.0f);
 
 UVCoords get_sprite_cut(lua_State* L, int index);
+
+std::pair<float, float> get_vec2(lua_State* L, int index);
