@@ -5,6 +5,7 @@
 #include "../../gfx/text/text.h"
 #include "../../gfx/sprite/sprite.h"
 
+
 static int l_cls(lua_State* L){
     float r = luaL_optnumber(L,1,0.0f);
     float g = luaL_optnumber(L,2,0.0f);
@@ -94,19 +95,19 @@ static int l_getscr(lua_State* L){
 }
 
 static void draw_text(const char* text, int x, int y, 
-    std::string font_name, float scale, Color color, float space_multiplier, Text* text_obj){
+    std::string font_name, float scale, Color color, Text* text_obj){
     
     try {
-        text_obj->draw_text(text, x, y, font_name, scale, color, space_multiplier);
+        text_obj->draw_text(text, x, y, font_name, scale, color);
     } 
     catch (const std::exception& e) {
         if (std::string(e.what()).find("Font not found") != std::string::npos) {
             font_name = "default";
             std::cerr << "Warning: " << e.what() << " Falling back to default font." << std::endl;
             try {
-                text_obj->draw_text(text, x, y, font_name, scale, color, space_multiplier);
+                text_obj->draw_text(text, x, y, font_name, scale, color);
             } catch (const std::exception& e) {
-                std::cerr << "Error: Default font also not found. Cannot draw text." << std::endl;
+                std::cerr << "Error: Default font not found. Cannot draw text." << std::endl;
             }
         } else {
             std::cerr << "Error in l_text: " << e.what() << std::endl;
@@ -123,21 +124,23 @@ static void draw_text(const char* text, int x, int y,
 * 4. font_name (string) - name of the font to use
 * 5. scale (number, optional) - scale of the text (default: 1.0)
 * 6. color (table, optional) - color of the text as a table {r=..., g=..., b=..., a=...} (default: white)
-* 7. space_multiplier (number, optional) - multiplier for space character width (default: 0.4)
 */
 static int l_text(lua_State* L){
+    // text("text to draw", {x, y}, scale, "font_name", {r=..., g=..., b=..., a=...})
     EngineContext* ctx = get_ctx(L);
     const char* text = luaL_checkstring(L,1);
-    float x = luaL_checknumber(L,2);
-    float y = luaL_checknumber(L,3);
-    float scale = luaL_optnumber(L, 4, 1.0f);
-    std::string font_name = luaL_checkstring(L, 5);
-    
-    Color color = get_color(L, 6);
 
-    float space_multiplier = luaL_optnumber(L, 7, 0.4f);
+    std::pair<float,float> pos = get_vec2(L, 2); // expects a table {x, y}
+
+    float scale = luaL_optnumber(L, 3, 1.0f);
+    scale = std::max(0.1f, scale); // Prevent too small or negative scales
+    scale = scale / 8.0f; // baked pixel size is 256, hence we divide by 8 to get a more reasonable scale
     
-    draw_text(text, x, y, font_name, scale, color, space_multiplier, ctx->text);
+    std::string font_name = luaL_checkstring(L, 4);
+    
+    Color color = get_color(L, 5);
+    
+    draw_text(text, pos.first, pos.second, font_name, scale, color, ctx->text);
     return 0;
 }
 

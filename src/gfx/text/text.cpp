@@ -1,3 +1,4 @@
+#define STB_TRUETYPE_IMPLEMENTATION
 #include "text.h"
 #include "../sprite/sprite.h"
 
@@ -19,85 +20,61 @@ bool Text::is_font_loaded(const std::string& font_name){
     return (font_cache.find(font_name) != font_cache.end());
 }
 
-void Text::load_font(const std::string& font_name){
-    FontData font_data = gfx.get_font_data(font_name);    
-    unsigned int tex_id = gfx.load_texture(font_data.path);
+void Text::load_font(const std::string& font_name) {
+    FontData font_config = gfx.get_font_data(font_name); 
     
-    if (!tex_id) return;
+    // load the raw .ttf
+    Resource res = FileSystem::get_resource(font_config.path);
+    if (!res.is_valid()) return;
 
-    unsigned int img_width = 0, img_height = 0;
-    std::vector<int> dims = gfx.get_image_dimensions(font_data.path);
-    img_width = dims[0];
-    img_height = dims[1];
+    // prepare a bitmap size for the alpha channel
+    const int atlas_w = 2048, atlas_h = 2048;
+    unsigned char* temp_bitmap = new unsigned char[atlas_w * atlas_h];
 
-    font_cache[font_name] = {tex_id, img_width, img_height, font_data};
+    const float BAKED_PIXEL_HEIGHT = 256.0f; // 8 times smaller than atlas... breacks otherwise.... but it is funny
+
+    // NOTE: '32' is the start char (Space), '96' is the count of chars to bake
+    stbtt_BakeFontBitmap(res.data.get(), 0, BAKED_PIXEL_HEIGHT, temp_bitmap, atlas_w, atlas_h, 32, 96, font_config.cdata);
+
+    // upload to GPU
+    unsigned int tex_id;
+    glGenTextures(1, &tex_id);
+    glBindTexture(GL_TEXTURE_2D, tex_id);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, atlas_w, atlas_h, 0, GL_RED, GL_UNSIGNED_BYTE, temp_bitmap);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    font_cache[font_name] = { tex_id, (unsigned int)atlas_w, (unsigned int)atlas_h, font_config };
 }
 
-size_t Text::get_char_index(char c, const std::string& charset) const {
-    size_t index = charset.find(c);
+
+void Text::draw_text(const std::string& text, float x, float y, const std::string& font_name, float scale, Color color) {
+    if (!is_font_loaded(font_name)) load_font(font_name);
+    if (!is_font_loaded(font_name)) return;
     
-    // Fallback to uppercase if lowercase isn't found
-    if (index == std::string::npos) {
-        char upper_c = static_cast<char>(toupper(static_cast<unsigned char>(c)));
-        index = charset.find(upper_c);
-    }
-    
-    return index;
-}
+    const LoadedFont& font = font_cache.at(font_name);
 
-UVCoords Text::calculate_uv_coords(size_t index, const LoadedFont& font) const {
-    const int chars_per_row = font.width / font.data.char_width;
-    const int total_rows = font.height / font.data.char_height;
+    float local_x = 0.0f;
+    float local_y = 0.0f;
 
-    int col = index % chars_per_row;
-    int row = index / chars_per_row;
-    
-    // Note: Are you sure these shouldn't be font.width / font.height?
-    /// Should be exactly that. No clue how it worked....
-    const float tex_width = font.width; 
-    const float tex_height = font.height;
-
-    const float margin_u = 0.1f / tex_width;
-    const float margin_v = 0.1f / tex_height;
-        
-    return {
-        (static_cast<float>(col) / chars_per_row) + margin_u,
-        (static_cast<float>(row) / total_rows) + margin_v,
-        (static_cast<float>(col + 1) / chars_per_row) - margin_u,
-        (static_cast<float>(row + 1) / total_rows) - margin_v
-    };
-}
-
-void Text::draw_text(const std::string& text, float x, float y, const std::string& font_name, float scale, Color color, float space_multiplier) {
-    // load font to cash onse
-    if (is_font_loaded(font_name) == false) {
-        load_font(font_name);
-    }
-    
-    if (is_font_loaded(font_name) == false) return;
-
-    const LoadedFont& font = font_cache[font_name];
-
-    float draw_width = font.data.char_width * scale; 
-    float draw_height = font.data.char_height * scale; 
-
-    float cursor_x = x;
-
-    // Drawing text by character
     for (char c : text) {
-        if (c == ' ') {
-            cursor_x += (draw_width * space_multiplier);
-            continue;
-        }
+        if (c < 32 || c > 127) continue;
 
-        size_t index = get_char_index(c, font.data.charset);
-        if (index == std::string::npos) continue;
+        stbtt_aligned_quad q;
+        
+        stbtt_GetBakedQuad(font.data.cdata, font.width, font.height, c - 32, &local_x, &local_y, &q, 1);
 
-        UVCoords uv = calculate_uv_coords(index, font);
-        Sprite sprite(font.texture_id, nullptr, nullptr, font.texture_id, cursor_x, y, draw_width, draw_height, uv, color);
+        float w = (q.x1 - q.x0) * scale;
+        float h = (q.y1 - q.y0) * scale;
+        
+        // shift the character to be centered on its position
+        float final_x = x + (q.x0 * scale) + (w / 2.0f);
+        float final_y = y + (q.y0 * scale) + (h / 2.0f);
 
-        gfx.draw(sprite);
+        UVCoords uv = { q.s0, q.t0, q.s1, q.t1 };
 
-        cursor_x += draw_width;
+        Sprite char_sprite(font.texture_id, nullptr, nullptr, font.texture_id, 
+                           final_x, final_y, w, h, uv, color);
+
+        gfx.draw(char_sprite);
     }
 }

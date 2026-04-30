@@ -2,12 +2,19 @@
 #include "../json_reader/get_config.h"
 #include "sprite_mesh/mesh_struct.h"
 
+// struct LoadedFont {
+//     unsigned int texture_id;
+//     int tex_width;
+//     int tex_height;
+
+//     stbtt_bakedchar cdata[96]; 
+// };
+
 struct LoadedFont {
     unsigned int texture_id;
-    int tex_width;
-    int tex_height;
-
-    stbtt_bakedchar cdata[96]; 
+    unsigned int width;
+    unsigned int height;
+    FontData data;
 };
 
 struct LoadedImages
