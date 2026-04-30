@@ -22,7 +22,7 @@ public:
     static void draw_polygon(const std::vector<std::pair<float, float>>& vertices, Color color);
 
 private:
-    static void draw_debug_shape(const std::vector<DebugVertex>& vertices, DebugPrimitiveType type);
+    static void draw_debug_shape(std::vector<DebugVertex>& vertices, DebugPrimitiveType type);
     
     unsigned int VAO, VBO;
     std::vector<DebugDrawCommand> frameCommands;

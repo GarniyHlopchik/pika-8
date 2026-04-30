@@ -72,6 +72,7 @@ void Debug::set_projection(int width, int height) {
     glUniformMatrix4fv(location, 1, GL_TRUE, proj);
 }
 
+
 void Debug::draw_line(float x1, float y1, float x2, float y2, Color color) {
     std::vector<DebugVertex> vertices = {
         {x1, y1, 0.0f, color},
@@ -110,11 +111,12 @@ void Debug::draw_polygon(const std::vector<std::pair<float, float>>& vertices, C
     for (const auto& vertex : vertices) {
         debugVertices.push_back({vertex.first, vertex.second, 0.0f, color});
     }
-    std::cout << "Drawing polygon with " << debugVertices.size() << " vertices." << std::endl;
     draw_debug_shape(debugVertices, DebugPrimitiveType::LineLoop);
 }
 
-void Debug::draw_debug_shape(const std::vector<DebugVertex>& vertices, DebugPrimitiveType type) {
+
+
+void Debug::draw_debug_shape(std::vector<DebugVertex>& vertices, DebugPrimitiveType type) {
     Debug& debug = get_instance();
     DebugDrawCommand command;
     command.vertices = vertices;

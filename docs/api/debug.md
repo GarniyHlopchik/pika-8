@@ -5,12 +5,18 @@ You can use this library to get quick debugging done as to where something is on
 ```lua
 function _update(delta)
    --params: start_position, end_position, color
-   Debug.draw_line({30,30},{120, 60},{1,1,1,0.5})
+   Debug.draw_line( {30, 30}, {120, 60}, {255, 255, 255, 128} )
+
    --params: center_position, radius, color
-   Debug.draw_circle({250, 400}, 30, {0.5, 0.7, 1.0, 1.0})
+   Debug.draw_circle( {250, 400}, 30, {128, 178, 255, 255} )
+
    --params: start_position, end_position, color
-   Debug.draw_rect({50,50},{250, 150},{1,1,0.67,0.5})
+   Debug.draw_rect( {50, 50}, {250, 150}, {255, 255, 0.67, 128})
+
+   -- params: vertice amount, side length, center position, color
+   Debug.draw_polygon( 6, 50, {150, 150}, {128, 178, 255, 255} )
+
    --params: vertice amount, [positions], color
-   Debug.draw_polygon(3, {10,20}, {40, 50}, {0, 100}, {0.5, 0.7, 1.0, 1.0})
+   Debug.draw_free_shape( 3, {10,20}, {40, 50}, {0, 100}, {128, 178, 255, 255} )
 end
 ```
