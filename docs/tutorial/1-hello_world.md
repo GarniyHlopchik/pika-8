@@ -11,11 +11,8 @@ Pika-8 generally doesn't require a configuration file to run. In that case it wi
     "lua_script": "game.lua",
     "fonts": [
         {
-        "name": "default",
-        "font_texture": "default_font.png",
-        "char_width": 8,
-        "char_height": 8,
-        "charset": " !\"#$%&'()*+,-./0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+            "name": "default",
+            "path": "default_font.png"
         }
     ]
 }
@@ -27,13 +24,22 @@ Just pop it into your project root as well! The name is not to be changed.
 ## Coding
 We can finally get to it, create game.lua and write some code:
 ```lua
+function _init()
+    text = "Hello, Pika-8!"
+    coords = { 160, 160 }
+    scale = 5
+    font = "default"
+    color = { 255, 255, 255, 255 }
+end
+
 function _update(delta)
     GFX.cls()    
-    GFX.text("Hello World!", 60, 60, 3, "default", {255, 255, 255, 255}, 1)
+
+    GFX.text(text, coords, scale, font, color)
 end
 ```
 
-This uses an update callback, which takes in delta parameter - time elapsed since last update. Inside of it we use 2 functions from engine's GFX API: ```cls()``` and ```text(text: String, x_position: int, y_position: int, scale: int, font_name: String, color: Table, spacing: int)```. Note that `text`, `x_position`, `y_position`, `scale` and `font_name` are required. 
+This uses an update callback, which takes in delta parameter - time elapsed since last update. Inside of it we use 2 functions from engine's GFX API: ```cls()``` and ```text(text: String, { x_position, y_position }: Table of int, scale: int, font_name: String, color: Table)```. Note that `text`, `x_position`, `y_position`, `scale` and `font_name` are required. 
 
 Color parametr is RGBA values 0-255. You can insted replace it with `{ }` and Color will default to `{255, 255, 255, 255}`
 

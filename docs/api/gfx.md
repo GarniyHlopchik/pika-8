@@ -46,20 +46,14 @@ The primary tool for drawing textures is `GFX.spr()`. It can draw a full image, 
 
 GFX.spr(spr, pos_x, post_y, width, height, x1, x2, y1, y2)
 
-x1 - start of the width cut (ex: 3)
+x1 - start of the width cut (ex: 3)  
+x2 - end   of the width cut (ex: b)  
+y1 - start of the height cut (ex: 2)  
+y2 - end   of the height cut (ex: 5)  
 
-
-x2 - end   of the width cut (ex: b)
-
-
-y1 - start of the height cut (ex: 2)
-
-
-y2 - end   of the height cut (ex: 5)
-
-if we apply those
-\* - unused
-\# - displayed
+if we apply those  
+\* - unused  
+\# - displayed  
 
 ```lua
 -- 0123456789abcdef
@@ -72,9 +66,9 @@ if we apply those
 -- **************** 6
 -- **************** 7
 ```
-## GFX.text(text: String, x: Number, y:Number, font_name: String, scale: Number,spacing: Number)
+## GFX.text(text: String, { x: Number, y:Number }, scale: Number, font_name: String, )
 
-Renders `text` onto the screen. X and Y are screen rendering coordinates, font_name corresponds to the font_name set up in config.json, scale is the size of the characters, and spacing is the space between words. 
+Renders `text` onto the screen. X and Y are screen rendering coordinates, font_name corresponds to the font_name set up in config.json, scale is the size of the characters,
 
 ## GFX.getscr() -> int width, int height
 
