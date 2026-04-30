@@ -10,16 +10,25 @@ struct UVCoords {
 
 struct Color
 {
-    int normalized = 0; // flag to indicate if the color was normalized already
+private:
+    int _normalized = 0; // flag to indicate if the color was normalized already
+
+public:
     float r, g, b, a;
+
+    Color(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {}
+
+    Color() : r(170.0f), g(95.0f), b(190.0f), a(255.0f) {} // default
+
     void normalize() {
-        if (normalized) return;
-        normalized = 1;
+        if (_normalized == 1) return;
+        _normalized = 1;
         r = r/255;
         g = g/255;
         b = b/255;
         a = a/255;
     }
+
     void print(const char* prefix = "") const {
         if (prefix != ""){
             std::cout << prefix << ": Color: {" << r << ", " << g << ", " << b << ", " << a << "}" << std::endl;

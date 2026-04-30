@@ -8,8 +8,6 @@ extern "C" {
 #include <lualib.h>
 }
 
-typedef std::pair<float, float> Vec2;
-
 std::vector<float> get_table_floats(lua_State* L, int index, int count, float fallback = 0.0f);
 std::vector<int> get_table_ints(lua_State* L, int index, int count, int fallback = 0);
 
