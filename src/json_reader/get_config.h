@@ -4,15 +4,18 @@
 #include <string>
 #include <vector>
 #include "file_resolve/file_system.h"
+#include "stb_truetype/stb_truetype.h"
 #define CONFIG_FILE_PATH "config.json"
 
 struct FontData {
     std::string name;
     std::string path;
-    int char_width;
-    int char_height;
-    std::string charset;
+
+    GLuint textureID;
+    stbtt_bakedchar cdata[96]; // ASCII 32..126
 };
+
+
 
 class Config {
 public:
@@ -67,7 +70,7 @@ public:
         auto show_console_res = doc["show_console"].get_int64();
         if (!show_console_res.error()) show_console = show_console_res.value();
 
-        // safely extract the fonts array
+        // extract the fonts array
         auto fonts_res = doc["fonts"].get_array();
         if (!fonts_res.error()) {
             for (auto font_elem : fonts_res.value()) {
@@ -80,17 +83,9 @@ public:
                 auto name_res = font_obj["name"].get_string();
                 if (!name_res.error()) font.name = name_res.value();
 
-                auto path_res = font_obj["font_texture"].get_string();
+                auto path_res = font_obj["path"].get_string();
                 if (!path_res.error()) font.path = path_res.value();
 
-                auto width_res = font_obj["char_width"].get_int64();
-                if (!width_res.error()) font.char_width = width_res.value();
-
-                auto height_res = font_obj["char_height"].get_int64();
-                if (!height_res.error()) font.char_height = height_res.value();
-
-                auto charset_res = font_obj["charset"].get_string();
-                if (!charset_res.error()) font.charset = charset_res.value();
 
                 if (!font.path.empty()) {
                     fonts.push_back(font);

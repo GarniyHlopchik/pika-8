@@ -27,7 +27,9 @@ out vec4 screenColor;
 uniform sampler2D ourTexture;
 
 void main() {
-    screenColor = texture(ourTexture, vUV) * vColor;
+    float alphaMask = texture(ourTexture, vUV).r;
+
+    screenColor = vec4(vColor.rgb, alphaMask * vColor.a);
 }
 )";
 
