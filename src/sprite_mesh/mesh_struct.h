@@ -10,8 +10,11 @@ struct UVCoords {
 
 struct Color
 {
+    int normalized = 0; // flag to indicate if the color was normalized already
     float r, g, b, a;
     void normalize() {
+        if (normalized) return;
+        normalized = 1;
         r = r/255;
         g = g/255;
         b = b/255;
