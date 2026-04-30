@@ -7,9 +7,6 @@
 #include <cmath>
 #include <utility>
 
-
-typedef std::pair<float, float> Vec2;
-
 static int l_draw_line(lua_State* L){
     std::vector<float> pos1 = get_table_floats(L,1,2);
     std::vector<float> pos2 = get_table_floats(L,2,2);
