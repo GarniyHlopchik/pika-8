@@ -265,8 +265,13 @@ int main(int argc, char** argv){
         }
         main_tick(&ctx);
     }
-    lua.call("_exit");
 
+    AllocConsole();
+    freopen("CONOUT$", "w", stdout);
+    freopen("CONOUT$", "w", stderr);
+    lua.call("_exit");
     
+    
+    exit(0);
     return 0;
 }
