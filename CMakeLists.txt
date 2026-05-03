@@ -134,6 +134,8 @@ set(PIKA_SOURCES
     src/lua_bindings/lua_bind/lua_bind_input.cpp
     src/scene_tree/y_sort.cpp
     src/lua_bindings/sol_bind/sol_bind_ysort.cpp
+    src/tilemap/tilemap.h
+    src/tilemap/tilemap.cpp
 )
 
 # ---------------- Target ----------------
