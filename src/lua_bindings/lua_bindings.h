@@ -3,11 +3,14 @@
 #include "config.h"
 #include "engine_context.h"
 
+typedef std::pair<float, float> Vec2;
+
 extern "C" {
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
 }
+
 void bind_debug(lua_State* L);
 void bind_gfx(lua_State* L);
 void bind_gfx_sprite(lua_State* L);
