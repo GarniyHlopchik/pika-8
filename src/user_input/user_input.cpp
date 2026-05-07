@@ -4,18 +4,14 @@
 #include <iostream>
 
 //check if key was just pressed
-bool IsKeyPressed(InputState state, int key)
-{
+bool IsKeyPressed(InputState state, int key) {
     return (state.keys[key] && !state.previous_keys[key]); //pressed now but wasn't last frame
 }
 
 //check if key is pressed
-bool IsKeyDown(InputState state, int key)
-{
+bool IsKeyDown(InputState state, int key) {
     return state.keys[key]; 
-
 }
-
 
 double* getRelativeCursorPosition(InputState state){
     double* position = new double[2];
@@ -122,7 +118,7 @@ void handleMouseEvent(const SDL_Event& event) {
             touch_state.touches.push_back(t);
             touch_state.num_touches++;
             touch_state.is_emulating = true;
-            printf("[MOUSE] Left DOWN at (%.0f, %.0f)\n", t.x, t.y);
+            // printf("[MOUSE] Left DOWN at (%.0f, %.0f)\n", t.x, t.y);
         }
         else if (event.button.button == SDL_BUTTON_RIGHT) {
             mouse_right_down = true;
@@ -137,9 +133,10 @@ void handleMouseEvent(const SDL_Event& event) {
             touch_state.touches.push_back(t);
             touch_state.num_touches++;
             touch_state.is_emulating = true;
-            printf("[MOUSE] Right DOWN at (%.0f, %.0f)\n", t.x, t.y);
+            // printf("[MOUSE] Right DOWN at (%.0f, %.0f)\n", t.x, t.y);
         }
-        break;
+        
+		break;
 
     case SDL_EVENT_MOUSE_BUTTON_UP:
         if (event.button.button == SDL_BUTTON_LEFT) {
@@ -156,7 +153,7 @@ void handleMouseEvent(const SDL_Event& event) {
                 [](const mobile_input::TouchPoint& p) { return !p.down; });
             touch_state.touches.erase(it, touch_state.touches.end());
             touch_state.num_touches = touch_state.touches.size();
-            printf("[MOUSE] Left UP\n");
+            // printf("[MOUSE] Left UP\n");
         }
         else if (event.button.button == SDL_BUTTON_RIGHT) {
             mouse_right_down = false;
@@ -172,7 +169,7 @@ void handleMouseEvent(const SDL_Event& event) {
                 [](const mobile_input::TouchPoint& p) { return !p.down; });
             touch_state.touches.erase(it, touch_state.touches.end());
             touch_state.num_touches = touch_state.touches.size();
-            printf("[MOUSE] Right UP\n");
+            // printf("[MOUSE] Right UP\n");
         }
         break;
 
@@ -201,4 +198,44 @@ void handleMouseEvent(const SDL_Event& event) {
         }
         break;
     }
+}
+
+// Check if a mouse button was just clicked this frame
+bool IsMouseButtonPressed(int button) {
+    // Button codes: SDL_BUTTON_LEFT = 1, SDL_BUTTON_MIDDLE = 2, SDL_BUTTON_RIGHT = 3
+    if (button == SDL_BUTTON_LEFT) {
+        for (const auto& t : touch_state.touches) {
+            if (t.id == 999 && t.just_pressed) {
+                return true;
+            }
+        }
+    } else if (button == SDL_BUTTON_RIGHT) {
+        for (const auto& t : touch_state.touches) {
+            if (t.id == 998 && t.just_pressed) {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
+// Check if a mouse button is currently held down
+bool IsMouseButtonDown(int button) {
+    // Button codes: SDL_BUTTON_LEFT = 1, SDL_BUTTON_MIDDLE = 2, SDL_BUTTON_RIGHT = 3
+    if (button == SDL_BUTTON_LEFT) {
+        for (const auto& t : touch_state.touches) {
+            if (t.id == 999 && t.down) {
+                return true;
+            }
+        }
+    } else if (button == SDL_BUTTON_RIGHT) {
+        for (const auto& t : touch_state.touches) {
+            if (t.id == 998 && t.down) {
+                return true;
+            }
+        }
+    }
+    
+    return false;
 }

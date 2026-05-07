@@ -110,6 +110,7 @@ set(PIKA_SOURCES
     src/gfx/sprite/sprite.cpp
     src/json_reader/json_reader.cpp
     src/user_input/user_input.cpp
+    src/user_input/button/button.cpp
     src/sfx/sfx.cpp
     src/scene_tree/node.cpp
     src/scene_tree/scene_tree.cpp
