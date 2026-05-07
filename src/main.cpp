@@ -8,6 +8,7 @@
 #include "lua_bindings/engine_context.h"
 #include "file_resolve/file_system.h"
 #include "user_input/user_input.h"
+#include "user_input/button/button.h"
 #include "globals.h"
 #include "debug/debug.h"
 #include "shader_utils/shader_utils.h"
@@ -74,7 +75,15 @@ void main_tick(void* arg) {
     ctx->gfx->poll_loaded_textures();
 
     Debug::begin_frame();
+    
+    // Update button states and invoke callbacks
+    button::button_update_all(*(ctx->input_state));
+    
     ctx->lua->call_update(dt);
+    
+    // Draw all buttons
+    button::button_draw_all(ctx->gfx);
+    
     ctx->gfx->update();
     AsyncLoader::process_main_thread_tasks();
     

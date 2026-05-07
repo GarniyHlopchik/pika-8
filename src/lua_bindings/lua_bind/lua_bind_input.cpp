@@ -148,54 +148,65 @@ static int l_is_emulating(lua_State* L) {
 
 
 /// BUTTON
-static int l_button_set_on_press_callback(lua_State* L) {
-    button::Button** btn_ptr = (button::Button**)luaL_checkudata(L, 1, "ButtonMetaTable");
-    luaL_checktype(L, 2, LUA_TFUNCTION);
-    
-    if (btn_ptr && *btn_ptr) {
-        sol::state_view sv(L);
-        sol::function callback(sv, sol::raw_index(2));
-        (*btn_ptr)->setOnPressCallback(callback);
-    }
-    return 0;
-}
-
-static int l_button_set_on_hold_callback(lua_State* L) {
-    button::Button** btn_ptr = (button::Button**)luaL_checkudata(L, 1, "ButtonMetaTable");
-    luaL_checktype(L, 2, LUA_TFUNCTION);
-    
-    if (btn_ptr && *btn_ptr) {
-        sol::state_view sv(L);
-        sol::function callback(sv, sol::raw_index(2));
-        (*btn_ptr)->setOnHoldCallback(callback);
-    }
-    return 0;
-}
-
 static int l_create_button(lua_State* L) {
 	EngineContext* ctx = get_ctx(L);
     std::string name = luaL_checkstring(L, 1);
     Vec2 pos = get_vec2(L, 2);
     Vec2 size = get_vec2(L, 3);
-
     unsigned int id = luaL_checkinteger(L, 4);
+    unsigned int texture = lua_tonumber(L, 5);
 
-    button::Button* button = new button::Button(pos.first, pos.second, size.first, size.second, id, ctx->lua, ctx->scene_tree);
-    button::Button** userdata = (button::Button**)lua_newuserdata(L, sizeof(button::Button*));
-    *userdata = button;
-
-    luaL_getmetatable(L, "ButtonMetaTable");
-    lua_setmetatable(L, -2);
+    unsigned int button_id = button::create_button(pos.first, pos.second, size.first, size.second, id, texture);
+    lua_pushinteger(L, button_id);
 
     return 1;
 }
 
-static int l_draw_button(lua_State* L) {
+static int l_button_set_on_press_callback(lua_State* L) {
+    unsigned int button_id = luaL_checkinteger(L, 1);
+    luaL_checktype(L, 2, LUA_TFUNCTION);
+    
+    sol::state_view sv(L);
+    sol::function callback(sv, sol::raw_index(2));
+    button::button_set_on_press_callback(button_id, callback);
+    
+    return 0;
+}
+
+static int l_button_set_on_hold_callback(lua_State* L) {
+    unsigned int button_id = luaL_checkinteger(L, 1);
+    luaL_checktype(L, 2, LUA_TFUNCTION);
+    
+    sol::state_view sv(L);
+    sol::function callback(sv, sol::raw_index(2));
+    button::button_set_on_hold_callback(button_id, callback);
+    
+    return 0;
+}
+
+static int l_button_draw(lua_State* L) {
 	EngineContext* ctx = get_ctx(L);
+	unsigned int button_id = luaL_checkinteger(L, 1);
+	
+	button::button_draw(button_id, ctx->gfx);
+	return 0;
+}
 
-	button::Button* btn_ptr = (button::Button*)luaL_checkudata(L, 1, "ButtonMetaTable");
-	btn_ptr->draw(ctx->gfx);
+static int l_button_draw_all(lua_State* L) {
+	EngineContext* ctx = get_ctx(L);
+	button::button_draw_all(ctx->gfx);
+	return 0;
+}
 
+static int l_button_update_all(lua_State* L) {
+	EngineContext* ctx = get_ctx(L);
+	button::button_update_all(*(ctx->input_state));
+	return 0;
+}
+
+static int l_button_destroy(lua_State* L) {
+	unsigned int button_id = luaL_checkinteger(L, 1);
+	button::button_destroy(button_id);
 	return 0;
 }
 
@@ -216,31 +227,15 @@ void bind_input(lua_State* L) {
         {"is_emulating", l_is_emulating},
 
         {"create_button", l_create_button},
+        {"button_set_on_press_callback", l_button_set_on_press_callback},
+        {"button_set_on_hold_callback", l_button_set_on_hold_callback},
+        {"button_draw", l_button_draw},
+        {"button_draw_all", l_button_draw_all},
+        {"button_update_all", l_button_update_all},
+        {"button_destroy", l_button_destroy},
 
         {NULL, NULL}
     };
     luaL_newlib(L, input_lib);
-    
-    // Setup Button metatable
-    luaL_newmetatable(L, "ButtonMetaTable");
-    
-    lua_pushstring(L, "__index");
-    lua_newtable(L);
-    
-    lua_pushstring(L, "setOnPressCallback");
-    lua_pushcfunction(L, l_button_set_on_press_callback);
-    lua_settable(L, -3);
-    
-    lua_pushstring(L, "setOnHoldCallback");
-    lua_pushcfunction(L, l_button_set_on_hold_callback);
-    lua_settable(L, -3);
-
-	lua_pushstring(L, "draw");
-    lua_pushcfunction(L, l_draw_button);
-    lua_settable(L, -3);
-    
-    lua_settable(L, -3);
-    lua_pop(L, 1);
-    
     lua_setglobal(L, "Input");
 }

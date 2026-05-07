@@ -1,34 +1,34 @@
 #pragma once
 
 #include "user_input/user_input.h"
-#include "gfx/sprite/sprite.h"
 #include <sol/sol.hpp>
+#include <unordered_map>
+#include <memory>
 
-namespace button{
-    class Button : public Sprite {
-    public:
-        Button(int x, int y, int width, int height, unsigned int id, LuaSystem* p_L, SceneTree* p_tree, unsigned int texture = 0, UVCoords uv = {0, 0, 1, 1}, Color color = Color()) 
-            : Sprite(id, p_L, p_tree, texture, static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height), uv, color),
-              _x(x), _y(y), _width(width), _height(height), _id(id) {}; 
-    
-        ~Button() = default;
-    
-        bool isPressed(InputState state);
-        bool isDown(InputState state);
-    
-        bool containsCursor(float x, float y) const;
-    
-        // Set a Lua function to be called when button is pressed
-        void setOnPressCallback(sol::function callback);
-        void setOnHoldCallback(sol::function callback);
+class GFX;
 
-		void draw(GFX* gfx);
-    
-    private:
-        int _x, _y, _width, _height;
-        unsigned int _id;
-    
+namespace button {
+    struct ButtonData {
+        float x, y, width, height;
+        unsigned int id;
+        unsigned int texture;
         sol::function onPressCallback;
         sol::function onHoldCallback;
     };
+
+    // Global button registry
+    extern std::unordered_map<unsigned int, std::shared_ptr<ButtonData>> button_registry;
+
+    // Function-based API
+    unsigned int create_button(float x, float y, float width, float height, unsigned int id, unsigned int texture = 0);
+    void button_set_on_press_callback(unsigned int button_id, sol::function callback);
+    void button_set_on_hold_callback(unsigned int button_id, sol::function callback);
+    void button_check_press(unsigned int button_id, InputState state);
+    void button_check_hold(unsigned int button_id, InputState state);
+    void button_update_all(InputState state);
+    void button_draw(unsigned int button_id, GFX* gfx);
+    void button_draw_all(GFX* gfx);
+    void button_destroy(unsigned int button_id);
+    void button_destroy_all();
+    bool button_contains_cursor(unsigned int button_id, float x, float y);
 }
