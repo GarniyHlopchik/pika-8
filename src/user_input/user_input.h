@@ -7,12 +7,15 @@
 struct InputState {
     bool keys[SDL_SCANCODE_COUNT] = {false};
     bool previous_keys[SDL_SCANCODE_COUNT] = {false};
-    bool mouseButtons[8] = {false};
     float mouseX, mouseY;
 };
 
 bool IsKeyPressed(InputState state, int key);
 bool IsKeyDown(InputState state, int key);
+
+// Mouse button functions
+bool IsMouseButtonPressed(int button);  // Check if mouse button was just clicked
+bool IsMouseButtonDown(int button);     // Check if mouse button is currently held
 double* getRelativeCursorPosition(InputState state);
 
 void initTouchInput();                          

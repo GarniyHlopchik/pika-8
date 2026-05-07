@@ -1,5 +1,10 @@
 #pragma once
 
+// Mouse buttons
+#define MOUSE_BUTTON_LEFT 1
+#define MOUSE_BUTTON_RIGHT 2
+#define MOUSE_BUTTON_MIDDLE 3
+
 // Key names
 #define KEY_SPACE 32
 #define KEY_APOSTROPHE 39 // ' 
