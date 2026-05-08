@@ -200,9 +200,8 @@ void handleMouseEvent(const SDL_Event& event) {
     }
 }
 
-// Check if a mouse button was just clicked this frame
+// button codes: SDL_BUTTON_LEFT = 1, SDL_BUTTON_MIDDLE = 2, SDL_BUTTON_RIGHT = 3
 bool IsMouseButtonPressed(int button) {
-    // Button codes: SDL_BUTTON_LEFT = 1, SDL_BUTTON_MIDDLE = 2, SDL_BUTTON_RIGHT = 3
     if (button == SDL_BUTTON_LEFT) {
         for (const auto& t : touch_state.touches) {
             if (t.id == 999 && t.just_pressed) {
@@ -220,20 +219,27 @@ bool IsMouseButtonPressed(int button) {
     return false;
 }
 
-// Check if a mouse button is currently held down
 bool IsMouseButtonDown(int button) {
-    // Button codes: SDL_BUTTON_LEFT = 1, SDL_BUTTON_MIDDLE = 2, SDL_BUTTON_RIGHT = 3
+	uint32_t current_time = SDL_GetTicks();
+	static const int hold_threshold = 500; // milliseconds
+
     if (button == SDL_BUTTON_LEFT) {
         for (const auto& t : touch_state.touches) {
-            if (t.id == 999 && t.down) {
-                return true;
-            }
+            if (t.id != 999) {
+				continue;
+			}
+			if (current_time - t.timestamp > hold_threshold) { 
+				return true;
+			}            
         }
     } else if (button == SDL_BUTTON_RIGHT) {
         for (const auto& t : touch_state.touches) {
-            if (t.id == 998 && t.down) {
-                return true;
-            }
+            if (t.id != 998) {
+				continue;
+			}
+			if (current_time - t.timestamp > hold_threshold) { 
+				return true;
+			} 
         }
     }
     
