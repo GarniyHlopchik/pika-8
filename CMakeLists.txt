@@ -137,6 +137,8 @@ set(PIKA_SOURCES
     src/lua_bindings/sol_bind/sol_bind_ysort.cpp
     src/tilemap/tilemap.h
     src/tilemap/tilemap.cpp
+    src/tilemap/tilemap_stream.h
+    src/tilemap/tilemap_stream.cpp
 )
 
 # ---------------- Target ----------------
