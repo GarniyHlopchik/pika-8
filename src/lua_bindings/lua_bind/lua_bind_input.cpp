@@ -156,7 +156,7 @@ static int l_create_button(lua_State* L) {
     unsigned int id = luaL_checkinteger(L, 4);
     unsigned int texture = lua_tonumber(L, 5);
 
-    unsigned int button_id = button::create_button(pos.first, pos.second, size.first, size.second, id, texture);
+    unsigned int button_id = button::create_button(pos.first, pos.second, size.first, size.second, id, texture, name);
     lua_pushinteger(L, button_id);
 
     return 1;

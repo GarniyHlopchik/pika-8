@@ -13,6 +13,75 @@ bool IsKeyDown(InputState state, int key) {
     return state.keys[key]; 
 }
 
+
+static mobile_input::InputState touch_state;
+
+// button codes: SDL_BUTTON_LEFT = 1, SDL_BUTTON_MIDDLE = 2, SDL_BUTTON_RIGHT = 3
+bool IsMouseButtonPressed(int button) {
+    static const int click_cooldown = 10; // milliseconds
+
+	if (button == SDL_BUTTON_LEFT) {
+        for (const auto& t : touch_state.touches) {
+            if (t.id != 999) {
+				continue;            
+			}
+			// if (SDL_GetTicks() - t.timestamp < click_cooldown) { 
+			// 	continue; 
+			// }
+			if (!t.just_pressed) {\
+				continue;
+			}
+			
+			return true;
+        }
+    } else if (button == SDL_BUTTON_RIGHT) {
+        for (const auto& t : touch_state.touches) {
+
+            if (t.id != 998) {
+				continue;            
+			}
+			// if (SDL_GetTicks() - t.timestamp < click_cooldown) { 
+			// 	continue; 
+			// }
+			if (!t.just_pressed) {
+				continue;
+			}
+
+			return true;
+        }
+    }
+    
+    return false;
+}
+
+bool IsMouseButtonDown(int button) {
+	uint32_t current_time = SDL_GetTicks();
+	static const int hold_threshold = 500; // milliseconds
+
+    if (button == SDL_BUTTON_LEFT) {
+        for (const auto& t : touch_state.touches) {
+            if (t.id != 999) {
+				continue;
+			}
+			if (current_time - t.timestamp > hold_threshold) { 
+				return true;
+			}            
+        }
+    } else if (button == SDL_BUTTON_RIGHT) {
+        for (const auto& t : touch_state.touches) {
+            if (t.id != 998) {
+				continue;
+			}
+			if (current_time - t.timestamp > hold_threshold) { 
+				return true;
+			} 
+        }
+    }
+    
+    return false;
+}
+
+
 double* getRelativeCursorPosition(InputState state){
     double* position = new double[2];
     position[0] = state.mouseX;
@@ -20,7 +89,6 @@ double* getRelativeCursorPosition(InputState state){
     return position;
 }
 
-static mobile_input::InputState touch_state;
 static int touch_window_width = 0;
 static int touch_window_height = 0;
 
@@ -200,48 +268,3 @@ void handleMouseEvent(const SDL_Event& event) {
     }
 }
 
-// button codes: SDL_BUTTON_LEFT = 1, SDL_BUTTON_MIDDLE = 2, SDL_BUTTON_RIGHT = 3
-bool IsMouseButtonPressed(int button) {
-    if (button == SDL_BUTTON_LEFT) {
-        for (const auto& t : touch_state.touches) {
-            if (t.id == 999 && t.just_pressed) {
-                return true;
-            }
-        }
-    } else if (button == SDL_BUTTON_RIGHT) {
-        for (const auto& t : touch_state.touches) {
-            if (t.id == 998 && t.just_pressed) {
-                return true;
-            }
-        }
-    }
-    
-    return false;
-}
-
-bool IsMouseButtonDown(int button) {
-	uint32_t current_time = SDL_GetTicks();
-	static const int hold_threshold = 500; // milliseconds
-
-    if (button == SDL_BUTTON_LEFT) {
-        for (const auto& t : touch_state.touches) {
-            if (t.id != 999) {
-				continue;
-			}
-			if (current_time - t.timestamp > hold_threshold) { 
-				return true;
-			}            
-        }
-    } else if (button == SDL_BUTTON_RIGHT) {
-        for (const auto& t : touch_state.touches) {
-            if (t.id != 998) {
-				continue;
-			}
-			if (current_time - t.timestamp > hold_threshold) { 
-				return true;
-			} 
-        }
-    }
-    
-    return false;
-}

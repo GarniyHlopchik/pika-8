@@ -12,6 +12,7 @@ namespace button {
         float x, y, width, height;
         unsigned int id;
         unsigned int texture;
+		std::string name;
         sol::function onPressCallback;
         sol::function onHoldCallback;
     };
@@ -20,7 +21,7 @@ namespace button {
     extern std::unordered_map<unsigned int, std::shared_ptr<ButtonData>> button_registry;
 
     // Function-based API
-    unsigned int create_button(float x, float y, float width, float height, unsigned int id, unsigned int texture = 0);
+    unsigned int create_button(float x, float y, float width, float height, unsigned int id, unsigned int texture = 0, std::string name = "");
     void button_set_on_press_callback(unsigned int button_id, sol::function callback);
     void button_set_on_hold_callback(unsigned int button_id, sol::function callback);
     void button_check_press(unsigned int button_id, InputState state);

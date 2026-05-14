@@ -144,8 +144,7 @@ set(PIKA_SOURCES
 if(ANDROID)
     add_library(pika-8 SHARED ${PIKA_SOURCES})
 else()
-    add_executable(pika-8 ${PIKA_SOURCES}
-)
+    add_executable(pika-8 ${PIKA_SOURCES})
 endif()
 
 # ---------------- Includes ----------------

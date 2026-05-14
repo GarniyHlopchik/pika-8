@@ -1,12 +1,13 @@
 #include "button.h"
 #include "gfx/gfx.h"
 #include "gfx/sprite/sprite.h"
+#include "gfx/text/text.h"
 
 namespace button {
     // Global button registry - stores all active buttons
     std::unordered_map<unsigned int, std::shared_ptr<ButtonData>> button_registry;
 
-    unsigned int create_button(float x, float y, float width, float height, unsigned int id, unsigned int texture) {
+    unsigned int create_button(float x, float y, float width, float height, unsigned int id, unsigned int texture, std::string name) {
         auto btn_data = std::make_shared<ButtonData>();
         btn_data->x = x;
         btn_data->y = y;
@@ -14,7 +15,7 @@ namespace button {
         btn_data->height = height;
         btn_data->id = id;
         btn_data->texture = texture;
-        
+        btn_data->name = name;
         button_registry[id] = btn_data;
         return id;
     }
@@ -101,6 +102,10 @@ namespace button {
 										btn->width, btn->height, 
 										{0.0f, 0.0f, 1.0f, 1.0f}, {255, 255, 255, 255}
 									);
+		Text* text_renderer = new Text(*gfx);
+		float text_scale = (btn->width * btn->height ) / 15000.0f; // Adjust scale based on button size
+		std::cout << text_scale << std::endl;
+		text_renderer->draw_text(btn->name, btn->x + 5, btn->y + 5, "default", text_scale, {255, 255, 255, 255});
         sprite->draw(gfx);
     }
 
