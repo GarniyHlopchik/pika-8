@@ -138,9 +138,9 @@ set(PIKA_SOURCES
     src/tilemap/tilemap.h
     src/tilemap/tilemap.cpp
 
-	src/logger/proxy_logger.h 
-	src/logger/interface_logger.h
-	src/logger/real_logger.h
+	src/logger/proxy.h 
+	src/logger/interface.h
+	src/logger/real.h
 	src/logger/log_file_save.h
 
     src/tilemap/tilemap_stream.h
