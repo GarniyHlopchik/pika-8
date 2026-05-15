@@ -137,12 +137,17 @@ set(PIKA_SOURCES
     src/lua_bindings/sol_bind/sol_bind_ysort.cpp
     src/tilemap/tilemap.h
     src/tilemap/tilemap.cpp
+<<<<<<< HEAD
 
 	src/logger/proxy_logger.h 
 	src/logger/interface_logger.h
 	src/logger/real_logger.h
 	src/logger/log_file_save.h
 
+=======
+    src/tilemap/tilemap_stream.h
+    src/tilemap/tilemap_stream.cpp
+>>>>>>> 46c316d191f60f794e15ad2b1b4a3649487bc955
 )
 
 # ---------------- Target ----------------
