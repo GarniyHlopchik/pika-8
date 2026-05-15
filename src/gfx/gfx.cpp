@@ -47,8 +47,6 @@ std::tuple<int, int> GFX::get_screen_size() {
     return std::make_tuple(width, height);
 }
 GFX::GFX(int w, int h, const char* title, InputState& p_state) : input_state(p_state), lua(nullptr), worker_should_run(false) {
-// LOG(LogLevel::INFO, "Initializing GFX...");
-// ProxyLogger::getInstance().log(LogLevel::INFO, "Initializing GFX...");
 #ifdef __linux__
     // 1. Set global hints BEFORE Init
     SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11");
@@ -111,7 +109,7 @@ GFX::GFX(int w, int h, const char* title, InputState& p_state) : input_state(p_s
 
     spritemesh.init();
 
-
+	LOG(LogLevel::DEBUG, "Grafical system initialized with OpenGL version: ", glGetString(GL_VERSION));
 }
 
 GFX::~GFX() {

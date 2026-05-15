@@ -160,14 +160,14 @@ int main(int argc, char** argv){
     FileSystem::init(EngineReadState::ZIP,"game.pika");
     #else
     if(has_embedded_zip(argv[0])){
-        std::cout << "Running embedded" << std::endl;
+		LOG(LogLevel::DEBUG, "Running embedded");
         FileSystem::init(EngineReadState::ZIP,argv[0]);
     }else if(has_external_zip("game.pika")){
-        std::cout << "Running external zip" << std::endl;
+        LOG(LogLevel::DEBUG, "Running external zip");
         FileSystem::init(EngineReadState::ZIP,"game.pika");
     }
     else{
-        std::cout << "Running directory" << std::endl;
+        LOG(LogLevel::DEBUG, "Running directory");
         FileSystem::init(EngineReadState::DIRECTORY,"");
     }
     #endif
@@ -220,6 +220,8 @@ int main(int argc, char** argv){
     bind_node(lua.get_state());
     bind_debug(lua.get_state());
 
+	LOG(LogLevel::DEBUG, "Lua bindings registered");
+
     /*lua_pushlightuserdata(lua.get_state(), &gfx);
     lua_setglobal(lua.get_state(), "gfx");
 
@@ -237,11 +239,13 @@ int main(int argc, char** argv){
         AllocConsole();
         freopen("CONOUT$", "w", stdout);
         freopen("CONOUT$", "w", stderr);
+		LOG(LogLevel::DEBUG, "Console enabled");
     } else {
         FreeConsole();
     }
     #endif
 
+	LOG(LogLevel::DEBUG, "Main loop initialized");
     //update loop
     while(gfx.is_running()){
         resetTouchFrame();
