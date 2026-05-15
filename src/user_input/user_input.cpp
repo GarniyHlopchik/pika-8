@@ -2,6 +2,7 @@
 #include "gfx/gfx.h"
 #include <algorithm>
 #include <iostream>
+#include "logger/proxy.h"
 
 //check if key was just pressed
 bool IsKeyPressed(InputState state, int key) {
@@ -94,13 +95,14 @@ static int touch_window_height = 0;
 
 void initTouchInput() {
     touch_state.clear();
-    std::cout << "[INPUT] Touch system initialized" << std::endl;
+    // std::cout << "[INPUT] Touch system initialized" << std::endl;
+	LOG(LogLevel::INFO, "Touch system initialized");
 }
 
 void setTouchWindowSize(int width, int height) {
     touch_window_width = width;
     touch_window_height = height;
-    std::cout << "[INPUT] Window size set to " << width << "x" << height << std::endl;
+    LOG(LogLevel::INFO, "Window size set to ", width, "x", height);
 }
 
 mobile_input::InputState* getTouchState() {

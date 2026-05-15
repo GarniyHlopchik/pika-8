@@ -15,6 +15,24 @@ struct FontData {
     stbtt_bakedchar cdata[96]; // ASCII 32..126
 };
 
+enum LogLevel {
+	ALL = 0,
+	EROR = 1, // EROR and not ERROR because something defines ERROR an 0
+	WARNING = 2,
+	INFO = 3,
+	DEBUG = 4
+};
+
+struct LoggerData {
+	int64_t is_logging = 0; // 1 = enable logging || 0 = disable logging (console)
+
+	int64_t save_log_in_file = 0; // 0 = save logs in file || 1 = don't save logs in file
+	std::string log_file_path = "logs/pika8.log";
+	
+	LogLevel log_level = LogLevel::EROR;
+	//  "all"  ||  "error"  ||   "warning" ||  "info"  ||  "debug"
+
+};
 
 
 class Config {
@@ -28,6 +46,7 @@ public:
     int64_t get_vsync() const { return VSync; }
     int64_t get_show_console() const { return show_console; }
     const std::vector<FontData>& get_fonts() const { return fonts; }
+    const LoggerData& get_logger_data() const { return logger_data; }
 
     Config() {
         // create ONE parser for the whole configuration
@@ -93,14 +112,61 @@ public:
                 }
             }
         }
+
+		// extract logger config
+		auto logger_res = doc["logger"].get_object();
+		if (!logger_res.error()) {
+			auto logger_obj = logger_res.value();
+
+			auto is_logging_res = logger_obj["is_logging"].get_int64();
+			if (!is_logging_res.error()) logger_data.is_logging = is_logging_res.value();
+
+			auto save_log_in_file_res = logger_obj["save_log_in_file"].get_int64();
+			if (!save_log_in_file_res.error()) logger_data.save_log_in_file = save_log_in_file_res.value();
+			
+			if (logger_data.save_log_in_file) {
+				auto log_file_path_res = logger_obj["log_file_path"].get_string();
+				if (!log_file_path_res.error()) logger_data.log_file_path = log_file_path_res.value();
+			} else {
+				logger_data.log_file_path = "";
+			}
+
+			auto log_level_res = logger_obj["log_level"].get_int64();
+			if (!log_level_res.error()) {
+				// we handle it as an enum of values
+				switch (log_level_res.value()) {
+					case 0: logger_data.log_level = LogLevel::ALL; break;
+					case 1: logger_data.log_level = LogLevel::EROR; break;
+					case 2: logger_data.log_level = LogLevel::WARNING; break;
+					case 3: logger_data.log_level = LogLevel::INFO; break;
+					case 4: logger_data.log_level = LogLevel::DEBUG; break;
+
+					default: logger_data.log_level = LogLevel::ALL; break;
+				}
+			}
+			
+			std::cout << "Logger config - is_logging: " << static_cast<int>(logger_data.is_logging) 
+					  << ", save_log_in_file: " << static_cast<int>(logger_data.save_log_in_file) 
+					  << ", log_file_path: " << logger_data.log_file_path 
+					  << ", log_level: " << static_cast<int>(logger_data.log_level) << std::endl;
+
+		}
+
     }
 
 private:
+	// WINDOW CONFIG
     std::string window_title = "Pika-8"; 
     std::string lua_script = "main.lua"; 
     int64_t window_width = 512; 
-    int64_t window_height = 512; 
-    int64_t VSync = 1;
-    int64_t show_console = 1; // 1 = show console, 0 = hide console
+    int64_t window_height = 512;
     std::vector<FontData> fonts; 
+
+	// RENDER CONFIG
+    int64_t VSync = 1;
+    int64_t show_console = 1; // 1 = show console || 0 = hide console
+
+	// LOGGER
+	LoggerData logger_data;
+
 };

@@ -16,6 +16,7 @@
 #include "data_types/priority_queue.h"
 #include "lua_system/lua_system.h"
 
+
 class GFX {
 public:
     GFX(int w, int h, const char* title, InputState &p_state);

@@ -3,6 +3,7 @@
 #include "stb_image/stb_image.h"
 
 #include <algorithm>
+#include "logger/proxy.h"
 
 std::vector<LoadedImages> loaded_images;
 SDL_Window* GFX::window = nullptr;
@@ -46,6 +47,8 @@ std::tuple<int, int> GFX::get_screen_size() {
     return std::make_tuple(width, height);
 }
 GFX::GFX(int w, int h, const char* title, InputState& p_state) : input_state(p_state), lua(nullptr), worker_should_run(false) {
+// LOG(LogLevel::INFO, "Initializing GFX...");
+// ProxyLogger::getInstance().log(LogLevel::INFO, "Initializing GFX...");
 #ifdef __linux__
     // 1. Set global hints BEFORE Init
     SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11");

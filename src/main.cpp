@@ -17,6 +17,7 @@
 #include <filesystem>
 #include <algorithm> 
 #include <SDL3/SDL_main.h>
+#include "logger/proxy.h"
 extern "C" int luaopen_Input(lua_State* L);
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -181,6 +182,13 @@ int main(int argc, char** argv){
     LuaSystem lua;
     SFX sfx(&lua);
     
+	// Singletone logger
+	ProxyLogger::getInstance().init(config.get_logger_data());
+	// Example usage of the logger
+	// int some_value = 42; std::string some_string = "Hello, Logger!"; 
+	// LOG(LogLevel::INFO, "This is an info message with a number: ", some_value, " and a string: ", some_string);
+	ProxyLogger::getInstance().log(LogLevel::INFO, "Logger initialized.");
+
     SceneTree scene_tree(&lua);
     ctx = {
         &lua,

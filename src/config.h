@@ -5,6 +5,8 @@
 #else
     #include <glad/glad.h>
 #endif
+
+
 #include "iostream"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_opengl.h>
@@ -36,8 +38,8 @@ extern "C" {
 #include "pugixml/pugixml.hpp"
 #include "memory"
 #include "utility"
+#include "globals.h"
 #include "lua_system/lua_system.h"
 #include "scene_tree/scene_tree.h"
 #include "scene_tree/node.h"
 #include "sol/sol.hpp"
-#include "globals.h"
