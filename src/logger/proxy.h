@@ -30,14 +30,13 @@ public:
 
 	template<typename... Args>
 	void log(LogLevel level, Args&&... args) {
+		std::ostringstream msg;
+		(msg << ... << std::forward<Args>(args));
+		
 		if(_file) { _file->log(level, msg.str()); }
 		
 		if (!shouldLog(level)) { return; }
 		if (_config.is_logging == 0) { return; }
-	
-		std::ostringstream msg;
-		(msg << ... << std::forward<Args>(args));
-		
 
 
 		_real->log(level, msg.str());

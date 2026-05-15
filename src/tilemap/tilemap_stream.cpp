@@ -211,8 +211,9 @@ namespace tilemap {
         }
     }
 
-    StreamingTilemapBuilder::StreamingTilemapBuilder(int tile_size)
+    StreamingTilemapBuilder::StreamingTilemapBuilder(int tile_size, int chunk_size)
         : m_tile_size(tile_size)
+        , m_chunk_size(chunk_size)
         , m_total_tiles(0)
         , m_processed_tiles(0)
         , m_progress(0.0f)

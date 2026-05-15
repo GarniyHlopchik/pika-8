@@ -152,13 +152,18 @@ void on_load_failure(const char* file){
 #endif
 int main(int argc, char** argv){
     //data source setup
+    LOG(LogLevel::INFO, "=== PIKA-8 Engine Starting ===");
+    LOG(LogLevel::DEBUG, "Main entry point reached with ", argc, " arguments");
     #ifdef __EMSCRIPTEN__
+    LOG(LogLevel::DEBUG, "Running on Emscripten platform");
     emscripten_async_wget("game.pika", "/game.pika", on_load_success, on_load_failure);
     return 0;
     #else
     #ifdef __ANDROID__
+    LOG(LogLevel::DEBUG, "Running on Android platform");
     FileSystem::init(EngineReadState::ZIP,"game.pika");
     #else
+    LOG(LogLevel::DEBUG, "Detecting game data source...");
     if(has_embedded_zip(argv[0])){
 		LOG(LogLevel::DEBUG, "Running embedded");
         FileSystem::init(EngineReadState::ZIP,argv[0]);
@@ -175,19 +180,31 @@ int main(int argc, char** argv){
     //context setup------------------------
     // auto config_future = Config::load_async();
     // Config config = config_future.get();
+    LOG(LogLevel::INFO, "Loading configuration...");
     Config config;
-    InputState input_state;
-    GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str(),input_state);
-    Text text(gfx);
-    LuaSystem lua;
-    SFX sfx(&lua);
-    
 	// Singletone logger
 	ProxyLogger::getInstance().init(config.get_logger_data());
 	// Example usage of the logger
 	// int some_value = 42; std::string some_string = "Hello, Logger!"; 
 	// LOG(LogLevel::INFO, "This is an info message with a number: ", some_value, " and a string: ", some_string);
 	ProxyLogger::getInstance().log(LogLevel::INFO, "Logger initialized.");
+
+
+    LOG(LogLevel::INFO, "Initializing input system...");
+    InputState input_state;
+    LOG(LogLevel::INFO, "Creating graphics context...");
+    GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str(),input_state);
+    LOG(LogLevel::DEBUG, "Window size set to ", config.get_window_width(), "x", config.get_window_height());
+
+	LOG(LogLevel::INFO, "Initializing text rendering...");
+	Text text(gfx);
+    LOG(LogLevel::INFO, "Initializing Lua system...");
+    LuaSystem lua;
+    LOG(LogLevel::INFO, "Initializing audio system...");
+    SFX sfx(&lua);
+    
+
+
 
     SceneTree scene_tree(&lua);
     ctx = {
@@ -201,26 +218,26 @@ int main(int argc, char** argv){
         &input_state
     };
     // Debug shader setup
+    LOG(LogLevel::DEBUG, "Creating debug shader...");
     ctx.debugShader = make_debug_shader();
     GFX::set_debug_shader(ctx.debugShader);
     Debug::init(ctx.debugShader);
     lua.set_context(&ctx);
     gfx.set_lua_system(&lua);
-    
+    LOG(LogLevel::DEBUG, "Setting VSync: ", config.get_vsync() ? "enabled" : "disabled");
     SDL_GL_SetSwapInterval(config.get_vsync()); // Enable VSync
 
     initTouchInput();
     auto [w, h] = gfx.get_screen_size();
     setTouchWindowSize(w, h);
 
+    LOG(LogLevel::DEBUG, "Registering Lua bindings...");
     bind_gfx(lua.get_state());
     bind_gfx_sprite(lua.get_state());
     bind_input(lua.get_state());
     bind_sfx(lua.get_state());
     bind_node(lua.get_state());
     bind_debug(lua.get_state());
-
-	LOG(LogLevel::DEBUG, "Lua bindings registered");
 
     /*lua_pushlightuserdata(lua.get_state(), &gfx);
     lua_setglobal(lua.get_state(), "gfx");
@@ -245,9 +262,12 @@ int main(int argc, char** argv){
     }
     #endif
 
-	LOG(LogLevel::DEBUG, "Main loop initialized");
+	LOG(LogLevel::INFO, "=== Engine initialization complete ===");
+	LOG(LogLevel::INFO, "Starting main loop...");
     //update loop
+    unsigned __int64 frame_count = 0;
     while(gfx.is_running()){
+        frame_count++;
         resetTouchFrame();
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -287,12 +307,14 @@ int main(int argc, char** argv){
         main_tick(&ctx);
     }
 
+    LOG(LogLevel::INFO, "Main loop finished after ", frame_count, " frames");
+    LOG(LogLevel::INFO, "Calling Lua _exit function...");
     AllocConsole();
     freopen("CONOUT$", "w", stdout);
     freopen("CONOUT$", "w", stderr);
     lua.call("_exit");
     
-    
+    LOG(LogLevel::INFO, "=== PIKA-8 Engine Shutting Down ===");
     exit(0);
     return 0;
 }

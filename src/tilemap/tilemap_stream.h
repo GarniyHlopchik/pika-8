@@ -77,7 +77,7 @@ namespace tilemap {
     public:
         using TileHandler = std::function<void(int x, int y, int tile_id)>;
 
-        StreamingTilemapBuilder(int tile_size = 16);
+        StreamingTilemapBuilder(int tile_size = 16, int chunk_size = 16);
         ~StreamingTilemapBuilder();
 
         void build(TilemapStream& stream, TileHandler handler);
@@ -85,6 +85,7 @@ namespace tilemap {
 
     private:
         int m_tile_size;
+        int m_chunk_size;
         int m_total_tiles;
         int m_processed_tiles;
         float m_progress;
