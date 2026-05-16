@@ -106,6 +106,7 @@ set(PIKA_SOURCES
     src/lua_system/lua_system.cpp
     src/gfx/gfx.cpp
     src/debug/debug.cpp
+    src/debug/framecounter.h
     src/gfx/text/text.cpp
     src/gfx/sprite/sprite.cpp
     src/json_reader/json_reader.cpp

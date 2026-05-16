@@ -15,9 +15,11 @@
 #include "async_loader.h"
 #include <fstream>
 #include <filesystem>
-#include <algorithm> 
+#include <algorithm>
+#include <queue>
 #include <SDL3/SDL_main.h>
 #include "logger/proxy.h"
+#include "debug/framecounter.h"
 extern "C" int luaopen_Input(lua_State* L);
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -27,6 +29,13 @@ extern "C" int luaopen_Input(lua_State* L);
     #include <windows.h>
     #include <iostream>
 #endif
+
+void enableANSI() {
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    DWORD dwMode = 0;
+    GetConsoleMode(hOut, &dwMode);
+    SetConsoleMode(hOut, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+}
 
 bool has_embedded_zip(const std::string& exe_path)
 {
@@ -57,6 +66,26 @@ bool has_external_zip(const std::string& path)
 {
     return std::filesystem::exists(path);
 }
+
+// Early startup logging queue - used before ProxyLogger is initialized
+struct EarlyLog {
+    LogLevel level;
+    std::string message;
+};
+std::queue<EarlyLog> early_log_queue;
+
+void early_log(LogLevel level, const std::string& message) {
+    early_log_queue.push({level, message});
+}
+
+void flush_early_logs() {
+    while (!early_log_queue.empty()) {
+        const auto& log_entry = early_log_queue.front();
+        ProxyLogger::getInstance().log(log_entry.level, log_entry.message);
+        early_log_queue.pop();
+    }
+}
+
 auto last_time = std::chrono::high_resolution_clock::now();
 EngineContext ctx;
 void main_tick(void* arg) {
@@ -151,44 +180,39 @@ void on_load_failure(const char* file){
 }
 #endif
 int main(int argc, char** argv){
-    //data source setup
-    LOG(LogLevel::INFO, "=== PIKA-8 Engine Starting ===");
-    LOG(LogLevel::DEBUG, "Main entry point reached with ", argc, " arguments");
+	enableANSI();
+    //data source setup - MUST be before Config object creation
+    early_log(LogLevel::INFO, "=== PIKA-8 Engine Starting ===");
+    early_log(LogLevel::DEBUG, "Main entry point reached with " + std::to_string(argc) + " arguments");
     #ifdef __EMSCRIPTEN__
-    LOG(LogLevel::DEBUG, "Running on Emscripten platform");
+    early_log(LogLevel::DEBUG, "Running on Emscripten platform");
     emscripten_async_wget("game.pika", "/game.pika", on_load_success, on_load_failure);
     return 0;
     #else
     #ifdef __ANDROID__
-    LOG(LogLevel::DEBUG, "Running on Android platform");
+    early_log(LogLevel::DEBUG, "Running on Android platform");
     FileSystem::init(EngineReadState::ZIP,"game.pika");
     #else
-    LOG(LogLevel::DEBUG, "Detecting game data source...");
+    early_log(LogLevel::DEBUG, "Detecting game data source...");
     if(has_embedded_zip(argv[0])){
-		LOG(LogLevel::DEBUG, "Running embedded");
+		early_log(LogLevel::DEBUG, "Running embedded");
         FileSystem::init(EngineReadState::ZIP,argv[0]);
     }else if(has_external_zip("game.pika")){
-        LOG(LogLevel::DEBUG, "Running external zip");
+        early_log(LogLevel::DEBUG, "Running external zip");
         FileSystem::init(EngineReadState::ZIP,"game.pika");
     }
     else{
-        LOG(LogLevel::DEBUG, "Running directory");
+        early_log(LogLevel::DEBUG, "Running directory");
         FileSystem::init(EngineReadState::DIRECTORY,"");
     }
     #endif
     #endif
-    //context setup------------------------
-    // auto config_future = Config::load_async();
-    // Config config = config_future.get();
-    LOG(LogLevel::INFO, "Loading configuration...");
-    Config config;
-	// Singletone logger
-	ProxyLogger::getInstance().init(config.get_logger_data());
-	// Example usage of the logger
-	// int some_value = 42; std::string some_string = "Hello, Logger!"; 
-	// LOG(LogLevel::INFO, "This is an info message with a number: ", some_value, " and a string: ", some_string);
-	ProxyLogger::getInstance().log(LogLevel::INFO, "Logger initialized.");
 
+	early_log(LogLevel::INFO, "Loading configuration...");
+	Config config;
+	ProxyLogger::getInstance().init(config.get_logger_data());
+	flush_early_logs();
+	LOG(LogLevel::WARNING, "Realtime logging initialized. Previous early log messages flushed to real logger");
 
     LOG(LogLevel::INFO, "Initializing input system...");
     InputState input_state;
@@ -254,6 +278,7 @@ int main(int argc, char** argv){
     #ifdef _WIN32
     if (config.get_show_console()) {
         AllocConsole();
+		enableANSI();
         freopen("CONOUT$", "w", stdout);
         freopen("CONOUT$", "w", stderr);
 		LOG(LogLevel::DEBUG, "Console enabled");
@@ -265,9 +290,10 @@ int main(int argc, char** argv){
 	LOG(LogLevel::INFO, "=== Engine initialization complete ===");
 	LOG(LogLevel::INFO, "Starting main loop...");
     //update loop
-    unsigned __int64 frame_count = 0;
+	FrameCounter frame;
+	frame.init();
     while(gfx.is_running()){
-        frame_count++;
+        frame.add_frame();
         resetTouchFrame();
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -307,9 +333,10 @@ int main(int argc, char** argv){
         main_tick(&ctx);
     }
 
-    LOG(LogLevel::INFO, "Main loop finished after ", frame_count, " frames");
+    LOG(LogLevel::INFO, "Main loop finished after ", frame.get_frame_count(), " frames");
     LOG(LogLevel::INFO, "Calling Lua _exit function...");
     AllocConsole();
+    enableANSI();
     freopen("CONOUT$", "w", stdout);
     freopen("CONOUT$", "w", stderr);
     lua.call("_exit");

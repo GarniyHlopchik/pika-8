@@ -20,7 +20,8 @@ enum LogLevel {
 	EROR = 1, // EROR and not ERROR because something defines ERROR an 0
 	WARNING = 2,
 	INFO = 3,
-	DEBUG = 4
+	DEBUG = 4,
+	NONE = 5
 };
 
 struct LoggerData {
@@ -30,7 +31,7 @@ struct LoggerData {
 	std::string log_file_path = "logs/pika8.log";
 	
 	LogLevel log_level = LogLevel::EROR;
-	//  "all"  ||  "error"  ||   "warning" ||  "info"  ||  "debug"
+	//  "all"  ||  "error"  ||   "warning" ||  "info"  ||  "debug" || "none"
 
 };
 
@@ -141,15 +142,9 @@ public:
 					case 3: logger_data.log_level = LogLevel::INFO; break;
 					case 4: logger_data.log_level = LogLevel::DEBUG; break;
 
-					default: logger_data.log_level = LogLevel::ALL; break;
+					default: logger_data.log_level = LogLevel::NONE; break;
 				}
 			}
-			
-			std::cout << "Logger config - is_logging: " << static_cast<int>(logger_data.is_logging) 
-					  << ", save_log_in_file: " << static_cast<int>(logger_data.save_log_in_file) 
-					  << ", log_file_path: " << logger_data.log_file_path 
-					  << ", log_level: " << static_cast<int>(logger_data.log_level) << std::endl;
-
 		}
 
     }

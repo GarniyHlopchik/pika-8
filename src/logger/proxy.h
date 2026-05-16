@@ -20,7 +20,7 @@ public:
     }
 
 	void log(LogLevel level, const std::string& message) override {
-    	if(_file) { _file->log(level, message); } // log to file if enabled
+		if(_file) { _file->log(level, message); }
 		
 		if (_config.is_logging == 0) { return; }
 		if (!shouldLog(level)) { return; }
@@ -58,9 +58,9 @@ private:
 	{}
 
     bool shouldLog(LogLevel level) const {
-        if (_config.log_level == LogLevel::ALL) {
-            return true;
-        }
+        if (_config.log_level == LogLevel::ALL) { return true; }
+        if (_config.log_level == LogLevel::NONE) { return false; }
+		
         return level == _config.log_level;
     }
 

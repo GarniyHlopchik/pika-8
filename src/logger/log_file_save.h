@@ -1,6 +1,7 @@
 #pragma once
 #include "interface.h"
 #include <time.h>
+#include "debug/framecounter.h"
 
 class LogFileSave : public ILogger {
 public:
@@ -23,15 +24,16 @@ public:
 		ptr = localtime(&t);
 		char date[128];
 		strftime(date, sizeof(date), "%Y-%m-%d %H:%M:%S", ptr);
-
+		frame = FrameCounter::get_frame_count();
 		if (log_file.is_open()) {
-			log_file << date << " [" << ILogger::levelToString(level) << "] " << message << "\n";
+			log_file << date << "-" << frame << " [" << ILogger::levelToString(level, false) << "] " << message << "\n";
 			log_file.close();
 		}
 	}
 
 private:
 	LoggerData _config;
+	static inline uint64_t frame = FrameCounter::get_frame_count();
 
 	void create_nonexistant_directories(const std::string& path) {
 		size_t pos = 0;
