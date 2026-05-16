@@ -4,6 +4,7 @@
 #include <regex>
 #include <chrono>
 #include <thread>
+#include "logger/proxy.h"
 
 namespace tilemap {
 
@@ -230,7 +231,7 @@ namespace tilemap {
             TileChunk chunk = stream.next();
 
             if (chunk.is_error) {
-                std::cerr << "[TilemapBuilder] Error: " << chunk.error_msg << std::endl;
+                LOG(LogLevel::EROR, "TilemapBuilder: ", chunk.error_msg);
                 break;
             }
 

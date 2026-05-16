@@ -53,7 +53,8 @@ GFX::GFX(int w, int h, const char* title, InputState& p_state) : input_state(p_s
 #endif
     // 2. Init
     if (!SDL_Init(SDL_INIT_VIDEO)) {
-        SDL_Log("SDL_Init failed: %s", SDL_GetError());
+		LOG(LogLevel::EROR, "SDL_Init failed: ", SDL_GetError());
+        // SDL_Log("SDL_Init failed: %s", SDL_GetError());
         return;
     }
 
@@ -75,7 +76,8 @@ GFX::GFX(int w, int h, const char* title, InputState& p_state) : input_state(p_s
     // 4. Create Window
     window = SDL_CreateWindow(title, w, h, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (!window) {
-        SDL_Log("Window creation failed: %s", SDL_GetError());
+		LOG(LogLevel::EROR, "Window creation failed: ", SDL_GetError());
+        // SDL_Log("Window creation failed: %s", SDL_GetError());
         return;
     }
 
@@ -83,7 +85,8 @@ GFX::GFX(int w, int h, const char* title, InputState& p_state) : input_state(p_s
     gl_context = SDL_GL_CreateContext(window);
     if (!gl_context) {
         // This is where "Invalid window" was happening
-        SDL_Log("Context creation failed: %s", SDL_GetError());
+		LOG(LogLevel::EROR, "Context creation failed: ", SDL_GetError());
+        // SDL_Log("Context creation failed: %s", SDL_GetError());
         return;
     }
     SDL_GL_MakeCurrent(window, gl_context);
@@ -95,7 +98,8 @@ GFX::GFX(int w, int h, const char* title, InputState& p_state) : input_state(p_s
 
 #else
     if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
-        SDL_Log("Failed to initialize GLAD for Desktop GL");
+		LOG(LogLevel::EROR, "Failed to initialize GLAD for Desktop GL");
+        // SDL_Log("Failed to initialize GLAD for Desktop GL");
         return;
     }
 #endif
@@ -172,11 +176,11 @@ static unsigned int upload_pixels_to_gpu(const unsigned char* pixels, int width,
 
 std::string GFX::get_texture_path(const unsigned int id) {
     for (const LoadedImages& img : loaded_images) {
-        if (img.id == id) {
+        if (img.id == id) { 
             return img.path;
         }
     }
-    throw std::runtime_error("Image not found with id: " + id);
+    LOG(LogLevel::EROR, "Image not found with id: " + id);
 }
 
 void GFX::add_new_image(const LoadedImages img) {
@@ -220,6 +224,7 @@ void GFX::update() {
 
 // Sync version of texture loading
 // Why? beacause i dont want to bother and rewrite text display
+// Also... no logging for this shit? because i'm lazy af
 unsigned int GFX::load_texture(const std::string& path) {
     int width, height, nrChannels;
     Resource res = FileSystem::get_resource(path);
@@ -237,10 +242,11 @@ unsigned int GFX::load_texture(const std::string& path) {
 FontData GFX::get_font_data(const std::string& name) {
     for (const auto& font : config.get_fonts()) {
         if (font.name == name) {
+			LOG(LogLevel::DEBUG, "Loaded font: " + name);
             return font;
         }
     }
-    throw std::runtime_error("Font not found: " + name);
+    LOG(LogLevel::EROR, "Font not found: " + name);
 }
 
 void default_color_helper(Color* color) {
@@ -269,12 +275,14 @@ static ImageData load_image_data(const std::string& path) {
     
     Resource res = FileSystem::get_resource(path);
     if (!res.is_valid()) {
+		LOG(LogLevel::EROR, "Failed to load path: ", path);
         return result;
     }
 
     int width, height, nrChannels;
     unsigned char* texture_data = stbi_load_from_memory(res.data.get(), res.size, &width, &height, &nrChannels, 0);
     if (!texture_data) {
+		LOG(LogLevel::EROR, "Failed to load image from path: ", path);
         return result;
     }
 
@@ -282,7 +290,8 @@ static ImageData load_image_data(const std::string& path) {
     result.width = width;
     result.height = height;
     result.channels = nrChannels;
-    
+	
+	LOG(LogLevel::DEBUG, "Loaded image from '", path, "'. Dimensions: [", width, "x", height, "]. ", "Channels: ", nrChannels);
     return result;
 }
 

@@ -4,6 +4,7 @@
 #include "gfx/sprite/sprite.h"
 #include "lua_bindings/sol_bind/sol.h"
 #include "lua_bindings/lua_bindings.h"
+#include "logger/proxy.h"
 
 extern "C" int luaopen_Input(lua_State* L);
 int lua_zip_searcher(lua_State* L) {
@@ -164,7 +165,7 @@ int LuaSystem::load_script_table(const std::string& path){
     Resource res = FileSystem::get_resource(path);
 
     if(!res.is_valid()){
-        std::cerr << "Failed to load script: " << path << std::endl;
+        LOG(LogLevel::EROR, "Failed to load script: ", path);
         return LUA_REFNIL;
     }
 
@@ -174,19 +175,19 @@ int LuaSystem::load_script_table(const std::string& path){
         res.size,
         path.c_str()
     ) != LUA_OK){
-        std::cerr << "Lua compile error: " << lua_tostring(L,-1) << std::endl;
+        LOG(LogLevel::EROR, "Lua compile error: ", lua_tostring(L,-1));
         lua_pop(L,1);
         return LUA_REFNIL;
     }
 
     if(lua_pcall(L,0,1,0) != LUA_OK){
-        std::cerr << "Lua runtime error: " << lua_tostring(L,-1) << std::endl;
+        LOG(LogLevel::EROR, "Lua runtime error: ", lua_tostring(L,-1));
         lua_pop(L,1);
         return LUA_REFNIL;
     }
 
     if(!lua_istable(L,-1)){
-        std::cerr << "Lua script did not return a table!" << std::endl;
+        LOG(LogLevel::EROR, "Lua script did not return a table!");
         lua_pop(L,1);
         return LUA_REFNIL;
     }
@@ -194,7 +195,7 @@ int LuaSystem::load_script_table(const std::string& path){
     int ref = luaL_ref(L, LUA_REGISTRYINDEX);
     tables.push_back(ref);
 
-    std::cout << "Loaded script, ref = " << ref << std::endl;
+    LOG(LogLevel::INFO, "Loaded script, ref = ", ref);
 
     return ref;
 }
@@ -236,7 +237,7 @@ void LuaSystem::call_init(int table_ref, Node& node_ref) {
     
     // 5. Call function(self, node)
     if (lua_pcall(L, 2, 0, 0) != LUA_OK) {
-        std::cerr << "Lua _init error: " << lua_tostring(L, -1) << std::endl;
+        LOG(LogLevel::EROR, "Lua _init error: ", lua_tostring(L, -1));
         lua_pop(L, 1);
     }
 
@@ -270,8 +271,7 @@ void LuaSystem::call_script_update(int table_ref, float dt)
 
         // Call _update(self, dt)
         if (lua_pcall(L, 2, 0, 0) != LUA_OK) {
-            std::cerr << "Lua _update error: "
-                      << lua_tostring(L, -1) << std::endl;
+            LOG(LogLevel::EROR, "Lua _update error: ", lua_tostring(L, -1));
             lua_pop(L, 1); // error message
         }
 
@@ -293,7 +293,7 @@ void LuaSystem::call_update(float dt){
     // Call: 1 argument, 0 return values
     if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
         const char* err = lua_tostring(L, -1);
-        std::cout << "UPDATE LOOP ERROR" << err << std::endl;
+        std::cout << "UPDATE LOOP EROR" << err << std::endl;
         lua_pop(L, 1);
     }
 }
@@ -305,7 +305,7 @@ void LuaSystem::call(const char* name){
     }
     if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
         const char* err = lua_tostring(L, -1);
-        std::cout << "ERROR IN CALLBACK " << name << ": "<< err << std::endl;
+        std::cout << "EROR IN CALLBACK " << name << ": "<< err << std::endl;
         lua_pop(L, 1);
     }
 }
@@ -322,8 +322,7 @@ void LuaSystem::resolve_promise(int handle, int table) {
     
     // Safety Check: Is it actually a table?
     if (!lua_istable(L, -1)) {
-        std::cerr << "Lua Error: Registry ref " << table << " is a " 
-                  << lua_typename(L, lua_type(L, -1)) << ", not a table!" << std::endl;
+		LOG(LogLevel::EROR, "Lua Error: Registry ref ", table, " is a ", lua_typename(L, lua_type(L, -1)), ", not a table!");
         lua_pop(L, 1); // Clean up the stack
         return;
     }

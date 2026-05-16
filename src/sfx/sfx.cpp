@@ -3,12 +3,12 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio/miniaudio.h"
 #include "file_resolve/file_system.h"
-
+#include "logger/proxy.h"
 
 SFX::SFX(LuaSystem* l_lua): worker_should_run(true), worker_thread(&SFX::worker_loop, this), lua(l_lua){
     ma_result result = ma_engine_init(NULL, &engine);
     if (result != MA_SUCCESS) {
-        std::cout << "Sound engine couldn't start" << std::endl;
+        LOG(LogLevel::EROR, "Sound engine couldn't start");
     }
 
 }
@@ -29,7 +29,7 @@ unsigned int SFX::load(const std::string& path){
     Resource res = FileSystem::get_resource(path);
 
     if (!res.is_valid()) {
-        std::cout << "Sound file could not be loaded: " << path << std::endl;
+        LOG(LogLevel::EROR, "Sound file could not be loaded: ", path);
         sounds.pop_back();
         return 0;
     }
@@ -42,7 +42,7 @@ unsigned int SFX::load(const std::string& path){
     );
 
     if (result != MA_SUCCESS) {
-        std::cout << "Failed to decode sound: " << path << std::endl;
+        LOG(LogLevel::EROR, "Failed to decode sound: ", path);
         sounds.pop_back();
         return 0;
     }
@@ -56,7 +56,7 @@ unsigned int SFX::load(const std::string& path){
     );
 
     if (result != MA_SUCCESS) {
-        std::cout << "Failed to create sound: " << path << std::endl;
+        LOG(LogLevel::EROR, "Failed to create sound: ", path);
         sounds.pop_back();
         return 0;
     }
@@ -64,6 +64,7 @@ unsigned int SFX::load(const std::string& path){
     s.data = std::move(res); // keep memory alive
     s.id = get_id();
 
+	LOG(LogLevel::DEBUG, "Loaded sound from '", path, "'. ID: '", s.id, "'");
     return s.id;
 }
 
@@ -76,6 +77,7 @@ void SFX::play(unsigned int sound_id, float volume, float pitch, bool loop, floa
     cmd.pitch = pitch;
     cmd.loop = loop;
     cmd.pan = pan;
+	LOG(LogLevel::DEBUG, "Scheduling play command for sound ID: ", sound_id);
     schedule_command(cmd);
 }
 
@@ -83,6 +85,7 @@ void SFX::stop(unsigned int sound_id) {
     AudioCommand cmd;
     cmd.type = AudioCommandType::STOP;
     cmd.sound_id = sound_id;
+	LOG(LogLevel::DEBUG, "Scheduling stop command for sound ID: ", sound_id);
     schedule_command(cmd);
 }
 
@@ -91,6 +94,7 @@ void SFX::set_volume(unsigned int sound_id, float volume) {
     cmd.type = AudioCommandType::SET_VOLUME;
     cmd.sound_id = sound_id;
     cmd.volume = volume;
+	LOG(LogLevel::DEBUG, "Scheduling set volume command for sound ID: " , sound_id, " with volume: ", volume);
     schedule_command(cmd);
 }
 
@@ -99,6 +103,7 @@ void SFX::set_pitch(unsigned int sound_id, float pitch) {
     cmd.type = AudioCommandType::SET_PITCH;
     cmd.sound_id = sound_id;
     cmd.pitch = pitch;
+	LOG(LogLevel::DEBUG, "Scheduling set pitch command for sound ID: " , sound_id, " with pitch: ", pitch);
     schedule_command(cmd);
 }
 
@@ -107,6 +112,7 @@ void SFX::set_pan(unsigned int sound_id, float pan) {
     cmd.type = AudioCommandType::SET_PAN;
     cmd.sound_id = sound_id;
     cmd.pan = pan;
+	LOG(LogLevel::DEBUG, "Scheduling set pan command for sound ID: " , sound_id, " with pan: ", pan);
     schedule_command(cmd);
 }
 
@@ -115,6 +121,7 @@ void SFX::set_looping(unsigned int sound_id, bool loop) {
     cmd.type = AudioCommandType::SET_LOOPING;
     cmd.sound_id = sound_id;
     cmd.loop = loop;
+	LOG(LogLevel::DEBUG, "Scheduling looping for sound ID: " , sound_id, " to " , loop);
     schedule_command(cmd);
 }
 
@@ -127,16 +134,17 @@ void SFX::schedule_command(const AudioCommand& cmd) {
 SoundRes* SFX::find_sound(unsigned int sound_id) {
     for (SoundRes& s : sounds) {
         if (s.id == sound_id) {
+			LOG(LogLevel::DEBUG, "Found sound with ID: " , sound_id);
             return &s;
         }
     }
+	LOG(LogLevel::EROR, "Sound not found: " , sound_id);
     return nullptr;
 }
 
 void SFX::internal_play(unsigned int sound_id, float volume, float pitch, bool loop, float pan) {
     SoundRes* s = find_sound(sound_id);
     if (!s) {
-        std::cout << "Sound not found: " << sound_id << std::endl;
         return;
     }
 
@@ -151,7 +159,7 @@ void SFX::internal_play(unsigned int sound_id, float volume, float pitch, bool l
     ma_sound_start(&s->sound);
     s->is_playing = true;
 
-    std::cout << "Sound started: " << sound_id << std::endl;
+    LOG(LogLevel::DEBUG, "Sound started: " , sound_id);
 }
 
 void SFX::internal_stop(unsigned int sound_id) {
@@ -160,7 +168,7 @@ void SFX::internal_stop(unsigned int sound_id) {
 
     ma_sound_stop(&s->sound);
     s->is_playing = false;
-    std::cout << "Sound stopped: " << sound_id << std::endl;
+    LOG(LogLevel::DEBUG, "Sound stopped: " , sound_id);
 }
 
 void SFX::internal_set_volume(unsigned int sound_id, float volume) {
@@ -200,15 +208,19 @@ void SFX::process_command(const AudioCommand& cmd) {
         internal_stop(cmd.sound_id);
         break;
     case AudioCommandType::SET_VOLUME:
+		LOG(LogLevel::DEBUG, "Volume changed to ", cmd.volume, " for sound ID: ", cmd.sound_id);
         internal_set_volume(cmd.sound_id, cmd.volume);
         break;
     case AudioCommandType::SET_PITCH:
+		LOG(LogLevel::DEBUG, "Pitch changed to ", cmd.pitch, " for sound ID: ", cmd.sound_id);
         internal_set_pitch(cmd.sound_id, cmd.pitch);
         break;
     case AudioCommandType::SET_PAN:
+		LOG(LogLevel::DEBUG, "Pan changed to ", cmd.pan, " for sound ID: ", cmd.sound_id);
         internal_set_pan(cmd.sound_id, cmd.pan);
         break;
     case AudioCommandType::SET_LOOPING:
+		LOG(LogLevel::DEBUG, "Looping changed to ", cmd.loop, " for sound ID: ", cmd.sound_id);
         internal_set_looping(cmd.sound_id, cmd.loop);
         break;
     default:

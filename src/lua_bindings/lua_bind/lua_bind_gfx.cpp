@@ -4,7 +4,7 @@
 #include "../../gfx/gfx.h"
 #include "../../gfx/text/text.h"
 #include "../../gfx/sprite/sprite.h"
-
+#include "logger/proxy.h"
 
 static int l_cls(lua_State* L){
     float r = luaL_optnumber(L,1,0.0f);
@@ -103,14 +103,14 @@ static void draw_text(const char* text, int x, int y,
     catch (const std::exception& e) {
         if (std::string(e.what()).find("Font not found") != std::string::npos) {
             font_name = "default";
-            std::cerr << "Warning: " << e.what() << " Falling back to default font." << std::endl;
+			LOG(LogLevel::WARNING, e.what(), "Falling back to default font");
             try {
                 text_obj->draw_text(text, x, y, font_name, scale, color);
             } catch (const std::exception& e) {
-                std::cerr << "Error: Default font not found. Cannot draw text." << std::endl;
+                LOG(LogLevel::WARNING, "Default font not found. Cannot draw text");
             }
         } else {
-            std::cerr << "Error in l_text: " << e.what() << std::endl;
+            LOG(LogLevel::EROR, "l_text: ", e.what());
         }
     }
 }
