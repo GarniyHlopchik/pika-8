@@ -43,7 +43,7 @@ void Sprite::update_uv(UVCoords uv) {
         float new_width = (_uv.u2 - _uv.u1) * 0.5;
         float new_height = (_uv.v2 - _uv.v1) * 0.5;
 
-        std::cout << "pivot: {" << new_width << ", " << new_width << "}";
+        // std::cout << "pivot: {" << new_width << ", " << new_width << "}";
 
         update_pivot(new_width, new_height);
 

@@ -2,6 +2,7 @@
 #include "gfx/gfx.h"
 #include "gfx/sprite/sprite.h"
 #include "gfx/text/text.h"
+#include "logger/proxy.h"
 
 namespace button {
     // Global button registry - stores all active buttons
@@ -104,7 +105,7 @@ namespace button {
 									);
 		Text* text_renderer = new Text(*gfx);
 		float text_scale = (btn->width * btn->height ) / 15000.0f; // Adjust scale based on button size
-		std::cout << text_scale << std::endl;
+		// LOG(LogLevel::DEBUG, "Button text scale: ", text_scale);
 		text_renderer->draw_text(btn->name, btn->x + 5, btn->y + 5, "default", text_scale, {255, 255, 255, 255});
         sprite->draw(gfx);
     }

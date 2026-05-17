@@ -208,23 +208,23 @@ int main(int argc, char** argv){
     #endif
     #endif
 
-	early_log(LogLevel::INFO, "Loading configuration...");
+	early_log(LogLevel::DEBUG, "Loading configuration...");
 	Config config;
 	ProxyLogger::getInstance().init(config.get_logger_data());
 	flush_early_logs();
 	LOG(LogLevel::WARNING, "Realtime logging initialized. Previous early log messages flushed to real logger");
 
-    LOG(LogLevel::INFO, "Initializing input system...");
+    LOG(LogLevel::DEBUG, "Initializing input system...");
     InputState input_state;
-    LOG(LogLevel::INFO, "Creating graphics context...");
+    LOG(LogLevel::DEBUG, "Creating graphics context...");
     GFX gfx(config.get_window_width(),config.get_window_height(), config.get_window_title().c_str(),input_state);
     LOG(LogLevel::DEBUG, "Window size set to ", config.get_window_width(), "x", config.get_window_height());
 
-	LOG(LogLevel::INFO, "Initializing text rendering...");
+	LOG(LogLevel::DEBUG, "Initializing text rendering...");
 	Text text(gfx);
-    LOG(LogLevel::INFO, "Initializing Lua system...");
+    LOG(LogLevel::DEBUG, "Initializing Lua system...");
     LuaSystem lua;
-    LOG(LogLevel::INFO, "Initializing audio system...");
+    LOG(LogLevel::DEBUG, "Initializing audio system...");
     SFX sfx(&lua);
     
 

@@ -77,7 +77,7 @@ void SFX::play(unsigned int sound_id, float volume, float pitch, bool loop, floa
     cmd.pitch = pitch;
     cmd.loop = loop;
     cmd.pan = pan;
-	LOG(LogLevel::DEBUG, "Scheduling play command for sound ID: ", sound_id);
+	// LOG(LogLevel::DEBUG, "Scheduling play command for sound ID: ", sound_id);
     schedule_command(cmd);
 }
 
@@ -85,7 +85,7 @@ void SFX::stop(unsigned int sound_id) {
     AudioCommand cmd;
     cmd.type = AudioCommandType::STOP;
     cmd.sound_id = sound_id;
-	LOG(LogLevel::DEBUG, "Scheduling stop command for sound ID: ", sound_id);
+	// LOG(LogLevel::DEBUG, "Scheduling stop command for sound ID: ", sound_id);
     schedule_command(cmd);
 }
 
@@ -94,7 +94,7 @@ void SFX::set_volume(unsigned int sound_id, float volume) {
     cmd.type = AudioCommandType::SET_VOLUME;
     cmd.sound_id = sound_id;
     cmd.volume = volume;
-	LOG(LogLevel::DEBUG, "Scheduling set volume command for sound ID: " , sound_id, " with volume: ", volume);
+	// LOG(LogLevel::DEBUG, "Scheduling set volume command for sound ID: " , sound_id, " with volume: ", volume);
     schedule_command(cmd);
 }
 
@@ -103,7 +103,7 @@ void SFX::set_pitch(unsigned int sound_id, float pitch) {
     cmd.type = AudioCommandType::SET_PITCH;
     cmd.sound_id = sound_id;
     cmd.pitch = pitch;
-	LOG(LogLevel::DEBUG, "Scheduling set pitch command for sound ID: " , sound_id, " with pitch: ", pitch);
+	// LOG(LogLevel::DEBUG, "Scheduling set pitch command for sound ID: " , sound_id, " with pitch: ", pitch);
     schedule_command(cmd);
 }
 
@@ -112,7 +112,7 @@ void SFX::set_pan(unsigned int sound_id, float pan) {
     cmd.type = AudioCommandType::SET_PAN;
     cmd.sound_id = sound_id;
     cmd.pan = pan;
-	LOG(LogLevel::DEBUG, "Scheduling set pan command for sound ID: " , sound_id, " with pan: ", pan);
+	// LOG(LogLevel::DEBUG, "Scheduling set pan command for sound ID: " , sound_id, " with pan: ", pan);
     schedule_command(cmd);
 }
 
@@ -121,7 +121,7 @@ void SFX::set_looping(unsigned int sound_id, bool loop) {
     cmd.type = AudioCommandType::SET_LOOPING;
     cmd.sound_id = sound_id;
     cmd.loop = loop;
-	LOG(LogLevel::DEBUG, "Scheduling looping for sound ID: " , sound_id, " to " , loop);
+	// LOG(LogLevel::DEBUG, "Scheduling looping for sound ID: " , sound_id, " to " , loop);
     schedule_command(cmd);
 }
 
@@ -134,7 +134,7 @@ void SFX::schedule_command(const AudioCommand& cmd) {
 SoundRes* SFX::find_sound(unsigned int sound_id) {
     for (SoundRes& s : sounds) {
         if (s.id == sound_id) {
-			LOG(LogLevel::DEBUG, "Found sound with ID: " , sound_id);
+			// LOG(LogLevel::DEBUG, "Found sound with ID: " , sound_id);
             return &s;
         }
     }

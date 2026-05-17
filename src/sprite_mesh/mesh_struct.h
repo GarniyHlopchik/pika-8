@@ -1,4 +1,5 @@
 #pragma once
+#include "logger/proxy.h"
 
 struct PivotPoint {
     float x, y;
@@ -31,10 +32,10 @@ public:
 
     void print(const char* prefix = "") const {
         if (prefix != ""){
-            std::cout << prefix << ": Color: {" << r << ", " << g << ", " << b << ", " << a << "}" << std::endl;
+            LOG(LogLevel::DEBUG, prefix, ": Color: {", r, ", ", g, ", ", b, ", ", a, "}");
             return;
         }
-        std::cout << "Color: {" << r << ", " << g << ", " << b << ", " << a << "}" << std::endl;
+        LOG(LogLevel::DEBUG, "Color: {", r, ", ", g, ", ", b, ", ", a, "}");
     }
 };
 

@@ -1,4 +1,5 @@
 #include "shader_utils.h"
+#include "logger/proxy.h"
 
 // Define shaders
 const char* vertexSource = R"(
@@ -74,7 +75,7 @@ unsigned int make_shader(){
     if(!success){
         char errLog[1024];
         glGetProgramInfoLog(shader, 1024,NULL,errLog);
-        std::cout << "Shader linking error:\n" << errLog << std::endl;
+        LOG(LogLevel::EROR, "Shader linking error: ", errLog);
 
     }
     for(unsigned int shaderModule : modules){
@@ -98,7 +99,7 @@ unsigned int make_debug_shader(){
     if(!success){
         char errLog[1024];
         glGetProgramInfoLog(shader, 1024,NULL,errLog);
-        std::cout << "Debug shader linking error:\n" << errLog << std::endl;
+        LOG(LogLevel::EROR, "Debug shader linking error: ", errLog);
     }
     for(unsigned int shaderModule : modules){
         glDeleteShader(shaderModule);
@@ -126,7 +127,7 @@ unsigned int make_debug_module(unsigned int module_type){
     if(!success){
         char errLog[1024];
         glGetShaderInfoLog(shaderModule, 1024,NULL,errLog);
-        std::cout << "Debug shader module compilation error:\n" << errLog << std::endl;
+        LOG(LogLevel::EROR, "Debug shader module compilation error: ", errLog);
     }
     return shaderModule;
 }
@@ -151,8 +152,7 @@ unsigned int make_module(unsigned int module_type){
     if(!success){
         char errLog[1024];
         glGetShaderInfoLog(shaderModule, 1024,NULL,errLog);
-        std::cout << "Shader module compilation error:\n" << errLog << std::endl;
-
+        LOG(LogLevel::EROR, "Shader module compilation error: ", errLog);
     }
 
     return shaderModule;

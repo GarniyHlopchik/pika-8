@@ -64,7 +64,7 @@ LuaSystem::LuaSystem(){
         "package.path = app_path .. game_path .. package.path";
 
     if (luaL_dostring(L, path_logic) != LUA_OK) {
-        std::cout << "Issue setting up lua_modules path" << std::endl;
+        LOG(LogLevel::EROR, "Issue setting up lua_modules path");
     }
     //sol setup
     bind_nodes(L);
@@ -114,7 +114,7 @@ LuaSystem::LuaSystem(){
 
     // 4. Call table.insert(searchers, 2, func)
     if (lua_pcall(L, 3, 0, 0) != LUA_OK) {
-        std::cout << "Error injecting searcher: " << lua_tostring(L, -1) << std::endl;
+        LOG(LogLevel::EROR, "Error injecting searcher: ", lua_tostring(L, -1));
         lua_pop(L, 1);
     }
 
@@ -141,7 +141,7 @@ void LuaSystem::load_script(const std::string& path){
     Resource res = FileSystem::get_resource(path);
 
     if(!res.is_valid()){
-        std::cout << "Issue loading " << path << std::endl;
+        LOG(LogLevel::EROR, "Failed to load script: ", path);
         return;
     }
 
@@ -151,13 +151,13 @@ void LuaSystem::load_script(const std::string& path){
         res.size,
         path.c_str()
     ) != LUA_OK){
-        std::cout << "Lua compile error: " << lua_tostring(L,-1) << std::endl;
+        LOG(LogLevel::EROR, "Lua compile error: ", lua_tostring(L,-1));
         lua_pop(L,1);
         return;
     }
 
     if(lua_pcall(L,0,0,0) != LUA_OK){
-        std::cout << "Lua runtime error: " << lua_tostring(L,-1) << std::endl;
+        LOG(LogLevel::EROR, "Lua runtime error: ", lua_tostring(L,-1));
         lua_pop(L,1);
     }
 }
@@ -293,7 +293,7 @@ void LuaSystem::call_update(float dt){
     // Call: 1 argument, 0 return values
     if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
         const char* err = lua_tostring(L, -1);
-        std::cout << "UPDATE LOOP EROR" << err << std::endl;
+        LOG(LogLevel::EROR, "UPDATE LOOP: ", err);
         lua_pop(L, 1);
     }
 }
@@ -305,7 +305,7 @@ void LuaSystem::call(const char* name){
     }
     if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
         const char* err = lua_tostring(L, -1);
-        std::cout << "EROR IN CALLBACK " << name << ": "<< err << std::endl;
+        LOG(LogLevel::EROR, "CALLBACK ", name, ": ", err);
         lua_pop(L, 1);
     }
 }
@@ -322,7 +322,7 @@ void LuaSystem::resolve_promise(int handle, int table) {
     
     // Safety Check: Is it actually a table?
     if (!lua_istable(L, -1)) {
-		LOG(LogLevel::EROR, "Lua Error: Registry ref ", table, " is a ", lua_typename(L, lua_type(L, -1)), ", not a table!");
+		LOG(LogLevel::EROR, "Lua: Registry ref ", table, " is a ", lua_typename(L, lua_type(L, -1)), ", not a table!");
         lua_pop(L, 1); // Clean up the stack
         return;
     }

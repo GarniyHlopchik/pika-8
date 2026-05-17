@@ -157,11 +157,11 @@ namespace tilemap {
 
             if (std::regex_search(line, match, width_regex)) {
                 m_width = std::stoi(match[1]);
-                std::cout << "[TilemapStream] Width: " << m_width << std::endl;
+                LOG(LogLevel::DEBUG, "[TilemapStream] Width: ", m_width);
             }
             else if (std::regex_search(line, match, height_regex)) {
                 m_height = std::stoi(match[1]);
-                std::cout << "[TilemapStream] Height: " << m_height << std::endl;
+                LOG(LogLevel::DEBUG, "[TilemapStream] Height: ", m_height);
             }
             else if (line == "tilemap:") {
                 break;
