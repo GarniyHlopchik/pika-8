@@ -146,6 +146,8 @@ set(PIKA_SOURCES
 
     src/tilemap/tilemap_stream.h
     src/tilemap/tilemap_stream.cpp
+
+    src/lua_system/lua_diagnostic_proxy.cpp
 )
 
 # ---------------- Target ----------------

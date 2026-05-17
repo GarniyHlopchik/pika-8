@@ -1,10 +1,12 @@
 #pragma once
 #include "config.h"
 #include "scene_tree/node.h"
+#include "lua_system_interface.h"
 struct EngineContext;
 class Node;
 class GFX;
-class LuaSystem{
+class LuaSystemInterface;
+class LuaSystem : public LuaSystemInterface{
     public:
     LuaSystem();
     ~LuaSystem();
