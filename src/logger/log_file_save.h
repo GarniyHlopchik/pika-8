@@ -2,8 +2,9 @@
 #include "interface.h"
 #include <time.h>
 #include "debug/framecounter.h"
+#include "log_level_str.h"
 
-class LogFileSave : public ILogger {
+class LogFileSave : public ILogger, public LogLevelStr {
 public:
 	LogFileSave(const LoggerData& config) : _config(config) {};
 
@@ -26,7 +27,7 @@ public:
 		strftime(date, sizeof(date), "%Y-%m-%d %H:%M:%S", ptr);
 		frame = FrameCounter::get_frame_count();
 		if (log_file.is_open()) {
-			log_file << date << "-" << frame << " [" << ILogger::levelToString(level, false) << "] " << message << "\n";
+			log_file << date << "-" << frame << " [" << LogLevelStr::levelToString(level, false) << "] " << message << "\n";
 			log_file.close();
 		}
 	}

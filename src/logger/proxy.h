@@ -1,10 +1,11 @@
 #pragma once
 #include "real.h"
 #include "log_file_save.h"
+#include "log_level_str.h"
 
 #define LOG(level, ...) ProxyLogger::getInstance().log(level, __VA_ARGS__)
 
-class ProxyLogger : public ILogger {
+class ProxyLogger : public ILogger, public LogLevelStr {
 public:
 	static ProxyLogger& getInstance() {
         static ProxyLogger instance;  // created once, lives forever
@@ -65,7 +66,7 @@ private:
     }
 
     static void printLevelBanner(LogLevel level) {
-        std::cout << ">>> Logging level: " << ILogger::levelToString(level) << " <<<\n";
+        std::cout << ">>> Logging level: " << LogLevelStr::levelToString(level) << " <<<\n";
     }
 
     LoggerData _config;
