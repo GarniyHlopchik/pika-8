@@ -1,6 +1,6 @@
-## Android building
+# Android building
 
-Pika now supports building for android devices. First, you need to get the base .apk file of the engine. If you want to build it from source, you need to have basic android sdk tools for building android apps: build-tools, cmake, ndk installed and added to path, as well as a version of jdk. Once that is done go to pika-android directory and write commands 
+Pika now supports building for android devices. First, you need to get the base .apk file of the engine. If you want to build it from source, you need to have basic android sdk tools for building android apps: build-tools, cmake, ndk installed and added to path, as well as a version of jdk. Once that is done go to pika-android directory and write commands
 
 `.\gradlew.bat clean`
 
@@ -33,7 +33,6 @@ if __name__ == "__main__":
 ```
 
 now run the script with `python android_build.py` and it will generate a final .apk file of your game.
-
 
 ## Web building
 

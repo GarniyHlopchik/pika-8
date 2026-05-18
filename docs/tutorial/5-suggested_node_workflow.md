@@ -1,10 +1,10 @@
-## Suggested nodetree workflow
+# Suggested nodetree workflow
 
 As discussed in the previous page, the engine has basic functionality for creating and managing nodetrees. Still, this abstraction isn't as robust as most other game engines, so you should consider some kind of workflow when dealing with it. While this is purely a suggestion, these ideas might help to design your games better.
 
 ## Handle your root(s)
 
-For starters, in pika there is no concept of a SceneTree or root by itself. Any node's update can be called from lua reference using `node._update(dt)` and will propagate down to any children it has. This means that you are the one creating a root node, making sure it's deleted properly and deciding when it should update. 
+For starters, in pika there is no concept of a SceneTree or root by itself. Any node's update can be called from lua reference using `node._update(dt)` and will propagate down to any children it has. This means that you are the one creating a root node, making sure it's deleted properly and deciding when it should update.
 
 The easiest thing you can do is simply create one root node, update it in main.lua's _update(dt) callback and delete it before the program closes in a `_exit()` callback. It would look something like that:
 

@@ -1,10 +1,14 @@
-## Preparing the Asset
-Now that we have created a window and successfully displayed text, it's time to get something more visual on the screen - like a sprite representing your player character. 
+# Sprite image Display
 
-First, you'll need an image file. You can draw a simple character or grab a placeholder and place it in your project folder right next to your `game.lua` file. 
+## Preparing the Asset
+
+Now that we have created a window and successfully displayed text, it's time to get something more visual on the screen - like a sprite representing your player character.
+
+First, you'll need an image file. You can draw a simple character or grab a placeholder and place it in your project folder right next to your `game.lua` file.
 
 ## Initialization
-Before we can draw the sprite, the engine needs to load the texture into memory. Loading files every single frame is bad for performance, so we want to do this only once when the game boots up. 
+
+Before we can draw the sprite, the engine needs to load the texture into memory. Loading files every single frame is bad for performance, so we want to do this only once when the game boots up.
 
 Pika-8 provides an `_init()` callback exactly for this purpose. Let's open `game.lua` and set up our player variable:
 
@@ -15,7 +19,6 @@ end
 ```
 
 Here we are utilizing the `GFX.load(path: String)` function from the engine's API. The `path` parameter simply points to the location and name of the image you want to load, storing the resulting texture data inside our `player` variable.
-
 
 ## Rendering the Sprite
 
@@ -55,23 +58,21 @@ Then, we call a new function: `GFX.spr(texture, x, y, [width], [height], {x1, x2
 | `strite:rotation`     | `(degree: int)`                       | sets a rotation                       |
 | `sprite:pivot`        | `(x: int, y: int)`                    | sets a pivot(origin).                 |
 
-
-
 GFX.spr function is quite flexible itself. Let's break down its arguments:
 
 ```lua
 GFX.spr(texture, x, y, [width], [height], {x1, x2, y1, y2}, {r, g, b, a})
 ```
 
-| Parametr          | Accepted type(s) | Required |
-| :---              | :---:         | :---      |
-| `texture`         | `int`         | `- [x]`   | 
-| `x`               | `float`       | `- [x]`   |
-| `y`               | `float`       | `- [ ]`   |
-| `width`           | `float`       | `- [ ]`   |
-| `height`          | `float`       | `- [ ]`   |
-| `{x1, y1, x2, y2}`| `{ float }`   | `- [ ]`   |
-| `{r, g, b, a}`    | `{ float }`   | `- [ ]`   |
+| Parametr          | Accepted type(s) | Required  |
+| :---              | :---:            | :---:     |
+| `texture`         | `int`            | `[x]`     |
+| `x`               | `float`          | `[x]`     |
+| `y`               | `float`          | `[ ]`     |
+| `width`           | `float`          | `[ ]`     |
+| `height`          | `float`          | `[ ]`     |
+| `{x1, y1, x2, y2}`| `{ float }`      | `[ ]`     |
+| `{r, g, b, a}`    | `{ float }`      | `[ ]`     |
 
 > [!IMPORTANT]
 > Even though many parametrs exept `float` values, it's *highly* recomended to use integer insted.

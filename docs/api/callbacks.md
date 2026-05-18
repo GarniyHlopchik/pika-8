@@ -1,3 +1,5 @@
+# Buildin callback functions
+
 ## function _init()
 
 Runs in the beginning of the program / node's lifecycle. In a node script takes a 'node' parameter which gives the script a reference to the node it's attached to.

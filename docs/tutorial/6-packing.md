@@ -1,3 +1,5 @@
+# Packing
+
 ## Overview
 
 Pika's executable has several ways of loading data that attempt to apply one after another. The simplest (but not necessarily worst!) way to use pika is by placing your game files in the same directory as the executable (for config files and lua entry point, other files can be in subdirectories and used by passing paths to the engine relative to the engine's location). This is very easy to use during the game's development and allows the easiest game modification for end users, which could be both a good thing and a bad thing. In fact, this is not the only way to ship your pika game. Note that everything is based around working directory, not where the engine is physically located. So if you run it from path, it will look in your currently open directory.

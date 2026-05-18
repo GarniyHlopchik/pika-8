@@ -1,4 +1,4 @@
-### Input
+# Input
 
 Input collection API in Pika.
 
@@ -14,4 +14,4 @@ Function that takes in the key id and returns true if the key was just pressed, 
 
 A function that returns current screen position of the mouse.
 
-Go to https://wiki.libsdl.org/SDL3/SDL_Scancode for a table that shows which integers map to which keys.
+Go to [SDL_Scancode wiki](https://wiki.libsdl.org/SDL3/SDL_Scancode) for a table that shows which integers map to which keys.

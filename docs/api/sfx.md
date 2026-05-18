@@ -1,4 +1,5 @@
-### SFX
+# SFX
+
 Low-level API for playing sounds.
 
 ## SFX.load(path: String) -> int

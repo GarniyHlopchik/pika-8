@@ -1,4 +1,5 @@
-### Pika-8
+# Pika-8
+
 ## What are we?
 
 Pika-8 is a 2D game engine written in c++ using OpenGL, which is programmed using Lua programming language. Pika-8 provides API's for both low-level and high-level videogame programming. Pika-8 executable file is designed both for direct execution, in which case it looks for files associated with your game in its current directory, as well as usage from the path variable with the abilty to specify a directory to execute on. In the end it functions as an editor-free programming environment with tools for game creation.  

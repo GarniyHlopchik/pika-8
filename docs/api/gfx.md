@@ -30,7 +30,7 @@ The primary tool for drawing textures is `GFX.spr()`. It can draw a full image, 
 | **x1, x2** | The horizontal start and end points of the "cut" from the source image | NUH-UH |
 | **y1, y2** | The vertical start and end points of the "cut" from the source image | NO |
 
-#### Showcase 
+#### Showcase
 
 ```lua
 -- 0123456789abcdef
@@ -66,6 +66,7 @@ if we apply those
 -- **************** 6
 -- **************** 7
 ```
+
 ## GFX.text(text: String, { x: Number, y:Number }, scale: Number, font_name: String, )
 
 Renders `text` onto the screen. X and Y are screen rendering coordinates, font_name corresponds to the font_name set up in config.json, scale is the size of the characters,
