@@ -27,7 +27,7 @@ enum LogLevel {
 struct LoggerData {
 	int64_t is_logging = 0; // 1 = enable logging || 0 = disable logging (console)
 
-	int64_t save_log_in_file = 0; // 0 = save logs in file || 1 = don't save logs in file
+	int64_t save_log_in_file = 1; // 0 = save logs in file || 1 = don't save logs in file
 	std::string log_file_path = "logs/pika8.log";
 	
 	LogLevel log_level = LogLevel::EROR;
